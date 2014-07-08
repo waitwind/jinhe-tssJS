@@ -1,0 +1,96 @@
+<html><head> 
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+<title>Reorder TreePanel</title> 
+<head> 
+        <script type="text/javascript"> 
+        <!-- 
+            function initNodes(){ 
+            var uls = document.getElementsByTagName("ul"); 
+            var i; 
+                for(i = 0; i < uls.length; i++) 
+                    if(uls[i].id != "root") 
+                        uls[i].style.display = "none"; 
+            } 
+
+            function clickNode(id){ 
+            var node = document.getElementById(id); 
+                if(node.style.display == "none") 
+                    node.style.display = "block"; 
+                else 
+                    node.style.display = "none"; 
+                return false; 
+            } 
+        --> 
+        </script> 
+    </head> 
+</head> 
+<body onload="initNodes()"> 
+    Example of a tree menu 
+    <ul id="root"> 
+        <li><a href="" onclick="return clickNode('r1n1')">Root 1</a> 
+            <ul id="r1n1"> 
+                <li>Node 1 
+                </li> 
+                <li>Node 2 
+                </li> 
+                <li>Node 3 
+                </li> 
+            </ul> 
+        </li> 
+        <li><a href="" onclick="return clickNode('r2n1')">Root 2</a> 
+            <ul id="r2n1"> 
+                <li><a href="" onclick="return clickNode('r2n1n1')">Node 1</a> 
+                    <ul id="r2n1n1"> 
+                        <li>Node 1 
+                        </li> 
+                        <li>Node 2 
+                        </li> 
+                        <li>Node 3 
+                        </li> 
+                        <li><a href="#">Node 4</a> 
+                        </li> 
+                        <li>Node 5 
+                        </li> 
+                        <li>Node 6 
+                        </li> 
+                        <li>Node 7 
+                        </li> 
+                        <li>Node 8 
+                        </li> 
+                        <li>Node 9 
+                        </li> 
+                    </ul> 
+                </li> 
+                <li>Node 2 
+                </li> 
+                <li>Node 3 
+                </li> 
+                <li><a href="" onclick="return clickNode('r2n4n1')">Node 4</a> 
+                    <ul id="r2n4n1"> 
+                        <li>Node 1 
+                        </li> 
+                        <li>Node 2 
+                        </li> 
+                        <li><a href="" onclick="return clickNode('r2n4n1n3')">Node 3</a> 
+                            <ul id="r2n4n1n3"> 
+                                <li>Node 1 
+                                </li> 
+                                <li>Node 2 
+                                </li> 
+                                <li>Node 3 
+                                </li> 
+                                <li>Node 4 
+                                </li> 
+                            </ul> 
+                        </li> 
+                    </ul> 
+                </li> 
+                <li>Node 5 
+                </li> 
+            </ul> 
+        </li> 
+    </ul> 
+    using style sheet and javascript. 
+    </body> 
+</html>

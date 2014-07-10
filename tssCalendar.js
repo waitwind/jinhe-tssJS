@@ -14,8 +14,8 @@ Date.prototype.format = function(format) {
 		"h+" : this.getHours(), 
 		"m+" : this.getMinutes(), 
 		"s+" : this.getSeconds(), 
-		"q+" : Math.floor((this.getMonth()+3)/3), // quarter
-		"S" : this.getMilliseconds() //millisecond
+		"q+" : Math.floor((this.getMonth()+3)/3),
+		"S" : this.getMilliseconds()
 	}
 
 	if(/(y+)/.test(format)) {
@@ -733,5 +733,4 @@ var hasEventListeners = !!window.addEventListener,
     };
 
     return Pikaday;
-
 });

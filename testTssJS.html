@@ -4,7 +4,7 @@
 	<meta charset="UTF-8" />
 	<title>tssJS test</title>
 
-	<script type="text/javascript" src="tssCalendar.js"></script>
+	<script type="text/javascript" src="tssJS.js"></script>
  
 	<style>
 		 
@@ -14,9 +14,13 @@
 
 	<script type="text/javascript">
 
-	 window.onload = function() {
-		 
-	 }
+	 $.ready(function(name){
+ 		alert("hello : " + name);
+	 }, "tssJS");
+
+	 tssJS.ready(function(name){
+ 		alert("hello : " + name);
+	 }, "tssJS2");
 
 	</script>
 </head>

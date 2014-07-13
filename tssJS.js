@@ -1,10 +1,10 @@
 (function(window, undefined) {
 
-    var tssJS = (function() {
+    var _tssJS = (function() {
 
         // 构建tssJS对象
-        var tssJS = function() {
-            return new tssJS.fn.init();
+        var tssJS = function(selector) {
+            return new tssJS.fn.init(selector, parent, rootTssJS);
         },
 
         version = "1.0.0",
@@ -12,9 +12,10 @@
         // Map over the $ in case of overwrite
         _$ = window.$,
 
-        // A simple way to check for HTML strings or ID strings
-        // (both of which we optimize for)
-        quickExpr = /^(?:[^<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/,
+        rootTssJS,
+
+        // The deferred used on DOM ready
+        readyList = [],
 
         // Check if a string has a non-whitespace character in it
         rnotwhite = /\S/,
@@ -29,30 +30,73 @@
         // JSON RegExp
         rvalidchars = /^[\],:{}\s]*$/,
 
-        // The deferred used on DOM ready
-        readyList,
-
         toString = Object.prototype.toString,
         push = Array.prototype.push,
         slice = Array.prototype.slice,
         trim = String.prototype.trim,
         indexOf = Array.prototype.indexOf,
 
+        ua = navigator.userAgent.toLowerCase(),
+        mc = function(e) {
+            return e.test(ua)
+        },
+
+        isOpera  = mc(/opera/),
+        isChrome = mc(/\bchrome\b/),
+        isWebKit = mc(/webkit/),
+        isSafari = !isChrome && mc(/safari/),
+        isIE = !isOpera && mc(/msie/),
+        supportCanvas = !!document.createElement('canvas').getContext,
+        isMobile = mc(/ipod|ipad|iphone|android/gi),
+
         // [[Class]] -> type pairs
         class2type = {};
+
 
         // tssJS对象原型
         tssJS.fn = tssJS.prototype = {
 
+            tssjs : version,
+
             constructor: tssJS,
 
-            init: function() {
-                return this;
+            init: function(selector, parent, rootTssJS) {
+                // Handle $(""), $(null), or $(undefined)
+                if (!selector) {
+                    return this;
+                }
+
+                // Handle $(DOMElement)
+                if (selector.nodeType || selector === document) {
+                    this[0] = selector;
+                    this.length = 1;
+                    return this;
+                }
+
+                if(typeof selector === "string") {
+                    // TODO 待ready
+                    return this.find(selector);
+                }
+
+                if (tssJS.isFunction(selector)) {
+                    return rootTssJS.ready(selector);
+                }
+            },
+
+            size: function() {
+                return this.length;
             },
 
             each: function(callback, args) {
                 return tssJS.each(this, callback, args);
-            }
+            },
+
+            ready: function(fn, args) {
+                // Attach the listeners
+                tssJS.bindReady.call(this, fn, args);
+
+                return this;
+            },
         };
 
         // Give the init function the tssJS prototype for later instantiation
@@ -102,8 +146,43 @@
                     tssJS.isReady = true;
 
                     // If there are functions bound, to execute
-                    fn(args);
+                    if(fn) {
+                        fn(args);
+                    }
+                    else {
+                        tssJS.each(readyList, function(i, name) {
+                            var _ = readyList[i];
+                            _.fn.call(_._this, _.args);
+                        });
+
+                        readyList = [];
+                    }
                 }
+            },
+
+            bindReady: function(fn, args) {
+                readyList.push({"_this": this, "fn": fn, "args": args});
+
+                if (document.readyState === "complete") {
+                    return setTimeout(tssJS.ready, 1);
+                }
+
+                if (document.addEventListener) {
+                    document.addEventListener("DOMContentLoaded", DOMContentLoaded, false);
+                    window.addEventListener("load", tssJS.ready, false);
+                } else if (document.attachEvent) {           
+                    document.attachEvent("onreadystatechange", DOMContentLoaded);
+                    window.attachEvent("onload", tssJS.ready);
+                    
+                    var toplevel = false;
+                    try {
+                        toplevel = window.frameElement == null;
+                    } catch(e) {}
+
+                    if (document.documentElement.doScroll && toplevel) {
+                        doScrollCheck();
+                    }
+                }             
             },
 
             // 是否函数
@@ -293,6 +372,37 @@
             }
         );
 
+        var DOMContentLoaded = (function() {
+          if (document.addEventListener) {
+              return function() {
+                  document.removeEventListener("DOMContentLoaded", DOMContentLoaded, false);
+                  tssJS.ready();
+              };
+          } else if (document.attachEvent) {
+              return function() {
+                  if (document.readyState === "complete") {
+                      document.detachEvent("onreadystatechange", DOMContentLoaded);
+                      tssJS.ready();
+                  }
+              };
+          }
+        })();
+
+        var doScrollCheck = function() {
+            if (isReady) {
+                return;
+            }
+            try {
+                document.documentElement.doScroll("left");
+            } catch(e) {
+                setTimeout(doScrollCheck, 1);
+                return;
+            }
+            tssJS.ready();
+        }
+
+        rootTssJS = tssJS(document);
+
         // Expose tssJS to the global object
         // 到这里，tssJS对象构造完成，后边的代码都是对tssJS或tssJS对象的扩展
         return tssJS;
@@ -315,14 +425,12 @@
     };
 
     Array.prototype.sort = function(f) {
-        var _ = this,
-            L = _.length - 1,
-            T;
+        var _ = this, L = _.length - 1;
 
         for (var i = 0; i < L; i++) {
             for (var j = L; j > i; j--) {　　
                 if (f ? !f(_[j], _[j - 1]) : (_[j] < _[j - 1])) {　　
-                    T = _[j];　　
+                    var T = _[j];　　
                     _[j] = _[j - 1];　　
                     _[j - 1] = T;
                 }
@@ -340,6 +448,66 @@
         return false;  
     }
 
-    window.tssJS = window.$ = tssJS;
+    window.tssJS = window.$ = _tssJS;
 
 })(window);
+
+
+// 扩展tssJS原型方法
+;(function($) {
+    $.fn.extend({
+
+        "find": function(selector, parent) {
+            var elements = [];
+            switch (selector.charAt(0)) {
+                case '#' :
+                  elements[0] = $.getElementById(selector.substring(1));
+                  break;
+                case '.' : 
+                  elements = $.getElementsByClass(selector.substring(1), parent);
+                  break;
+                default : 
+                  elements = $.getElementsByTag(selector, parent);
+            }
+
+            this.length = elements.length;
+            for (var i = 0; i < this.length; i ++) {
+              this[i] = (elements[i]);
+            }
+
+            return this;
+        }
+
+    });
+})(tssJS);
+
+// 扩展tssJS静态方法
+;(function($) {
+    $.extend({
+        "getElementById": function (id) {
+            return document.getElementById(id);
+        },
+
+        "getElementsByTag": function (tag, parentNode) {
+            var node = parentNode ? parentNode : document;
+            return node.getElementsByTagName(tag);
+        },
+
+        "getElementsByClass": function (cn, parentNode) {
+            var node = parentNode ? parentNode : document;
+            var result = [];
+            var all = node.getElementsByTagName('*');
+            for (var i = 0; i < all.length; i ++) {
+              if ( hasClass(all[i], cn) ) {
+                result.push(all[i]);
+              }
+            }
+            return result;
+        },
+
+        "hasClass":function(element, className){
+            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+            return element.className.match(reg);
+        }
+    });
+})(tssJS);

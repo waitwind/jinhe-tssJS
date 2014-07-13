@@ -8127,6 +8127,9 @@ $(function(){
  * @end
  */
 
+
+
+
 /**
  * @overview the area2d componment
  * @component#@chart#$.Area2D

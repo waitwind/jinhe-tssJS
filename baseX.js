@@ -9,42 +9,6 @@ function Base(args) {
   this.elements = [];
   
   if (typeof args == 'string') {
-    //css模拟
-    if (args.indexOf(' ') != -1) {
-      var elements = args.split(' ');			//把节点拆开分别保存到数组里
-      var childElements = [];					//存放临时节点对象的数组，解决被覆盖的问题
-      var node = [];								//用来存放父节点用的
-      for (var i = 0; i < elements.length; i ++) {
-        if (node.length == 0) node.push(document);		//如果默认没有父节点，就把document放入
-        switch (elements[i].charAt(0)) {
-          case '#' :
-            childElements = [];				//清理掉临时节点，以便父节点失效，子节点有效
-            childElements.push(this.getId(elements[i].substring(1)));
-            node = childElements;		//保存父节点，因为childElements要清理，所以需要创建node数组
-            break;
-          case '.' : 
-            childElements = [];
-            for (var j = 0; j < node.length; j ++) {
-              var temps = this.getClass(elements[i].substring(1), node[j]);
-              for (var k = 0; k < temps.length; k ++) {
-                childElements.push(temps[k]);
-              }
-            }
-            node = childElements;
-            break;
-          default : 
-            childElements = [];
-            for (var j = 0; j < node.length; j ++) {
-              var temps = this.getTagName(elements[i], node[j]);
-              for (var k = 0; k < temps.length; k ++) {
-                childElements.push(temps[k]);
-              }
-            }
-            node = childElements;
-        }
-      }
-      this.elements = childElements;
-    } else {
       //find模拟
       switch (args.charAt(0)) {
         case '#' :
@@ -56,7 +20,6 @@ function Base(args) {
         default : 
           this.elements = this.getTagName(args);
       }
-    }
   } else if (typeof args == 'object') {
     if (args != undefined) {    //_this是一个对象，undefined也是一个对象，区别与typeof返回的带单引号的'undefined'
       this.elements[0] = args;
@@ -329,134 +292,6 @@ Base.prototype.resize = function (fn) {
   return this;
 };
 
-//设置动画
-Base.prototype.animate = function (obj) {
-  for (var i = 0; i < this.elements.length; i ++) {
-    var element = this.elements[i];
-    var attr = obj['attr'] == 'x' ? 'left' : obj['attr'] == 'y' ? 'top' : 
-             obj['attr'] == 'w' ? 'width' : obj['attr'] == 'h' ? 'height' : 
-             obj['attr'] == 'o' ? 'opacity' : obj['attr'] != undefined ? obj['attr'] : 'left';
-
-    
-    var start = obj['start'] != undefined ? obj['start'] : 
-            attr == 'opacity' ? parseFloat(getStyle(element, attr)) * 100 : 
-                           parseInt(getStyle(element, attr));
-    
-    var t = obj['t'] != undefined ? obj['t'] : 10;												//可选，默认10毫秒执行一次
-    var step = obj['step'] != undefined ? obj['step'] : 20;								//可选，每次运行10像素
-    
-    var alter = obj['alter'];
-    var target = obj['target'];
-    var mul = obj['mul'];
-    
-    var speed = obj['speed'] != undefined ? obj['speed'] : 6;							//可选，默认缓冲速度为6
-    var type = obj['type'] == 0 ? 'constant' : obj['type'] == 1 ? 'buffer' : 'buffer';		//可选，0表示匀速，1表示缓冲，默认缓冲
-    
-    
-    if (alter != undefined && target == undefined) {
-      target = alter + start;
-    } else if (alter == undefined && target == undefined && mul == undefined) {
-      throw new Error('alter增量或target目标量必须传一个！');
-    }
-    
-    
-    
-    if (start > target) step = -step;
-    
-    if (attr == 'opacity') {
-      element.style.opacity = parseInt(start) / 100;
-      element.style.filter = 'alpha(opacity=' + parseInt(start) +')';
-    } else {
-      //element.style[attr] = start + 'px';
-    }
-    
-    
-    if (mul == undefined) {
-      mul = {};
-      mul[attr] = target;
-    } 
-    
-
-    clearInterval(element.timer);
-    element.timer = setInterval(function () {
-    
-      /*
-        问题1：多个动画执行了多个列队动画，我们要求不管多少个动画只执行一个列队动画
-        问题2：多个动画数值差别太大，导致动画无法执行到目标值，原因是定时器提前清理掉了
-        
-        解决1：不管多少个动画，只提供一次列队动画的机会
-        解决2：多个动画按最后一个分动画执行完毕后再清理即可
-      */
-      
-      //创建一个布尔值，这个值可以了解多个动画是否全部执行完毕
-      var flag = true; //表示都执行完毕了
-      
-      
-      for (var i in mul) {
-        attr = i == 'x' ? 'left' : i == 'y' ? 'top' : i == 'w' ? 'width' : i == 'h' ? 'height' : i == 'o' ? 'opacity' : i != undefined ? i : 'left';
-        target = mul[i];
-          
-
-        if (type == 'buffer') {
-          step = attr == 'opacity' ? (target - parseFloat(getStyle(element, attr)) * 100) / speed :
-                             (target - parseInt(getStyle(element, attr))) / speed;
-          step = step > 0 ? Math.ceil(step) : Math.floor(step);
-        }
-        
-        
-        
-        if (attr == 'opacity') {
-          if (step == 0) {
-            setOpacity();
-          } else if (step > 0 && Math.abs(parseFloat(getStyle(element, attr)) * 100 - target) <= step) {
-            setOpacity();
-          } else if (step < 0 && (parseFloat(getStyle(element, attr)) * 100 - target) <= Math.abs(step)) {
-            setOpacity();
-          } else {
-            var temp = parseFloat(getStyle(element, attr)) * 100;
-            element.style.opacity = parseInt(temp + step) / 100;
-            element.style.filter = 'alpha(opacity=' + parseInt(temp + step) + ')';
-          }
-          
-          if (parseInt(target) != parseInt(parseFloat(getStyle(element, attr)) * 100)) flag = false;
-
-        } else {
-          if (step == 0) {
-            setTarget();
-          } else if (step > 0 && Math.abs(parseInt(getStyle(element, attr)) - target) <= step) {
-            setTarget();
-          } else if (step < 0 && (parseInt(getStyle(element, attr)) - target) <= Math.abs(step)) {
-            setTarget();
-          } else {
-            element.style[attr] = parseInt(getStyle(element, attr)) + step + 'px';
-          }
-          
-          if (parseInt(target) != parseInt(getStyle(element, attr))) flag = false;
-        }
-        
-        //document.getElementById('test').innerHTML += i + '--' + parseInt(target) + '--' + parseInt(getStyle(element, attr)) + '--' + flag + '<br />';
-        
-      }
-      
-      if (flag) {
-        clearInterval(element.timer);
-        if (obj.fn != undefined) obj.fn();
-      }
-        
-    }, t);
-    
-    function setTarget() {
-      element.style[attr] = target + 'px';
-    }
-    
-    function setOpacity() {
-      element.style.opacity = parseInt(target) / 100;
-      element.style.filter = 'alpha(opacity=' + parseInt(target) + ')';
-    }
-  }
-  return this;
-};
-
 //插件入口
 Base.prototype.extend = function (name, fn) {
   Base.prototype[name] = fn;
@@ -664,65 +499,4 @@ function scrollTop() {
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
 }
-$().extend('drag', function () {
-  var tags = arguments;
-  for (var i = 0; i < this.elements.length; i ++) {
-    addEvent(this.elements[i], 'mousedown', function (e) {
-      if (trim(this.innerHTML).length == 0) e.preventDefault();
-      var _this = this;
-      var diffX = e.clientX - _this.offsetLeft;
-      var diffY = e.clientY - _this.offsetTop;
-      
-      //自定义拖拽区域
-      var flag = false;
-      
-      for (var i = 0; i < tags.length; i ++) {
-        if (e.target == tags[i]) {
-          flag = true;					//只要有一个是true，就立刻返回
-          break;
-        }
-      }
-      
-      if (flag) {
-        addEvent(document, 'mousemove', move);
-        addEvent(document, 'mouseup', up);
-      } else {
-        removeEvent(document, 'mousemove', move);
-        removeEvent(document, 'mouseup', up);
-      }
-      
-      function move(e) {
-        var left = e.clientX - diffX;
-        var top = e.clientY - diffY;
-        
-        if (left < 0) {
-          left = 0;
-        } else if (left > getInner().width - _this.offsetWidth) {
-          left = getInner().width - _this.offsetWidth;
-        }
-        
-        if (top < 0) {
-          top = 0;
-        } else if (top > getInner().height - _this.offsetHeight) {
-          top = getInner().height - _this.offsetHeight;
-        }
-        
-        _this.style.left = left + 'px';
-        _this.style.top = top + 'px';
-        
-        if (typeof _this.setCapture != 'undefined') {
-          _this.setCapture();
-        } 
-      }
-      
-      function up() {
-        removeEvent(document, 'mousemove', move);
-        removeEvent(document, 'mouseup', up);
-        if (typeof _this.releaseCapture != 'undefined') {
-          _this.releaseCapture();
-        }
-      }
-    });
-  }
-  return this;
-});
+ 

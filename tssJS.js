@@ -74,7 +74,6 @@
                 }
 
                 if(typeof selector === "string") {
-                    // TODO 待ready
                     return this.find(selector);
                 }
 
@@ -453,6 +452,30 @@
 })(window);
 
 
+// 扩展tssJS 单元测试的静态方法
+;(function($) {
+    $.extend({
+        /* 前台单元测试断言 */
+        "assertEquals": function (actual, expect, msg) {
+          if( expect != actual ) {
+            alert(msg || "" + "[expect: " + expect + ", actual: " + actual + "]");
+          }
+        },
+
+        "assertTrue": function(result, msg) {
+          if( !result && msg ) {
+            alert(msg);
+          }
+        },
+
+        "assertNotNull": function(result, msg) {
+          if( result == null && msg ) {
+            $.error(msg);
+          }
+        }
+    });
+})(tssJS);
+
 // 扩展tssJS原型方法
 ;(function($) {
     $.fn.extend({
@@ -472,16 +495,118 @@
 
             this.length = elements.length;
             for (var i = 0; i < this.length; i ++) {
-              this[i] = (elements[i]);
+              this[i] = elements[i];
             }
 
             return this;
-        }
+        },
 
+        //设置CSS
+        "css": function(attr, value) {
+          for (var i = 0; i < this.length; i ++) {
+            var element = this[i];
+            if (arguments.length == 1) {
+              return getStyle(element, attr);
+            }
+            element.style[attr] = value;
+          }
+          return this;
+        },
+
+        // 添加Class
+        "addClass": function(className) {
+          for (var i = 0; i < this.length; i ++) {
+            var element = this[i];
+            if ( !hasClass(element, className) ) {
+              element.className += ' ' + className;
+            }
+          }
+          return this;
+        },
+
+        // 移除Class
+        "removeClass": function(className) {
+          for (var i = 0; i < this.length; i ++) {
+            var element = this[i];
+            if (hasClass(element, className)) {
+              element.className = element.className.replace(new RegExp('(\\s|^)' + className +'(\\s|$)'), ' ');
+            }
+          }
+          return this;
+        },
+
+        // 设置innerHTML
+        "html": function(str) {
+          for (var i = 0; i < this.length; i ++) {
+            var element = this[i];
+            if (arguments.length == 0) {
+              return element.innerHTML;
+            }
+            element.innerHTML = str;
+          }
+          return this;
+        },
+
+        // 设置鼠标移入移出方法
+        "hover": function(over, out) {
+          for (var i = 0; i < this.length; i ++) {
+            addEvent(this[i], 'mouseover', over);
+            addEvent(this[i], 'mouseout', out);
+          }
+          return this;
+        },
+
+        // 设置点击切换方法
+        "toggle": function() {
+          for (var i = 0; i < this.length; i ++) {
+            (function (element, args) {
+              var count = 0;
+              addEvent(element, 'click', function () {
+                args[count++ % args.length].call(this);
+              });
+            })(this[i], arguments);
+          }
+          return this;
+        },
+
+        //设置显示
+        "show": function() {
+          for (var i = 0; i < this.length; i ++) {
+            this[i].style.display = 'block';
+          }
+          return this;
+        },
+
+        //设置隐藏
+        "hide": function() {
+          for (var i = 0; i < this.length; i ++) {
+            this[i].style.display = 'none';
+          }
+          return this;
+        },
+
+        //设置物体居中
+        "center": function(width, height) {
+          var top  = (getInner().height - 250) / 2;
+          var left = (getInner().width - 350) / 2;
+          for (var i = 0; i < this.length; i ++) {
+            this[i].style.top = top + 'px';
+            this[i].style.left = left + 'px';
+          }
+          return this;
+        },
+
+        //触发点击事件
+        "click": function(fn) {
+          for (var i = 0; i < this.length; i ++) {
+            this[i].onclick = fn;
+          }
+          return this;
+        }
     });
 })(tssJS);
 
-// 扩展tssJS静态方法
+// 扩展tssJS操作HTML DOMElement的静态方法
 ;(function($) {
     $.extend({
         "getElementById": function (id) {
@@ -496,7 +621,14 @@
         "getElementsByClass": function (cn, parentNode) {
             var node = parentNode ? parentNode : document;
             var result = [];
-            var all = node.getElementsByTagName('*');
+            var all = [];
+            if ("getElementsByTagName" in node) {
+                all = node.getElementsByTagName("*");
+            } 
+            else if ("querySelectorAll" in node) {
+                all = node.querySelectorAll("*");
+            }  
+
             for (var i = 0; i < all.length; i ++) {
               if ( hasClass(all[i], cn) ) {
                 result.push(all[i]);
@@ -508,6 +640,32 @@
         "hasClass":function(element, className){
             var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
             return element.className.match(reg);
+        },
+
+        // 获取视口大小
+        "getInner": function() {
+          if (typeof window.innerWidth != 'undefined') {
+            return {
+              width : window.innerWidth,
+              height : window.innerHeight
+            }
+          } else {
+            return {
+              width : document.documentElement.clientWidth,
+              height : document.documentElement.clientHeight
+            }
+          }
+        },
+         
+        // 获取Style
+        "getStyle": function(element, attr) {
+          var value;
+          if (typeof window.getComputedStyle != 'undefined') {//W3C
+            value = window.getComputedStyle(element, null)[attr];
+          } else if (typeof element.currentStyle != 'undeinfed') {//IE
+            value = element.currentStyle[attr];
+          }
+          return value;
         }
     });
 })(tssJS);

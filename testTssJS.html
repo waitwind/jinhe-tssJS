@@ -14,12 +14,12 @@
 
 	<script type="text/javascript">
 
-	 $.ready(function(name){
- 		alert("hello : " + name + $().tssjs);
- 		// $().color();
- 		// $.color2();
+	 // $.ready(function(name){
+ 	// 	alert("hello : " + name + $().tssjs);
+ 	// 	// $().color();
+ 	// 	// $.color2();
 
-	 }, "tssJS");
+	 // }, "tssJS");
 
 	 // tssJS.ready(function(name){
  	// 	alert("hello : " + name);
@@ -40,7 +40,13 @@
  	// 	alert("hello : " + 5 + this.tssjs);
 	 // } );
 
-	 alert($("#div1").size());
+ 	$.ready(function() {
+ 		var tssJSObj = $("#div1");
+
+		alert(tssJSObj.size());
+		alert(tssJSObj[0].id);
+	 });
+	 	
 
 	</script>
 </head>
@@ -49,7 +55,7 @@
 
 
 	<div id='div1'>
-		<input id="d1"> </input>
+		<input id='d1'> </input>
 	</div>
  
 

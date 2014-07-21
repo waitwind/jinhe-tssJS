@@ -996,175 +996,290 @@
     });
 })(tssJS);
 
-
 /*********************************** 事件（Event）函数  start **********************************/
+;(function($){
 
-function preventDefault(event) {
-    if (event.preventDefault) {
-        event.preventDefault();
-    } else {
-        event.returnValue = false;
-    }
-}
+    $.extend({
+        "Event": {
+            "MOUSEDOWN": 1,
+            "MOUSEUP": 2,
+            "MOUSEOVER": 4,
+            "MOUSEOUT": 8,
+            "MOUSEMOVE":16,
+            "MOUSEDRAG": 32,
 
-var Event = {};
-Event.MOUSEDOWN = 1;
-Event.MOUSEUP   = 2;
-Event.MOUSEOVER = 4;
-Event.MOUSEOUT  = 8;
-Event.MOUSEMOVE = 16;
-Event.MOUSEDRAG = 32;
+            "timeout": {},
 
-Event.timeout = {};
+            "preventDefault": function(event) {
+                if (event.preventDefault) {
+                    event.preventDefault();
+                } else {
+                    event.returnValue = false;
+                }
+            },
 
-/*
- *  获得事件触发对象
- *  参数： event:eventObj      事件对象
- *  返回值：object:object       HTML对象
- */
-Event.getSrcElement = function(eventObj) {
-    var srcElement =  eventObj.target || eventObj.srcElement;
-    return srcElement;
-}
+            /* 取消事件 */
+            "cancel": function(event) { preventDefault(event); },
 
-/* 使事件始终捕捉对象。设置事件捕获范围。 */
-Event.setCapture = function(srcElement, eventType) {
-    if (srcElement.setCapture) {             
-        srcElement.setCapture();         
-    } 
-    else if(window.captureEvents){           
-        window.captureEvents(eventType);         
-    }
-}
+            // 获得事件触发对象
+            "getSrcElement": function(eventObj) {
+                return eventObj.target || eventObj.srcElement;
+            },
 
-/* 使事件放弃始终捕捉对象。 */
-Event.releaseCapture = function(srcElement, eventType) {
-    if(srcElement.releaseCapture){
-        srcElement.releaseCapture();
-    }
-    else if(window.captureEvents) {
-        window.captureEvents(eventType);
-    }
-}
+            /* 使事件始终捕捉对象。设置事件捕获范围。 */
+            "setCapture": function(srcElement, eventType) {
+                if (srcElement.setCapture) {             
+                    srcElement.setCapture();         
+                } 
+                else if(window.captureEvents){           
+                    window.captureEvents(eventType);         
+                }
+            },
 
-/* 取消事件 */
-Event.cancel = function(eventObj) {
-    if(window.DOMParser) {
-        eventObj.preventDefault();
-    }
-    else {
-        eventObj.returnValue = false;
-    }
-}
+            /* 使事件放弃始终捕捉对象。 */
+            "releaseCapture": function(srcElement, eventType) {
+                if(srcElement.releaseCapture){
+                    srcElement.releaseCapture();
+                }
+                else if(window.captureEvents) {
+                    window.captureEvents(eventType);
+                }
+            },
 
-/* 阻止事件向上冒泡 */
-Event.cancelBubble = function(eventObj) {
-    if( eventObj.stopPropagation ) {
-        eventObj.stopPropagation();
-    }
-    else {
-        eventObj.cancelBubble = true;
-    }
-}
+            /* 阻止事件向上冒泡 */
+            "cancelBubble": function(eventObj) {
+                if( eventObj.stopPropagation ) {
+                    eventObj.stopPropagation();
+                }
+                else {
+                    eventObj.cancelBubble = true;
+                }
+            },
 
-/*
- *  附加事件
- *  参数： object:srcElement       HTML对象
-            string:eventName        事件名称(不带on前缀)
-            function:listener       回调方法                
- */
-Event.attachEvent = function(srcElement, eventName, listener) {
-    if(null == eventName || null == listener) {
-        return alert("需要的参数为空，请检查");
-    }
+            "attachEvent": function(element, eventName, fn) {
+                if(element.addEventListener) {
+                    element.addEventListener(eventName, fn, false);
+                }
+                else if(element.attachEvent) {
+                    element.attachEvent("on" + eventName, fn);
+                }
+            },
 
-    if(srcElement.addEventListener) {
-        srcElement.addEventListener(eventName, listener, false);
-    }
-    else if(srcElement.attachEvent) {
-        srcElement.attachEvent("on" + eventName, listener);
-    }
-    else {
-        srcElement['on' + eventName] = listener;
-    }
-}
+            "detachEvent": function(element, eventName, fn) {
+                if( element.removeEventListener ) {
+                    element.removeEventListener(eventName, fn, false);
+                }
+                else {
+                    element.detachEvent("on" + eventName, fn);
+                }
+            },
 
-Event.detachEvent = function(srcElement, eventName, listener) {
-    if(null == srcElement || null == eventName || null == listener) {
-        return alert("需要的参数为空，请检查");
-    }
+            "fireOnScrollBar": function(eventObj) {
+                var isOnScrollBar = false;
+                var element = getSrcElement(eventObj);
 
-    if( srcElement.removeEventListener ) {
-        srcElement.removeEventListener(eventName, listener, false);
-    }
-    else {
-        srcElement.detachEvent("on" + eventName, listener);
-    }
-}
+                var absPosition = $.absPosition(element);
 
-Event.fireOnScrollBar = function(eventObj) {
-    var isOnScrollBar = false;
-    var srcElement = this.getSrcElement(eventObj);
+                // 是否有纵向滚动条
+                if(element.offsetWidth > element.clientWidth) {
+                    var offsetX = eventObj.clientX - absPosition.left;
+                    if(offsetX > element.clientWidth) {
+                        isOnScrollBar = true;
+                    }
+                }
 
-    // 是否有纵向滚动条
-    if(srcElement.offsetWidth > srcElement.clientWidth) {
-        var offsetX = Event.offsetX(eventObj);
-        if(offsetX > srcElement.clientWidth) {
-            isOnScrollBar = true;
+                // 是否有横向滚动条
+                if(false == isOnScrollBar && element.offsetHeight > element.clientHeight) {
+                    var offsetY = eventObj.clientY - absPosition.top;
+                    if(offsetY > element.clientHeight) {
+                        isOnScrollBar = true;
+                    }
+                }
+                return isOnScrollBar;
+            },
+
+            /** 模拟事件 */
+            "createEventObject": function() { return new Object(); },
         }
-    }
+    });
 
-    // 是否有横向滚动条
-    if(false == isOnScrollBar && srcElement.offsetHeight > srcElement.clientHeight) {
-        var offsetY = Event.offsetY(eventObj);
-        if(offsetY > srcElement.clientHeight) {
-            isOnScrollBar = true;
-        }
-    }
-    return isOnScrollBar;
-}
+    $.extend({
 
-// 事件相对触发对象位置X
-Event.offsetX = function(eventObj) {
-    var clientX = eventObj.clientX;
-    var srcElement = this.getSrcElement(eventObj);
-    var offsetLeft = Element.absLeft(srcElement);
-
-    return clientX - offsetLeft;
-}
-
-// 事件相对触发对象位置Y
-Event.offsetY = function(eventObj) {
-    var clientY = eventObj.clientY;
-    var srcElement = this.getSrcElement(eventObj);
-    var offsetTop = Element.absTop(srcElement);
-
-    return clientY - offsetTop;
-}
-
-/** 模拟事件 */
-function createEventObject() {
-    return new Object();
-}
-
-function EventFirer(element, eventName) {
-    var _name = eventName;
-    this.fire = function (event) {
-        var func = element.getAttribute(_name) || eval("element." + _name);
-        if( func ) {
-            var funcType = typeof(func);
-            if("string" == funcType) {
-                eval(func);
-            }
-            else if ("function" == funcType) {
-                func(event);
+        "EventFirer" : function(element, eventName) {
+            var _name = eventName;
+            this.fire = function (event) {
+                var func = element.getAttribute(_name) || eval("element." + _name);
+                if( func ) {
+                    var funcType = typeof(func);
+                    if("string" == funcType) {
+                        eval(func);
+                    }
+                    else if ("function" == funcType) {
+                        func(event);
+                    }
+                }
             }
         }
-    }
-}
+
+    });
+
+})(tssJS);
 
 /*********************************** 事件（Event）函数  end **********************************/
 
+/*********************************** xml相关操作函数  start **********************************/
+
+;(function($) {
+
+    $.extend({
+
+    });
+
+})(tssJS);
+
+
+MSXML_DOCUMENT_VERSION = "Msxml2.DOMDocument.6.0";
+
+/* 将字符串转化成xml节点对象 */
+function loadXmlToNode(xml) {
+    if(xml == null || xml == "" || xml == "undifined") {
+        return null;
+    }
+
+    xml = xml.revertEntity();
+    var xr = new XmlReader(xml);
+    return xr.documentElement;
+}
+
+function xml2String(element) {
+    if (Public.isIE()) {
+        return element.xml;
+    }
+    else {
+        var xmlSerializer = new XMLSerializer();
+        return xmlSerializer.serializeToString(element);
+    }
+}
+
+function getNodeText(node) {
+    return node.text || node.textContent || ""; // 取节点值时，chrome里用textContent
+}
+
+function getXmlDOM() {
+    var xmlDom;
+    if (Public.isIE()) {
+        xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
+        xmlDom.async = false;
+    }
+    else {
+        var parser = new DOMParser();
+        xmlDom = parser.parseFromString("<null/>", "text/xml");
+        xmlDom.parser = parser;
+    } 
+    return xmlDom;
+}
+
+var EMPTY_XML_DOM = getXmlDOM();
+
+function loadXmlDOM(url) {
+    var xmlDom;
+    if (window.DOMParser) {
+        var xmlhttp = new window.XMLHttpRequest();  
+        xmlhttp.open("GET", url, false);  
+        try {  xmlhttp.responseType = 'msxml-document';  } catch (e) {  } 
+        xmlhttp.send(null);  
+        xmlDom = xmlhttp.responseXML.documentElement;  
+    }
+    else { // < IE10
+        xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
+        xmlDom.async = false;
+        xmlDom.load(url);
+    } 
+    return xmlDom;
+}
+
+function XmlReader(text) {
+    this.xmlDom = null;
+
+    if (Public.isIE()) {
+        this.xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
+        this.xmlDom.async = false;
+        this.xmlDom.loadXML(text); 
+    }
+    else {
+        var parser = new DOMParser();
+        this.xmlDom = parser.parseFromString(text, "text/xml"); 
+    } 
+
+    this.documentElement = this.xmlDom.documentElement || this.xmlDom;
+}
+
+XmlReader.prototype.loadXml = function(text) {
+    if (Public.isIE()) {
+        this.xmlDom.loadXML(text); 
+    }
+    else { 
+        var parser = new DOMParser();
+        this.xmlDom = parser.parseFromString(text, "text/xml");
+    } 
+}
+
+XmlReader.prototype.createElement = function(name) {
+    var node = this.xmlDom.createElement(name);
+    var xmlNode = new XmlNode(node);
+    return xmlNode;
+}
+
+XmlReader.prototype.createCDATA = function(data) {
+    var xmlNode;
+    data = String(data).convertCDATA();
+    if(window.DOMParser) {
+        var tempReader = new XmlReader("<root><![CDATA[" + data + "]]></root>");
+        var xmlNode = new XmlNode(tempReader.documentElement.firstChild);
+    }
+    else {
+        xmlNode = new XmlNode(this.xmlDom.createCDATASection(data));
+    }
+    return xmlNode;
+}
+
+ XmlReader.prototype.createElementCDATA = function(name, data) {
+    var xmlNode   = this.createElement(name);
+    var cdataNode = this.createCDATA(data);
+    xmlNode.appendChild(cdataNode);
+    return xmlNode;
+}
+
+/* 获取解析错误 */
+XmlReader.prototype.getParseError = function() {
+    var parseError = null;
+    if(window.DOMParser) {
+
+    } 
+    else {
+        if( this.xmlDom.parseError.errorCode != 0 ) {
+            parseError = this.xmlDom.parseError;
+        }
+    }
+    return parseError;
+}
+
+XmlReader.prototype.toString = function() {
+    var str = [];
+    str[str.length] = "[XmlReader Object]";
+    str[str.length] = "xml:" + this.toXml();
+    return str.join("\r\n");
+}
+
+XmlReader.prototype.toXml = function() {
+    if (Public.isIE()) {
+        return this.xmlDom.xml;
+    }
+    else {
+        var xmlSerializer = new XMLSerializer();
+        return xmlSerializer.serializeToString(this.xmlDom.documentElement);
+    }
+}
 
 
 if ( !Public.isIE() ) {

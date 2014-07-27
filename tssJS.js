@@ -1133,178 +1133,146 @@
 
     $.extend({
 
+        "XML" : {
+            "MSXML_DOCUMENT_VERSION": "Msxml2.DOMDocument.6.0",
+            "_NODE_TYPE_ELEMENT"    : 1,
+            "_NODE_TYPE_ATTRIBUTE"  : 2,
+            "_NODE_TYPE_TEXT"       : 3,
+            "_NODE_TYPE_CDATA"      : 4; 
+            "_NODE_TYPE_COMMENT"    : 8,
+            "_NODE_TYPE_DOCUMENT"   : 9,
+
+            /* 将字符串转化成xml节点对象 */
+            "loadXmlToNode": function() {
+                if(xml == null || xml == "" || xml == "undifined") {
+                    return null;
+                }
+
+                xml = xml.revertEntity();
+                var xr = new XmlReader(xml);
+                return xr.documentElement;
+            },
+
+            "xml2String": function(element) {
+                if (Public.isIE()) {
+                    return element.xml;
+                }
+                else {
+                    var xmlSerializer = new XMLSerializer();
+                    return xmlSerializer.serializeToString(element);
+                }
+            },
+
+            "getNodeText": function(node) {
+                return node.text || node.textContent || ""; // chrome 用 textContent
+            },
+
+            "EMPTY_XML_DOM": function(){
+                var xmlDom;
+                if ($.isIE) {
+                    xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
+                    xmlDom.async = false;
+                }
+                else {
+                    var parser = new DOMParser();
+                    xmlDom = parser.parseFromString("<null/>", "text/xml");
+                    xmlDom.parser = parser;
+                } 
+                return xmlDom;
+            },
+
+            "loadXml": function(text) {
+                var xmlDom;
+
+                if ($.isIE) {
+                    this.xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
+                    this.xmlDom.async = false;
+                    this.xmlDom.loadXML(text); 
+                }
+                else {
+                    var parser = new DOMParser();
+                    this.xmlDom = parser.parseFromString(text, "text/xml"); 
+                } 
+
+                return xmlDom.documentElement || xmlDom;
+            },
+
+            "createElement": function(xmlDom, name) {
+                var node = xmlDom.createElement(name);
+                var xmlNode = new XmlNode(node);
+                return xmlNode;
+            },
+
+            "createCDATA": function(data) {
+                var xmlNode;
+                data = String(data).convertCDATA();
+                if(window.DOMParser) {
+                    var xmlDom = loadXml("<root><![CDATA[" + data + "]]></root>");
+                    var xmlNode = new XmlNode(xmlDom);
+                }
+                else {
+                    xmlNode = new XmlNode(EMPTY_XML_DOM().createCDATASection(data));
+                }
+                return xmlNode;
+            },
+
+             "createElementCDATA": function(name, data) {
+                var xmlNode   = createElement(name);
+                var cdataNode = createCDATA(data);
+                xmlNode.appendChild(cdataNode);
+                return xmlNode;
+            },
+
+            /* 获取解析错误 */
+            "getParseError": function(xmlDom) {
+                var parseError = null;
+                if(window.DOMParser) {
+
+                } 
+                else {
+                    if( xmlDom.parseError.errorCode != 0 ) {
+                        parseError = xmlDom.parseError;
+                    }
+                }
+                return parseError;
+            }
+        }
+
     });
+
+    if ( !$.isIE ) {
+        XMLDocument.prototype.selectNodes = Element.prototype.selectNodes = function(p_xPath) {
+            var m_Evaluator = new XPathEvaluator();
+            var m_Result = m_Evaluator.evaluate(p_xPath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+
+            var m_Nodes = [];
+            if (m_Result) {
+                var m_Element;
+                while (m_Element = m_Result.iterateNext()) {
+                    m_Nodes.push(m_Element);
+                }
+            } 
+            return m_Nodes;
+        };
+
+        XMLDocument.prototype.selectSingleNode = Element.prototype.selectSingleNode = function(p_xPath) {
+            var m_Evaluator = new XPathEvaluator();
+            var m_Result = m_Evaluator.evaluate(p_xPath, this, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+
+            if (m_Result) {
+                return m_Result.singleNodeValue;
+            } else {
+                return null;
+            }
+        };
+    }
 
 })(tssJS);
 
 
-MSXML_DOCUMENT_VERSION = "Msxml2.DOMDocument.6.0";
-
-/* 将字符串转化成xml节点对象 */
-function loadXmlToNode(xml) {
-    if(xml == null || xml == "" || xml == "undifined") {
-        return null;
-    }
-
-    xml = xml.revertEntity();
-    var xr = new XmlReader(xml);
-    return xr.documentElement;
-}
-
-function xml2String(element) {
-    if (Public.isIE()) {
-        return element.xml;
-    }
-    else {
-        var xmlSerializer = new XMLSerializer();
-        return xmlSerializer.serializeToString(element);
-    }
-}
-
-function getNodeText(node) {
-    return node.text || node.textContent || ""; // 取节点值时，chrome里用textContent
-}
-
-function getXmlDOM() {
-    var xmlDom;
-    if (Public.isIE()) {
-        xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
-        xmlDom.async = false;
-    }
-    else {
-        var parser = new DOMParser();
-        xmlDom = parser.parseFromString("<null/>", "text/xml");
-        xmlDom.parser = parser;
-    } 
-    return xmlDom;
-}
-
-var EMPTY_XML_DOM = getXmlDOM();
-
-function loadXmlDOM(url) {
-    var xmlDom;
-    if (window.DOMParser) {
-        var xmlhttp = new window.XMLHttpRequest();  
-        xmlhttp.open("GET", url, false);  
-        try {  xmlhttp.responseType = 'msxml-document';  } catch (e) {  } 
-        xmlhttp.send(null);  
-        xmlDom = xmlhttp.responseXML.documentElement;  
-    }
-    else { // < IE10
-        xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
-        xmlDom.async = false;
-        xmlDom.load(url);
-    } 
-    return xmlDom;
-}
-
-function XmlReader(text) {
-    this.xmlDom = null;
-
-    if (Public.isIE()) {
-        this.xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
-        this.xmlDom.async = false;
-        this.xmlDom.loadXML(text); 
-    }
-    else {
-        var parser = new DOMParser();
-        this.xmlDom = parser.parseFromString(text, "text/xml"); 
-    } 
-
-    this.documentElement = this.xmlDom.documentElement || this.xmlDom;
-}
-
-XmlReader.prototype.loadXml = function(text) {
-    if (Public.isIE()) {
-        this.xmlDom.loadXML(text); 
-    }
-    else { 
-        var parser = new DOMParser();
-        this.xmlDom = parser.parseFromString(text, "text/xml");
-    } 
-}
-
-XmlReader.prototype.createElement = function(name) {
-    var node = this.xmlDom.createElement(name);
-    var xmlNode = new XmlNode(node);
-    return xmlNode;
-}
-
-XmlReader.prototype.createCDATA = function(data) {
-    var xmlNode;
-    data = String(data).convertCDATA();
-    if(window.DOMParser) {
-        var tempReader = new XmlReader("<root><![CDATA[" + data + "]]></root>");
-        var xmlNode = new XmlNode(tempReader.documentElement.firstChild);
-    }
-    else {
-        xmlNode = new XmlNode(this.xmlDom.createCDATASection(data));
-    }
-    return xmlNode;
-}
-
- XmlReader.prototype.createElementCDATA = function(name, data) {
-    var xmlNode   = this.createElement(name);
-    var cdataNode = this.createCDATA(data);
-    xmlNode.appendChild(cdataNode);
-    return xmlNode;
-}
-
-/* 获取解析错误 */
-XmlReader.prototype.getParseError = function() {
-    var parseError = null;
-    if(window.DOMParser) {
-
-    } 
-    else {
-        if( this.xmlDom.parseError.errorCode != 0 ) {
-            parseError = this.xmlDom.parseError;
-        }
-    }
-    return parseError;
-}
-
-XmlReader.prototype.toString = function() {
-    var str = [];
-    str[str.length] = "[XmlReader Object]";
-    str[str.length] = "xml:" + this.toXml();
-    return str.join("\r\n");
-}
-
-XmlReader.prototype.toXml = function() {
-    if (Public.isIE()) {
-        return this.xmlDom.xml;
-    }
-    else {
-        var xmlSerializer = new XMLSerializer();
-        return xmlSerializer.serializeToString(this.xmlDom.documentElement);
-    }
-}
+            
 
 
-if ( !Public.isIE() ) {
-    Element.prototype.selectNodes = function(p_xPath) {
-        var m_Evaluator = new XPathEvaluator();
-        var m_Result = m_Evaluator.evaluate(p_xPath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
 
-        var m_Nodes = [];
-        if (m_Result) {
-            var m_Element;
-            while (m_Element = m_Result.iterateNext()) {
-                m_Nodes.push(m_Element);
-            }
-        } 
-        return m_Nodes;
-    };
 
-    Element.prototype.selectSingleNode = function(p_xPath) {
-        var m_Evaluator = new XPathEvaluator();
-        var m_Result = m_Evaluator.evaluate(p_xPath, this, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-
-        if (m_Result) {
-            return m_Result.singleNodeValue;
-        } else {
-            return null;
-        }
-    };
-}
+            

@@ -448,9 +448,8 @@
 
     })();
 
-    /**
-     * Add useful method
-     */
+    /** -------------------------------- Add useful method --------------------------------------- */
+
     Array.prototype.each = function(f, s) {
         var j = this.length,
         r;
@@ -486,22 +485,6 @@
         return false;
     }
 
-    String.prototype.convertEntry = function() {
-        return this.replace(/\&/g, "&amp;").replace(/\"/g, "&quot;").replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
-    }
-
-    String.prototype.revertEntity = function() {
-        return this.replace(/&quot;/g, "\"").replace(/&lt;/g, "\<").replace(/&gt;/g, "\>").replace(/&amp;/g, "\&");
-    }
-
-    String.prototype.convertCDATA = function() {
-        return this.replace(/\<\!\[CDATA\[/g, "&lt;![CDATA[").replace(/\]\]>/g, "]]&gt;");
-    }
-
-    String.prototype.revertCDATA = function() {
-        return this.replace(/&lt;\!\[CDATA\[/g, "<![CDATA[").replace(/\]\]&gt;/g, "]]>");
-    }
-
     Date.prototype.format = function(format) {
         var o = {
             "M+": this.getMonth() + 1,
@@ -530,29 +513,6 @@
 
 })(window);
 
-// 扩展tssJS 单元测试的静态方法
-; (function($) {
-    $.extend({
-        /* 前台单元测试断言 */
-        "assertEquals": function(actual, expect, msg) {
-            if (expect != actual) {
-                alert(msg || "" + "[expect: " + expect + ", actual: " + actual + "]");
-            }
-        },
-
-        "assertTrue": function(result, msg) {
-            if (!result && msg) {
-                alert(msg);
-            }
-        },
-
-        "assertNotNull": function(result, msg) {
-            if (result == null && msg) {
-                $.error(msg);
-            }
-        }
-    });
-})(tssJS);
 
 // 扩展tssJS原型方法
 ; (function($) {
@@ -921,7 +881,7 @@
 
             "get": function(name, decode) {
                 var str = items[name];
-                return decode ? unescape(str) : str;
+                return decode ? unescape(str) : str; // decode=true，对参数值（可能为中文等）进行编码
             },
 
             "init": function(queryString) {
@@ -1131,6 +1091,22 @@
 
 ;(function($) {
 
+    String.prototype.convertEntry = function() {
+        return this.replace(/\&/g, "&amp;").replace(/\"/g, "&quot;").replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
+    }
+
+    String.prototype.revertEntity = function() {
+        return this.replace(/&quot;/g, "\"").replace(/&lt;/g, "\<").replace(/&gt;/g, "\>").replace(/&amp;/g, "\&");
+    }
+
+    String.prototype.convertCDATA = function() {
+        return this.replace(/\<\!\[CDATA\[/g, "&lt;![CDATA[").replace(/\]\]>/g, "]]&gt;");
+    }
+
+    String.prototype.revertCDATA = function() {
+        return this.replace(/&lt;\!\[CDATA\[/g, "<![CDATA[").replace(/\]\]&gt;/g, "]]>");
+    }
+
     $.extend({
 
         "XML" : {
@@ -1138,7 +1114,7 @@
             "_NODE_TYPE_ELEMENT"    : 1,
             "_NODE_TYPE_ATTRIBUTE"  : 2,
             "_NODE_TYPE_TEXT"       : 3,
-            "_NODE_TYPE_CDATA"      : 4; 
+            "_NODE_TYPE_CDATA"      : 4,
             "_NODE_TYPE_COMMENT"    : 8,
             "_NODE_TYPE_DOCUMENT"   : 9,
 
@@ -1235,6 +1211,34 @@
                     }
                 }
                 return parseError;
+            },
+
+            "getCDATA": function(pnode, name) {
+                var node = pnode.getElementsByTagName(name)[0];
+                node = node || pnode;
+
+                var cdataValue = node.text || node.textContent || "";
+                return cdataValue.revertCDATA();
+            },
+
+            "setCDATA": function(pnode, name, value) {               
+                var cdateNode = createElementCDATA(name, value);
+
+                var oldNode = pnode.getElementsByTagName(name)[0];
+                if(oldNode == null) {
+                    pnode.appendChild(cdateNode);
+                }
+                else {
+                    oldNode.firstChild.removeNode();
+                    oldNode.appendChild(cdateNode);
+                }
+            },
+
+            "removeCDATA": function(pnode, name) {
+                var node = pnode.getElementsByTagName(name)[0];
+                if( node ) {
+                    node.removeNode(true);
+                }
             }
         }
 

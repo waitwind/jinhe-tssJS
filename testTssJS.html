@@ -14,44 +14,59 @@
 
 	<script type="text/javascript">
 
-	 // $.ready(function(name){
- 	// 	alert("hello : " + name + $().tssjs);
- 	// 	// $().color();
- 	// 	// $.color2();
+	// 扩展tssJS 单元测试的静态方法
+	; (function($) {
+	    $.extend({
+	        /* 前台单元测试断言 */
+	        "assertEquals": function(actual, expect, msg) {
+	            if (expect != actual) {
+	                alert(msg || "" + "[expect: " + expect + ", actual: " + actual + "]");
+	            }
+	        },
 
-	 // }, "tssJS");
+	        "assertTrue": function(result, msg) {
+	            if (!result && msg) {
+	                alert(msg);
+	            }
+	        },
 
-	 // tssJS.ready(function(name){
- 	// 	alert("hello : " + name);
-	 // }, "tssJS2");
+	        "assertNotNull": function(result, msg) {
+	            if (result == null && msg) {
+	                $.error(msg);
+	            }
+	        }
+	    });
+	})(tssJS);
 
 
-	 // $.bindReady(function(name){
- 	// 	alert("hello : " + name + $().tssjs);
-
-	 // }, " 3 ");
-
-	 // $().ready(function(name) {
- 	// 	alert("hello : " + name + this.tssjs);
- 		
-	 // }, " 4 ");
-
-	 // $(function() {
- 	// 	alert("hello : " + 5 + this.tssjs);
-	 // } );
-
- 	$.ready(function() {
- 		var tssJSObj = $("#div1");
-
-		// alert(tssJSObj.size());
-		// alert(tssJSObj[0].id);
-
-		tssJSObj.css("background-color", "green");
-
-		alert(tssJSObj.css("background-color"));
+	 $(function() {
+ 		$.assertEquals("1.0.0", this.tssjs, "$(fn) method error.");
 	 });
 
+
+	 // test core
+
+	 $().ready(function(name) {
+ 		$.assertEquals("tssJS1.0.0", name + this.tssjs, "$().ready(fn) method error.");
+ 
+ 		var tssJSObj = $("#div1");
+ 		$.assertEquals(1, tssJSObj.size(), "tssJSObj.size() error.");
+ 		$.assertEquals("div1", tssJSObj[0].id, "tssJSObj[0].id error.");
+
+		tssJSObj.css("background-color", "#565656");
+		$.assertEquals("rgb(86, 86, 86)", tssJSObj.css("background-color"), "tssJSObj.css(xx) error.");
+
+	 }, "tssJS");
+
+ 	// test Element
+
+ 	// test Cookie、Query等
  	alert($.Query.get("x"));
+
+ 	// test Event
+
+
+ 	// test XML
 
 
 	</script>

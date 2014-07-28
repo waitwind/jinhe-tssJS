@@ -53,10 +53,28 @@
  		$.assertEquals(1, tssJSObj.size(), "tssJSObj.size() error.");
  		$.assertEquals("div1", tssJSObj[0].id, "tssJSObj[0].id error.");
 
+ 		tssJSObj.each(function(x) { 
+ 			$.assertEquals("div1234", this.id + x, "tssJSObj.each() error.");
+ 		}, [234]);
+
 		tssJSObj.css("background-color", "#565656");
 		$.assertEquals("rgb(86, 86, 86)", tssJSObj.css("background-color"), "tssJSObj.css(xx) error.");
 
 	 }, "tssJS");
+
+	 $.assertEquals(true, !!$);
+	 $.noConflict();
+	 tssJS.assertEquals(false, !!$);
+
+	 $ = tssJS;
+
+	 $.assertEquals(true,  $.isFunction( function(){}) );
+	 $.assertEquals(true,  $.isArray( [1,2,3] ) );
+	 $.assertEquals(true,  $.isWindow( this ) );
+	 $.assertEquals(true,  $.isEmptyObject( {} ) );
+	 $.assertEquals(false,  $.isEmptyObject( {"x":"1"} ) );
+
+	 $.assertEquals(true,  $.isNullOrEmpty( " " ) );
 
  	// test Element
 

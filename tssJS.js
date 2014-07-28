@@ -24,16 +24,13 @@
         trimLeft = /^\s+/,
         trimRight = /\s+$/,
 
-        // Check for digits
-        rdigit = /\d/,
-
         // JSON RegExp
         rvalidchars = /^[\],:{}\s]*$/,
 
         toString = Object.prototype.toString,
-        push = Array.prototype.push,
-        slice = Array.prototype.slice,
         trim = String.prototype.trim,
+        push    = Array.prototype.push,
+        slice   = Array.prototype.slice,     
         indexOf = Array.prototype.indexOf,
 
         ua = navigator.userAgent.toLowerCase(),
@@ -197,19 +194,13 @@
 
             // 是否数组
             isArray: Array.isArray ||
-            function(obj) {
-                return tssJS.type(obj) === "array";
-            },
+                function(obj) {
+                    return tssJS.type(obj) === "array";
+                },
 
             // 简单的判断（判断setInterval属性）是否window对象
             isWindow: function(obj) {
                 return obj && typeof obj === "object" && "setInterval" in obj;
-            },
-
-            // 是否是保留字NaN
-            isNaN: function(obj) {
-                // 等于null 或 不是数字 或调用window.isNaN判断
-                return obj == null || !rdigit.test(obj) || isNaN(obj);
             },
 
             // 获取对象的类型
@@ -229,8 +220,8 @@
                 return true;
             },
 
-            "isNullOrEmpty": function(value) {
-                return (value == null || (typeof(value) == 'string' && value == ""));
+            isNullOrEmpty: function(value) {
+                return (value == null || (typeof(value) == 'string' && value.trim() == ""));
             },
 
             // 抛出一个异常

@@ -18,9 +18,9 @@
 	; (function($) {
 	    $.extend({
 	        /* 前台单元测试断言 */
-	        "assertEquals": function(actual, expect, msg) {
+	        "assertEquals": function(expect, actual, msg) {
 	            if (expect != actual) {
-	                alert(msg || "" + "[expect: " + expect + ", actual: " + actual + "]");
+	                alert(msg + ": " + "[expect: " + expect + ", actual: " + actual + "]");
 	            }
 	        },
 
@@ -76,16 +76,40 @@
 
 	 $.assertEquals(true,  $.isNullOrEmpty( " " ) );
 
+	// $.error("1234");
+
+	var json = '{"x":"1", "y":"2"}';
+	var data = $.parseJSON(json);
+	$.assertEquals("12", data["x"] + data["y"], "$.parseJSON(json) error.");
+
+	var f1 = "function f1() { return console.log('f1'); };";
+	$.globalEval(f1 + "f1();");
+
+	var f2 = function(x) { return "f2" + (x?x:"");}
+	$.assertEquals("f2", $.execCommand(f2), "$.execCommand() error.");
+	$.assertEquals("f299", $.execCommand("f2", 99), "$.execCommand() error.");
+ 
+
  	// test Element
 
  	// test Cookie、Query等
- 	alert($.Query.get("x"));
+ 	// alert($.Query.get("x"));
 
  	// test Event
 
 
  	// test XML
+	var str = [];
+    str[str.length] = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+    str[str.length] = "<book id=\"1\">";
+	str[str.length] = "	<title>Harry Potter</title>";
+	str[str.length] = "	<author>JK.Rowling</author>";
+	str[str.length] = "	<year>2005</year>";
+	str[str.length] = "</book>";
 
+	var dataXml = str.join("\r\n");
+
+	var xml = $.parseXML(dataXml);
 
 	</script>
 </head>

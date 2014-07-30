@@ -256,22 +256,21 @@
                 tssJS.error("Invalid JSON: " + data);
             },
 
-            // 解析XML 跨浏览器
-            // parseXML函数也主要是标准API和IE的封装。
-            // 标准API是DOMParser对象。
-            // 而IE使用的是Microsoft.XMLDOM的 ActiveXObject对象。
-            parseXML: function(data, xml, tmp) {
-
+            // 解析XML 跨浏览器, parseXML函数也主要是标准API和IE的封装。
+            // 标准API是DOMParser对象, 而IE使用的是Microsoft.XMLDOM的 ActiveXObject对象。
+            parseXML: function(data) {
+                var xml;
                 if (window.DOMParser) { // Standard 标准XML解析器
-                    tmp = new DOMParser();
-                    xml = tmp.parseFromString(data, "text/xml");
-                } else { // IE IE的XML解析器
+                    var parser = new DOMParser();
+                    xml = parser.parseFromString(data, "text/xml");
+                } 
+                else { // IE IE的XML解析器
                     xml = new ActiveXObject("Microsoft.XMLDOM");
                     xml.async = "false";
                     xml.loadXML(data);
                 }
 
-                tmp = xml.documentElement;
+                var tmp = xml.documentElement;
 
                 if (!tmp || !tmp.nodeName || tmp.nodeName === "parsererror") {
                     alert("Invalid XML: " + data);
@@ -285,19 +284,14 @@
             // 因为整个tssJS代码都是一整个匿名函数，所以当前context是tssJS，如果要将上下文设置为window则需使用globalEval。
             globalEval: function(data) {
                 if (data && /\S/.test(data)) { // data非空
-                    // use execScript on IE
-                    // use an anonymous function so that context is window rather than tssJS in Firefox
-                    (window.execScript ||
-                    function(data) {
-                        window["eval"].call(window, data);
-                    })(data);
+                    ( window.execScript || function(data) { window["eval"].call(window, data); } ) (data);
                 }
             },
 
-            "executeCommand": function(callback, param) {
+            "execCommand": function(callback, param) {
                 var returnVal;
                 try {
-                    if(isFunction(callback)) {
+                    if(tssJS.isFunction(callback)) {
                         returnVal = callback(param);
                     }
                     else {
@@ -341,8 +335,8 @@
                             }
                         }
                     } else {
-                        for (; i < length;) {
-                            if (callback.call(object[i], i, object[i++]) === false) {
+                        for (; i < length; i++) {
+                            if (callback.call(object[i], i, object[i]) === false) {
                                 break;
                             }
                         }

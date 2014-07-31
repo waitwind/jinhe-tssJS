@@ -347,14 +347,8 @@
             },
 
             // 尽可能的使用本地String.trim方法，否则先过滤开头的空格，再过滤结尾的空格
-            trim: trim ?
-            function(text) {
-                return trim.call(text);
-            }:
-            // Otherwise use our own trimming functionality
-            function(text) {
-                return text.toString().replace(trimLeft, "").replace(trimRight, "");
-            },
+            trim: trim ? function(text) { return trim.call(text); } :
+                function(text) { return text.toString().replace(trimLeft, "").replace(trimRight, ""); },
 
             // 过滤数组，返回新数组；callback返回true时保留
             grep: function(elems, callback) {
@@ -381,7 +375,7 @@
             /* 负责生成对象唯一编号（为了兼容FF） */
             "uid": 0,
             "getUniqueID": function(prefix) {
-                return (prefix || "_default_id_") + String(uid ++ );
+                return (prefix || "_default_id_") + String($.uid ++ );
             },
 
             // 获取当前时间的便捷函数
@@ -427,7 +421,6 @@
 
         rootTssJS = tssJS(document);
 
-        // Expose tssJS to the global object
         // 到这里，tssJS对象构造完成，后边的代码都是对tssJS或tssJS对象的扩展
         return tssJS;
 
@@ -435,29 +428,9 @@
 
     /** -------------------------------- Add useful method --------------------------------------- */
 
-    Array.prototype.each = function(f, s) {
-        var j = this.length,
-        r;
-        for (var i = 0; i < j; i++) {
-            r = s ? f.call(s, this[i], i) : f(this[i], i);
-            if (typeof r === "boolean" && !r) {
-                break
-            }
-        };
+    Array.prototype.each = function(fn, args) {
+        $.each(this, fn, args);
         return this;
-    };
-
-    Array.prototype.sort = function(f) {
-        var _ = this,
-        L = _.length - 1;
-
-        for (var i = 0; i < L; i++) {
-            for (var j = L; j > i; j--) {　　
-                if (f ? !f(_[j], _[j - 1]) : (_[j] < _[j - 1])) {　　
-                    var T = _[j];　　_[j] = _[j - 1];　　_[j - 1] = T;
-                }
-            }
-        }
     };
 
     Array.prototype.contains = function(obj) {
@@ -477,9 +450,8 @@
             "h+": this.getHours(),
             "m+": this.getMinutes(),
             "s+": this.getSeconds(),
-            "q+": Math.floor((this.getMonth() + 3) / 3),
-            // quarter
-            "S": this.getMilliseconds() //millisecond
+            "q+": Math.floor((this.getMonth() + 3) / 3),  // quarter
+            "S": this.getMilliseconds()
         }
 
         if (/(y+)/.test(format)) {
@@ -653,7 +625,7 @@
             }
 
             for (var i = 0; i < all.length; i++) {
-                if (hasClass(all[i], cn)) {
+                if ($.hasClass(all[i], cn)) {
                     result.push(all[i]);
                 }
             }

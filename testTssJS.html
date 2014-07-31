@@ -7,9 +7,7 @@
 	<script type="text/javascript" src="tssJS.js"></script>
  
 	<style>
-		 
- 
-
+	
 	</style>
 
 	<script type="text/javascript">
@@ -20,13 +18,13 @@
 	        /* 前台单元测试断言 */
 	        "assertEquals": function(expect, actual, msg) {
 	            if (expect != actual) {
-	                alert(msg + ": " + "[expect: " + expect + ", actual: " + actual + "]");
+	                $.error(msg + ": " + "[expect: " + expect + ", actual: " + actual + "]");
 	            }
 	        },
 
 	        "assertTrue": function(result, msg) {
 	            if (!result && msg) {
-	                alert(msg);
+	                $.error(msg);
 	            }
 	        },
 
@@ -44,39 +42,20 @@
 	 });
 
 
-	 // test core
+	// test core
+	$.assertEquals(true, !!$);
+	$.noConflict();
+	tssJS.assertEquals(false, !!$);
 
-	 $().ready(function(name) {
- 		$.assertEquals("tssJS1.0.0", name + this.tssjs, "$().ready(fn) method error.");
- 
- 		var tssJSObj = $("#div1");
- 		$.assertEquals(1, tssJSObj.size(), "tssJSObj.size() error.");
- 		$.assertEquals("div1", tssJSObj[0].id, "tssJSObj[0].id error.");
+	$ = tssJS;
 
- 		tssJSObj.each(function(x) { 
- 			$.assertEquals("div1234", this.id + x, "tssJSObj.each() error.");
- 		}, [234]);
+	$.assertEquals(true,  $.isFunction( function(){}) );
+	$.assertEquals(true,  $.isArray( [1,2,3] ) );
+	$.assertEquals(true,  $.isWindow( this ) );
+	$.assertEquals(true,  $.isEmptyObject( {} ) );
+	$.assertEquals(false,  $.isEmptyObject( {"x":"1"} ) );
 
-		tssJSObj.css("background-color", "#565656");
-		$.assertEquals("rgb(86, 86, 86)", tssJSObj.css("background-color"), "tssJSObj.css(xx) error.");
-
-	 }, "tssJS");
-
-	 $.assertEquals(true, !!$);
-	 $.noConflict();
-	 tssJS.assertEquals(false, !!$);
-
-	 $ = tssJS;
-
-	 $.assertEquals(true,  $.isFunction( function(){}) );
-	 $.assertEquals(true,  $.isArray( [1,2,3] ) );
-	 $.assertEquals(true,  $.isWindow( this ) );
-	 $.assertEquals(true,  $.isEmptyObject( {} ) );
-	 $.assertEquals(false,  $.isEmptyObject( {"x":"1"} ) );
-
-	 $.assertEquals(true,  $.isNullOrEmpty( " " ) );
-
-	// $.error("1234");
+	$.assertEquals(true,  $.isNullOrEmpty( " " ) );
 
 	var json = '{"x":"1", "y":"2"}';
 	var data = $.parseJSON(json);
@@ -88,9 +67,72 @@
 	var f2 = function(x) { return "f2" + (x?x:"");}
 	$.assertEquals("f2", $.execCommand(f2), "$.execCommand() error.");
 	$.assertEquals("f299", $.execCommand("f2", 99), "$.execCommand() error.");
- 
 
+	var map = {"x":"1", "y":"2"};
+	$.each(map, function(name, value) {
+		console.log("this=" + this + "  " + name + "=" + value);
+	});
+
+	$.each(map, function(arg1, arg2) {
+		console.log("this=" + this + "  args=[" + arg1 + "," + arg2 + "]");
+	}, [3, 4]);
+
+	var array = [{"x":"1", "y":"2"}, {"x":"7", "y":"9"}];
+	$.each(array, function(name, value) {
+		console.log("$.each(array) --> this.x=" + this.x + "  value.x=" + value.x);
+	});
+
+	array.each(function(name, value) {
+		console.log("array.each --> this.x=" + this.x + "  value.x=" + value.x);
+	});
+
+	var array3 = [4,6,3,8,2,5];
+	$.assertEquals(true, array3.contains(5), "Array.contains() error.");
+	var result1 = array3.slice().sort( function(n1, n2) {return n2- n1;} );
+	console.log(result1);
+
+	var result2 = array3.slice().sort();
+	console.log(result2);
+ 
+ 	$.assertEquals("Good morning!", $.trim(" Good morning! "), "$.trim() error.");
+
+ 	var array2 = $.grep(array, function(item, index) {
+ 		return index == 1 && item.x == 7;
+ 	}); 
+ 	$.assertEquals("9", array2[0].y, "$.grep() error.");
+
+ 	$.assertEquals("_default_id_0", $.getUniqueID(), "$.getUniqueID() error.");
+ 	$.assertEquals("_default_id_1", $.getUniqueID(), "$.getUniqueID() error.");
+
+ 	console.log((new Date()).format("yyyy-MM-dd"));
+ 
  	// test Element
+
+ 	$().ready(function(name) {
+ 		$.assertEquals("tssJS1.0.0", name + this.tssjs, "$().ready(fn) method error.");
+ 		
+ 		// test id selector
+ 		var tssJSObj = $("#div1");
+ 		$.assertEquals(1, tssJSObj.size(), "tssJSObj.size() error.");
+ 		$.assertEquals("div1", tssJSObj[0].id, "tssJSObj[0].id error.");
+
+ 		tssJSObj.each(function(x) { 
+ 			$.assertEquals("div1234", this.id + x, "tssJSObj.each() error.");
+ 		}, [234]);
+
+		tssJSObj.css("background-color", "#565656");
+		$.assertEquals("rgb(86, 86, 86)", tssJSObj.css("background-color"), "tssJSObj.css(xx) error.");
+
+		// test class selector
+		tssJSObj = $(".c2");
+		$.assertEquals(3, tssJSObj.size());
+		tssJSObj.css("background-color", "yellow");
+
+ 		tssJSObj.each(function(x) { 
+ 			$.assertEquals("div1234", this.id + x);
+ 		}, [234]);
+
+	 }, "tssJS");
 
  	// test Cookie、Query等
  	// alert($.Query.get("x"));
@@ -117,10 +159,17 @@
 <body>
 
 
-	<div id='div1'>
-		<input id='d1'> </input>
+	<div id='div1' class="c1">
+		<input id='d1' class="c2"> </input>
 	</div>
  
+ 	<div id='div2' class="c3">
+		<input id='d2' class="c2"> </input>
+	</div>
+
+	 <div id='div3' class="c3">
+		<input id='d3' class="c2"> </input>
+	</div>
 
 </body>
 </html>

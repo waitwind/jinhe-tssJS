@@ -38,14 +38,6 @@
             return e.test(ua)
         },
 
-        isOpera = mc(/opera/),
-        isChrome = mc(/\bchrome\b/),
-        isWebKit = mc(/webkit/),
-        isSafari = !isChrome && mc(/safari/),
-        isIE = !isOpera && mc(/msie/),
-        supportCanvas = !!document.createElement('canvas').getContext,
-        isMobile = mc(/ipod|ipad|iphone|android/gi),
-
         // [[Class]] -> type pairs
         class2type = {};
 
@@ -381,7 +373,15 @@
             // 获取当前时间的便捷函数
             now: function() {
                 return (new Date()).getTime();
-            }
+            },
+
+            isOpera:  mc(/opera/),
+            isChrome: mc(/\bchrome\b/),
+            isWebKit: mc(/webkit/),
+            isSafari: mc(/safari/),
+            isIE: !mc(/opera/) && mc(/msie/),
+            supportCanvas: !!document.createElement('canvas').getContext,
+            isMobile: mc(/ipod|ipad|iphone|android/gi),
         });
 
         // Populate the class2type map
@@ -475,11 +475,14 @@
 ; (function($) {
     $.fn.extend({
 
-        "find": function(selector, parent) {
+        find: function(selector, parent) {
             var elements = [];
             switch (selector.charAt(0)) {
             case '#':
-                elements[0] = $.getElementById(selector.substring(1));
+                var temp = $.getElementById(selector.substring(1));
+                if(temp) {
+                    elements.push(temp);
+                }
                 break;
             case '.':
                 elements = $.getElementsByClass(selector.substring(1), parent);
@@ -497,7 +500,7 @@
         },
 
         //设置CSS
-        "css": function(attr, value) {
+        css: function(attr, value) {
             for (var i = 0; i < this.length; i++) {
                 var element = this[i];
                 if (arguments.length == 1) {
@@ -509,10 +512,10 @@
         },
 
         // 添加Class
-        "addClass": function(className) {
+        addClass: function(className) {
             for (var i = 0; i < this.length; i++) {
                 var element = this[i];
-                if (!hasClass(element, className)) {
+                if (!$.hasClass(element, className)) {
                     element.className += ' ' + className;
                 }
             }
@@ -520,11 +523,11 @@
         },
 
         // 移除Class
-        "removeClass": function(className) {
+        removeClass: function(className) {
             var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
             for (var i = 0; i < this.length; i++) {
                 var element = this[i];
-                if (hasClass(element, className)) {
+                if ($.hasClass(element, className)) {
                     element.className = element.className.replace(reg, ' ');
                 }
             }
@@ -532,7 +535,7 @@
         },
 
         // 设置innerHTML
-        "html": function(str) {
+        html: function(str) {
             for (var i = 0; i < this.length; i++) {
                 var element = this[i];
                 if (arguments.length == 0) {
@@ -544,20 +547,20 @@
         },
 
         // 设置鼠标移入移出方法
-        "hover": function(over, out) {
+        hover: function(over, out) {
             for (var i = 0; i < this.length; i++) {
-                addEvent(this[i], 'mouseover', over);
-                addEvent(this[i], 'mouseout', out);
+                $.Event.addEvent(this[i], 'mouseover', over);
+                $.Event.addEvent(this[i], 'mouseout', out);
             }
             return this;
         },
 
         // 设置点击切换方法
-        "toggle": function() {
-            for (var i = 0; i < this.length; i++) { (function(element, args) {
+        toggle: function() {
+            for (var i = 0; i < this.length; i++) { 
+                (function(element, args) {
                     var count = 0;
-                    addEvent(element, 'click',
-                    function() {
+                    $.Event.addEvent(element, 'click', function() {
                         args[count++%args.length].call(this);
                     });
                 })(this[i], arguments);
@@ -566,7 +569,7 @@
         },
 
         //设置显示
-        "show": function() {
+        show: function() {
             for (var i = 0; i < this.length; i++) {
                 this[i].style.display = 'block';
             }
@@ -574,26 +577,27 @@
         },
 
         //设置隐藏
-        "hide": function() {
+        hide: function() {
             for (var i = 0; i < this.length; i++) {
                 this[i].style.display = 'none';
             }
             return this;
         },
 
-        //设置物体居中
-        "center": function(width, height) {
-            var top = (getInner().height - 250) / 2;
-            var left = (getInner().width - 350) / 2;
+        // 设置物体居中
+        center: function(width, height) {
+            var top  = ($.getInner().height - (width || 100) ) / 2;
+            var left = ($.getInner().width - (height || 100) ) / 2;
             for (var i = 0; i < this.length; i++) {
+                this[i].style.position = "absolute";
                 this[i].style.top = top + 'px';
                 this[i].style.left = left + 'px';
             }
             return this;
         },
 
-        //触发点击事件
-        "click": function(fn) {
+        // 触发点击事件
+        click: function(fn) {
             for (var i = 0; i < this.length; i++) {
                 this[i].onclick = fn;
             }
@@ -605,16 +609,16 @@
 // 扩展tssJS操作HTML DOMElement的静态方法
 ; (function($) {
     $.extend({
-        "getElementById": function(id) {
+        getElementById: function(id) {
             return document.getElementById(id);
         },
 
-        "getElementsByTag": function(tag, parentNode) {
+        getElementsByTag: function(tag, parentNode) {
             var node = parentNode ? parentNode: document;
             return node.getElementsByTagName(tag);
         },
 
-        "getElementsByClass": function(cn, parentNode) {
+        getElementsByClass: function(cn, parentNode) {
             var node = parentNode ? parentNode: document;
             var result = [];
             var all = [];
@@ -632,13 +636,13 @@
             return result;
         },
 
-        "hasClass": function(element, className) {
+        hasClass: function(element, className) {
             var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
             return element.className.match(reg);
         },
 
         // 获取视口大小
-        "getInner": function() {
+        getInner: function() {
             if (typeof window.innerWidth != 'undefined') {
                 return {
                     width: window.innerWidth,
@@ -653,7 +657,7 @@
         },
 
         // 获取Style
-        "getStyle": function(element, attr) {
+        getStyle: function(element, attr) {
             var value;
             if (typeof window.getComputedStyle != 'undefined') { // W3C
                 value = window.getComputedStyle(element, null)[attr];
@@ -663,17 +667,8 @@
             return value;
         },
 
-        "removeNode": function(node) {
-            if (node == null) return;
-
-            var parentNode = node.parentNode;
-            if (parentNode) {
-                parentNode.removeChild(node);
-            }
-        },
-
         //  获取绝对位置
-        "absPosition": function(node) {
+        absPosition: function(node) {
             var left, top, pEl = node;
 
             if (typeof node.getBoundingClientRect === 'function') {
@@ -694,50 +689,44 @@
             };
         },
 
-        // 创建带命名空间的对象
-        "createNSElement": function(tagName, ns) {
-            var obj;
-            if (ns == null) {
-                obj = document.createElement(tagName);
-            } else {
-                var tempDiv = document.createElement("DIV");
-                tempDiv.innerHTML = "<" + ns + ":" + tagName + "/>";
-                obj = tempDiv.firstChild.cloneNode(false);
-                Element.removeNode(tempDiv);
-            }
-
-            if (obj.uniqueID == null) {
-                obj.uniqueID = UniqueID.generator(); // 非IE
-            }
-            return obj;
-        },
-
-        "getNSElements": function(element, tagName, ns) {
-            var childs = element.getElementsByTagName(tagName);
-            if (childs == null || childs.length == 0) {
-                childs = element.getElementsByTagName(ns + ":" + tagName);
-            }
-            return childs;
-        },
-
-        "createElement": function(tagName, className) {
+        createElement: function(tagName, className) {
             var element = document.createElement(tagName);
             if (className) {
-                Element.addClass(element, className)
+                $(element).addClass(className)
             }
-
-            if (element.uniqueID == null) {
-                element.uniqueID = UniqueID.generator(); // 非IE
-            }
+ 
             return element;
         },
 
+        // 创建带命名空间的对象
+        createNSElement: function(tagName, ns) {
+            var tempDiv = document.createElement("DIV");
+            tempDiv.innerHTML = "<" + ns + ":" + tagName + "/>";
+            var element = tempDiv.firstChild.cloneNode(false);
+            $.removeNode(tempDiv);
+
+            return element;
+        },
+
+        getNSElements: function(element, tagName, ns) {
+            return element.getElementsByTagName(ns + ":" + tagName);
+        },
+
+        removeNode: function(node) {
+            if (node == null) return;
+
+            var parentNode = node.parentNode;
+            if (parentNode) {
+                parentNode.removeChild(node);
+            }
+        },
+
         /*
-         * where：插入位置。包括beforeBegin,beforeEnd,afterBegin,afterEnd。
+         * where：插入位置。包括afterBegin,afterEnd。
          * el：用于参照插入位置的html元素对象
          * html：要插入的html代码
          */
-        "insertHtml": function(where, el, html) {
+        insertHtml: function(where, el, html) {
             where = where.toLowerCase();
             if(el.insertAdjacentHTML) {
                 el.insertAdjacentHTML(where, html);
@@ -765,17 +754,17 @@
         },
 
         /* 动态创建脚本 */
-        "createScript": function(script) {
+        createScript: function(script) {
             var head = document.head || document.getElementsByTagName('head')[0];
             if( head ) {
-                var scriptNode = Element.createElement("script");
+                var scriptNode = $.createElement("script");
                 scriptNode.text = script;
                 head.appendChild(scriptNode);
             }
         },
 
         /* 设置透明度 */
-        "setOpacity": function(obj, opacity) {
+        setOpacity: function(obj, opacity) {
             if(opacity == null || opacity == "") {
                 opacity = 100;
             }
@@ -790,9 +779,9 @@
             }
         },
 
-        "waitingLayerCount": 0,
+        waitingLayerCount: 0,
 
-        "showWaitingLayer": function () {
+        showWaitingLayer: function () {
             var waitingDiv = $("#_waitingDiv")[0];
             if(waitingDiv == null) {
                 waitingDiv = document.createElement("div");    
@@ -805,7 +794,7 @@
                 waitingDiv.style.cursor = "wait"; 
                 waitingDiv.style.zIndex = "10000";
                 waitingDiv.style.background = "black";   
-                Element.setOpacity(waitingDiv, 10);
+                $.setOpacity(waitingDiv, 33);
 
                 document.body.appendChild(waitingDiv);
             }
@@ -814,14 +803,14 @@
                 waitingDiv.style.display = "block";
             }
 
-            waitingLayerCount ++;
+            $.waitingLayerCount ++;
         },
 
-        "hideWaitingLayer": function() {
-            waitingLayerCount --;
+        hideWaitingLayer: function() {
+            $.waitingLayerCount --;
 
             var waitingDiv = $("#_waitingDiv")[0];
-            if( waitingDiv && waitingLayerCount <= 0 ) {
+            if( waitingDiv && $.waitingLayerCount <= 0 ) {
                 waitingDiv.style.display = "none";
             }
         }
@@ -829,19 +818,44 @@
     });
 })(tssJS);
 
+// 扩展tssJS 单元测试的静态方法
+; (function($) {
+    $.extend({
+        /* 前台单元测试断言 */
+        assertEquals: function(expect, actual, msg) {
+            if (expect != actual) {
+                $.error(msg + ": " + "[expect: " + expect + ", actual: " + actual + "]");
+            }
+        },
+
+        assertTrue: function(result, msg) {
+            if (!result && msg) {
+                $.error(msg);
+            }
+        },
+
+        assertNotNull: function(result, msg) {
+            if (result == null && msg) {
+                $.error(msg);
+            }
+        }
+    });
+})(tssJS);
+
+
+/* 负责获取当前页面地址参数 */
 ; (function($) {
 
-    $.extend({
-        /* 负责获取当前页面地址参数 */
-        "Query": {
-            "items": {},
+    $.extend({        
+        Query: {
+            items: {},
 
-            "get": function(name, decode) {
+            get: function(name, decode) {
                 var str = items[name];
                 return decode ? unescape(str) : str; // decode=true，对参数值（可能为中文等）进行编码
             },
 
-            "init": function(queryString) {
+            init: function(queryString) {
                 items = {}; // 先清空
                 queryString = queryString || window.location.search.substring(1);
 
@@ -851,7 +865,6 @@
                     items[param[0]] = param[1];
                 }
             }
-
         }
     });
 
@@ -866,8 +879,8 @@
 ; (function($) {
 
     $.extend({
-        "Cookie": {
-            "setValue": function(name, value, expires, path) {
+        Cookie: {
+            setValue: function(name, value, expires, path) {
                 if (expires == null) {
                     var exp = new Date();
                     exp.setTime(exp.getTime() + 365 * 24 * 60 * 60 * 1000);
@@ -878,7 +891,7 @@
                 window.document.cookie = name + "=" + escape(value) + ";expires=" + expires + ";path=" + path;
             },
 
-            "getValue": function(name) {
+            getValue: function(name) {
                 var value = null;
                 var cookies = window.document.cookie.split(";");
                 for (var i = 0; i < cookies.length; i++) {
@@ -894,18 +907,18 @@
                 return value;
             },
 
-            "del": function(name, path) {
+            del: function(name, path) {
                 var expires = new Date(0).toGMTString();
                 this.setValue(name, "", expires, path);
             },
 
-            "delAll": function(path) {
+            delAll: function(path) {
                 var cookies = window.document.cookie.split(";");
                 for (var i = 0; i < cookies.length; i++) {
                     var cookie = cookies[i];
                     var index = cookie.indexOf("=");
                     var curName = cookie.substring(0, index).replace(/^ /gi, "");
-                    del(curName, path);
+                    $.Cookie.del(curName, path);
                 }
             }
 
@@ -917,17 +930,36 @@
 ;(function($){
 
     $.extend({
-        "Event": {
-            "MOUSEDOWN": 1,
-            "MOUSEUP": 2,
-            "MOUSEOVER": 4,
-            "MOUSEOUT": 8,
-            "MOUSEMOVE":16,
-            "MOUSEDRAG": 32,
+        Event: {
+            MOUSEDOWN: 1,
+            MOUSEUP: 2,
+            MOUSEOVER: 4,
+            MOUSEOUT: 8,
+            MOUSEMOVE:16,
+            MOUSEDRAG: 32,
 
-            "timeout": {},
+            timeout: {},
 
-            "preventDefault": function(event) {
+            addEvent: function(element, eventName, fn) {
+                if(element.addEventListener) {
+                    element.addEventListener(eventName, fn, false);
+                }
+                else if(element.attachEvent) {
+                    element.attachEvent("on" + eventName, fn);
+                }
+            },
+
+            removeEvent: function(element, eventName, fn) {
+                if( element.removeEventListener ) {
+                    element.removeEventListener(eventName, fn, false);
+                }
+                else {
+                    element.detachEvent("on" + eventName, fn);
+                }
+            },
+
+            /* 取消事件 */
+            cancel: function(event) { 
                 if (event.preventDefault) {
                     event.preventDefault();
                 } else {
@@ -935,26 +967,23 @@
                 }
             },
 
-            /* 取消事件 */
-            "cancel": function(event) { preventDefault(event); },
-
             // 获得事件触发对象
-            "getSrcElement": function(eventObj) {
+            getSrcElement: function(eventObj) {
                 return eventObj.target || eventObj.srcElement;
             },
 
             /* 使事件始终捕捉对象。设置事件捕获范围。 */
-            "setCapture": function(srcElement, eventType) {
+            setCapture: function(srcElement, eventType) {
                 if (srcElement.setCapture) {             
                     srcElement.setCapture();         
                 } 
-                else if(window.captureEvents){           
+                else if (window.captureEvents) {           
                     window.captureEvents(eventType);         
                 }
             },
 
             /* 使事件放弃始终捕捉对象。 */
-            "releaseCapture": function(srcElement, eventType) {
+            releaseCapture: function(srcElement, eventType) {
                 if(srcElement.releaseCapture){
                     srcElement.releaseCapture();
                 }
@@ -964,7 +993,7 @@
             },
 
             /* 阻止事件向上冒泡 */
-            "cancelBubble": function(eventObj) {
+            cancelBubble: function(eventObj) {
                 if( eventObj.stopPropagation ) {
                     eventObj.stopPropagation();
                 }
@@ -973,59 +1002,16 @@
                 }
             },
 
-            "attachEvent": function(element, eventName, fn) {
-                if(element.addEventListener) {
-                    element.addEventListener(eventName, fn, false);
-                }
-                else if(element.attachEvent) {
-                    element.attachEvent("on" + eventName, fn);
-                }
-            },
-
-            "detachEvent": function(element, eventName, fn) {
-                if( element.removeEventListener ) {
-                    element.removeEventListener(eventName, fn, false);
-                }
-                else {
-                    element.detachEvent("on" + eventName, fn);
-                }
-            },
-
-            "fireOnScrollBar": function(eventObj) {
-                var isOnScrollBar = false;
-                var element = getSrcElement(eventObj);
-
-                var absPosition = $.absPosition(element);
-
-                // 是否有纵向滚动条
-                if(element.offsetWidth > element.clientWidth) {
-                    var offsetX = eventObj.clientX - absPosition.left;
-                    if(offsetX > element.clientWidth) {
-                        isOnScrollBar = true;
-                    }
-                }
-
-                // 是否有横向滚动条
-                if(false == isOnScrollBar && element.offsetHeight > element.clientHeight) {
-                    var offsetY = eventObj.clientY - absPosition.top;
-                    if(offsetY > element.clientHeight) {
-                        isOnScrollBar = true;
-                    }
-                }
-                return isOnScrollBar;
-            },
-
             /** 模拟事件 */
-            "createEventObject": function() { return new Object(); },
+            createEventObject: function() { return new Object(); }
         }
     });
 
     $.extend({
 
-        "EventFirer" : function(element, eventName) {
-            var _name = eventName;
+        EventFirer: function(element, eventName) {
             this.fire = function (event) {
-                var func = element.getAttribute(_name) || eval("element." + _name);
+                var func = element.getAttribute(eventName) || eval("element." + eventName);
                 if( func ) {
                     var funcType = typeof(func);
                     if("string" == funcType) {

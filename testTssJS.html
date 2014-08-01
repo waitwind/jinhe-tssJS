@@ -7,35 +7,14 @@
 	<script type="text/javascript" src="tssJS.js"></script>
  
 	<style>
+
+		.cc {
+			width: 250px;
+		}
 	
 	</style>
 
 	<script type="text/javascript">
-
-	// 扩展tssJS 单元测试的静态方法
-	; (function($) {
-	    $.extend({
-	        /* 前台单元测试断言 */
-	        "assertEquals": function(expect, actual, msg) {
-	            if (expect != actual) {
-	                $.error(msg + ": " + "[expect: " + expect + ", actual: " + actual + "]");
-	            }
-	        },
-
-	        "assertTrue": function(result, msg) {
-	            if (!result && msg) {
-	                $.error(msg);
-	            }
-	        },
-
-	        "assertNotNull": function(result, msg) {
-	            if (result == null && msg) {
-	                $.error(msg);
-	            }
-	        }
-	    });
-	})(tssJS);
-
 
 	 $(function() {
  		$.assertEquals("1.0.0", this.tssjs, "$(fn) method error.");
@@ -125,20 +104,68 @@
 
 		// test class selector
 		tssJSObj = $(".c2");
-		$.assertEquals(3, tssJSObj.size());
+		$.assertEquals(4, tssJSObj.size());
 		tssJSObj.css("background-color", "yellow");
+		tssJSObj.addClass("cc");
 
- 		tssJSObj.each(function(x) { 
- 			$.assertEquals("div1234", this.id + x);
- 		}, [234]);
+		$("#d2").removeClass("cc");
+
+		console.log($("#div1").html());
+		$("#div1").html('<input id="d1" class="c2 cc" style="background-color: red;">');
+
+		$("#d1").hover( function() { this.value = "over"; }, function() { this.value = "out"; } );
+
+		$(".btClass").toggle(function() { this.value = "B-click-1"; }, function() { this.value = "B-click-2"; } );
+
+		$("a").click( function() { 
+				$("#d4").show()
+					.css("background-color", "grey")
+					.css("height", "50px")
+					.center(200, 50); 
+				console.log( $.absPosition($("#d4")[0]) );
+			} 			
+		);
+
+		var newElement = $.createElement("div", "cc");
+		$(newElement).html("<br/>new Div<br/>123456").css("background-color", "#396656");
+		document.body.appendChild(newElement);
+
+		newElement = $.createNSElement("Page", "WorkSpace");
+		$(newElement).addClass("cc").html("<br/> new WorkSpace:Page").css("background-color", "red").css("display", "block");
+		document.body.appendChild(newElement);
+
+		$.assertEquals(1, $.getNSElements(document.body, "Page", "WorkSpace").length);
+		$.assertEquals(1, $("WorkSpace:Page").size());
+
+		$.insertHtml("afterEnd", newElement, "<div>test insertHtml afterEnd</div>");
+		$.insertHtml("afterBegin", newElement, "<div>test insertHtml afterBegin 1</div>");
+		$.insertHtml("afterBegin", newElement, "<div>test insertHtml afterBegin 2</div>");
+
+		$.createScript("console.log('test createScript')");
+
+		$.showWaitingLayer();
+		setTimeout($.hideWaitingLayer, 2000);
 
 	 }, "tssJS");
 
  	// test Cookie、Query等
- 	// alert($.Query.get("x"));
+ 	$.Query.init("name=JK&id=1");
+	$.assertEquals($.Query.get("id", true), "1");
+
+ 	$.Cookie.setValue("token", "1234567890", null, "/tss");
+	$.Cookie.del("token", "/tss");
+
+	$.Cookie.setValue("token", "abceefghij");
+	var token = $.Cookie.getValue("token");
+	if($.isChrome) {
+		$.assertTrue(token == null); // Chrome只支持在线网站的cookie的读写操作，对本地html的cookie操作是禁止的。
+	} else {
+		$.assertEquals(token, "abceefghij"); 
+	}
+
+	$.Cookie.delAll();
 
  	// test Event
-
 
  	// test XML
 	var str = [];
@@ -160,15 +187,21 @@
 
 
 	<div id='div1' class="c1">
-		<input id='d1' class="c2"> </input>
+		<input id='d1' class="c2"> </input> <input type='button' name='B1' value='B1' class='btClass'></input>
 	</div>
  
  	<div id='div2' class="c3">
-		<input id='d2' class="c2"> </input>
+		<input id='d2' class="c2"> </input> <input type='button' name='B2' value='B2' class='btClass'></input>
 	</div>
 
 	 <div id='div3' class="c3">
-		<input id='d3' class="c2"> </input>
+		<input id='d3' class="c2"> </input> <input type='button' name='B3' value='B3' class='btClass'></input>
+	</div>
+
+	<div id='div4' class="c3" >
+		<div id='d4' class="c2" style="display:none;"> you catch me now </div> 
+		<input type='button' id='B4' value='B4' class='btClass'></input> 
+		<a href='#'>i'm a href, click me</a>
 	</div>
 
 </body>

@@ -1030,7 +1030,7 @@
 
 /*********************************** 事件（Event）函数  end **********************************/
 
-/*********************************** xml相关操作函数  start **********************************/
+/*********************************** XML相关操作函数  start **********************************/
 
 ;(function($) {
 
@@ -1052,28 +1052,23 @@
 
     $.extend({
 
-        "XML" : {
-            "MSXML_DOCUMENT_VERSION": "Msxml2.DOMDocument.6.0",
-            "_NODE_TYPE_ELEMENT"    : 1,
-            "_NODE_TYPE_ATTRIBUTE"  : 2,
-            "_NODE_TYPE_TEXT"       : 3,
-            "_NODE_TYPE_CDATA"      : 4,
-            "_NODE_TYPE_COMMENT"    : 8,
-            "_NODE_TYPE_DOCUMENT"   : 9,
+        XML : {
+            MSXML_DOCUMENT_VERSION: "Msxml2.DOMDocument.6.0",
+            _NODE_TYPE_ELEMENT    : 1,
+            _NODE_TYPE_ATTRIBUTE  : 2,
+            _NODE_TYPE_TEXT       : 3,
+            _NODE_TYPE_CDATA      : 4,
+            _NODE_TYPE_COMMENT    : 8,
+            _NODE_TYPE_DOCUMENT   : 9,
 
             /* 将字符串转化成xml节点对象 */
-            "loadXmlToNode": function() {
-                if(xml == null || xml == "" || xml == "undifined") {
-                    return null;
-                }
-
+            toNode: function(xml) {
                 xml = xml.revertEntity();
-                var xr = new XmlReader(xml);
-                return xr.documentElement;
+                return $.parseXML(xml).documentElement;
             },
 
-            "xml2String": function(element) {
-                if (Public.isIE()) {
+            toString: function(element) {
+                if ($.isIE) {
                     return element.xml;
                 }
                 else {
@@ -1082,11 +1077,11 @@
                 }
             },
 
-            "getNodeText": function(node) {
+            getText: function(node) {
                 return node.text || node.textContent || ""; // chrome 用 textContent
             },
 
-            "EMPTY_XML_DOM": function(){
+            EMPTY_XML_DOM: (function() {
                 var xmlDom;
                 if ($.isIE) {
                     xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
@@ -1098,65 +1093,46 @@
                     xmlDom.parser = parser;
                 } 
                 return xmlDom;
+            })(),
+
+            createNode: function(name) {
+                return $.XML.EMPTY_XML_DOM.createElement(name);
             },
 
-            "loadXml": function(text) {
-                var xmlDom;
-
-                if ($.isIE) {
-                    this.xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
-                    this.xmlDom.async = false;
-                    this.xmlDom.loadXML(text); 
-                }
-                else {
-                    var parser = new DOMParser();
-                    this.xmlDom = parser.parseFromString(text, "text/xml"); 
-                } 
-
-                return xmlDom.documentElement || xmlDom;
-            },
-
-            "createElement": function(xmlDom, name) {
-                var node = xmlDom.createElement(name);
-                var xmlNode = new XmlNode(node);
-                return xmlNode;
-            },
-
-            "createCDATA": function(data) {
-                var xmlNode;
-                data = String(data).convertCDATA();
+            createCDATA: function(data) {
                 if(window.DOMParser) {
-                    var xmlDom = loadXml("<root><![CDATA[" + data + "]]></root>");
-                    var xmlNode = new XmlNode(xmlDom);
+                    return $.XML.toNode("<root><![CDATA[" + data + "]]></root>").firstChild;
                 }
                 else {
-                    xmlNode = new XmlNode(EMPTY_XML_DOM().createCDATASection(data));
+                    return $.XML.EMPTY_XML_DOM.createCDATASection(data);
                 }
-                return xmlNode;
             },
 
-             "createElementCDATA": function(name, data) {
-                var xmlNode   = createElement(name);
-                var cdataNode = createCDATA(data);
+            appendCDATA: function(name, data) {
+                var xmlNode   = $.XML.createNode(name);
+                var cdataNode = $.XML.createCDATA(data);
                 xmlNode.appendChild(cdataNode);
                 return xmlNode;
             },
 
             /* 获取解析错误 */
-            "getParseError": function(xmlDom) {
+            getParseError: function(xmlDom) {
                 var parseError = null;
                 if(window.DOMParser) {
-
+                    var errorNodes = xmlDom.getElementsByTagName("parsererror");
+                    if(errorNodes.length > 0) {
+                        return errorNodes[0].innerHTML;
+                    }
                 } 
                 else {
                     if( xmlDom.parseError.errorCode != 0 ) {
-                        parseError = xmlDom.parseError;
+                        return xmlDom.parseError;
                     }
                 }
-                return parseError;
+                return "";
             },
 
-            "getCDATA": function(pnode, name) {
+            getCDATA: function(pnode, name) {
                 var node = pnode.getElementsByTagName(name)[0];
                 node = node || pnode;
 
@@ -1164,8 +1140,8 @@
                 return cdataValue.revertCDATA();
             },
 
-            "setCDATA": function(pnode, name, value) {               
-                var cdateNode = createElementCDATA(name, value);
+            setCDATA: function(pnode, name, value) {               
+                var cdateNode = $.XML.appendCDATA(name, value);
 
                 var oldNode = pnode.getElementsByTagName(name)[0];
                 if(oldNode == null) {
@@ -1177,10 +1153,10 @@
                 }
             },
 
-            "removeCDATA": function(pnode, name) {
+            removeCDATA: function(pnode, name) {
                 var node = pnode.getElementsByTagName(name)[0];
                 if( node ) {
-                    node.removeNode(true);
+                    pnode.removeChild(node);
                 }
             }
         }

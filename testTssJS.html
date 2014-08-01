@@ -166,19 +166,72 @@
 	$.Cookie.delAll();
 
  	// test Event
+	$().ready(function() {
+		var clearObj = $("#d4")[0];
+		var f2 = function() { alert("test Event"); }
+
+		$.Event.addEvent(clearObj, "click", f2);
+		$.Event.removeEvent(clearObj, "click", f2);
+
+	    $.Event.addEvent(clearObj, "dblclick", function(eventObj) {
+			var srcElement = $.Event.getSrcElement(eventObj);
+
+			alert("事件坐标："  + eventObj.clientX + ", " + eventObj.clientY );
+
+			$.Event.cancel(eventObj);
+		});
+
+		$.Event.setCapture(clearObj, $.Event.MOUSEDOWN);
+		$.Event.releaseCapture(clearObj, $.Event.MOUSEDOWN);
+	});
 
  	// test XML
 	var str = [];
     str[str.length] = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     str[str.length] = "<book id=\"1\">";
-	str[str.length] = "	<title>Harry Potter</title>";
-	str[str.length] = "	<author>JK.Rowling</author>";
+	str[str.length] = "	<title>TSS Framework</title>";
+	str[str.length] = "	<author>Jon.King</author>";
 	str[str.length] = "	<year>2005</year>";
 	str[str.length] = "</book>";
 
 	var dataXml = str.join("\r\n");
+	$.assertEquals(dataXml, dataXml.convertEntry().revertEntity());
+
+	var cdateNodeXML = "<![CDATA[ 1 > 2 ]]>";
+	$.assertEquals(cdateNodeXML, cdateNodeXML.convertCDATA().revertCDATA());
 
 	var xml = $.parseXML(dataXml);
+	var xmlNode = $.XML.toNode(dataXml);
+	console.log($.XML.toString(xmlNode));
+
+	var xmlNode2 = $.XML.toNode("<author>Jon.King</author>");
+	$.assertEquals("Jon.King", $.XML.getText(xmlNode2));
+
+	var xmlNode3 = $.XML.createNode("author");
+	$.assertEquals("", $.XML.getText(xmlNode3));
+
+	var cdataNode = $.XML.createCDATA("1<>2");
+	$.assertEquals("<![CDATA[1<>2]]>", $.XML.toString(cdataNode));
+
+	var xmlNode4 = $.XML.appendCDATA("test", "1<>2");
+	$.assertEquals("<test><![CDATA[1<>2]]></test>",$.XML.toString(xmlNode4));
+	$.assertEquals("1<>2", $.XML.getCDATA(xmlNode4, "test"));
+
+	var xmlNode5 = $.XML.toNode("<p></p>")
+	$.XML.setCDATA(xmlNode5, "test", "3<>4");
+	$.assertEquals("3<>4", $.XML.getCDATA(xmlNode5, "test"));
+
+	$.XML.removeCDATA(xmlNode5, "test");
+	$.assertEquals("<p/>",$.XML.toString(xmlNode5));
+
+	var xmlDom = $.parseXML("<test>1<>2</test>");
+	console.log($.XML.getParseError(xmlDom));
+
+	console.log(xml.selectNodes("/book/year")[0]);
+	console.log(xmlNode.selectNodes("/book/year")[0]);
+
+	console.log(xml.selectSingleNode("/book/author"));
+	console.log(xmlNode.selectSingleNode("/book/author"));
 
 	</script>
 </head>

@@ -1,54 +1,13 @@
 
-(function (root, factory) {
+;(function ($, factory) {
 
-    root.Pikaday = factory(root.moment);
+    $.Calendar = factory($.moment);
 
-})(this, function (moment) {
+})(tssJS, function (moment) {
     
     'use strict';
 
-Date.prototype.format = function(format) {
-	var o = {
-		"M+" : this.getMonth() + 1,  
-		"d+" : this.getDate(), 
-		"h+" : this.getHours(), 
-		"m+" : this.getMinutes(), 
-		"s+" : this.getSeconds(), 
-		"q+" : Math.floor((this.getMonth()+3)/3),
-		"S" : this.getMilliseconds()
-	}
-
-	if(/(y+)/.test(format)) {
-		format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-	}
-
-	for(var k in o) {
-		if( new RegExp("("+ k +")").test(format) ) {
-			format = format.replace(RegExp.$1, RegExp.$1.length == 1? o[k] : ("00" + o[k]).substr((""+ o[k]).length));
-		}
-	}
-	return format;
-}
- 
-var hasEventListeners = !!window.addEventListener,
-
-    document = window.document,
-
-    addEvent = function(el, e, callback, capture) {
-        if (hasEventListeners) {
-            el.addEventListener(e, callback, !!capture);
-        } else {
-            el.attachEvent('on' + e, callback);
-        }
-    },
-
-    removeEvent = function(el, e, callback, capture) {
-        if (hasEventListeners) {
-            el.removeEventListener(e, callback, !!capture);
-        } else {
-            el.detachEvent('on' + e, callback);
-        }
-    },
+var  document = window.document,
 
     fireEvent = function(el, eventName, data) {
         var ev;
@@ -64,29 +23,7 @@ var hasEventListeners = !!window.addEventListener,
             el.fireEvent('on' + eventName, ev);
         }
     },
-
-    trim = function(str) {
-        return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g,'');
-    },
-
-    hasClass = function(el, cn) {
-        return (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1;
-    },
-
-    addClass = function(el, cn) {
-        if (!hasClass(el, cn)) {
-            el.className = (el.className === '') ? cn : el.className + ' ' + cn;
-        }
-    },
-
-    removeClass = function(el, cn) {
-        el.className = trim((' ' + el.className + ' ').replace(' ' + cn + ' ', ' '));
-    },
-
-    isArray = function(obj) {
-        return (/Array/).test(Object.prototype.toString.call(obj));
-    },
-
+ 
     isDate = function(obj) {
         return (/Date/).test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime());
     },
@@ -117,7 +54,7 @@ var hasEventListeners = !!window.addEventListener,
                         to[prop] = new Date(from[prop].getTime());
                     }
                 }
-                else if (isArray(from[prop])) {
+                else if ($.isArray(from[prop])) {
                     if (overwrite) {
                         to[prop] = from[prop].slice(0);
                     }
@@ -252,7 +189,7 @@ var hasEventListeners = !!window.addEventListener,
         }
         monthHtml = '<div class="pika-label">' + opts.i18n.months[month] + '<select class="pika-select pika-select-month">' + arr.join('') + '</select></div>';
 
-        if (isArray(opts.yearRange)) {
+        if ($.isArray(opts.yearRange)) {
             i = opts.yearRange[0];
             j = opts.yearRange[1] + 1;
         } else {
@@ -304,22 +241,22 @@ var hasEventListeners = !!window.addEventListener,
             var target = e.target || e.srcElement;
             if (!target) return;
 
-            if (!hasClass(target, 'is-disabled')) {
-                if (hasClass(target, 'pika-button') && !hasClass(target, 'is-empty')) {
+            if (!$.hasClass(target, 'is-disabled')) {
+                if ($.hasClass(target, 'pika-button') && !$.hasClass(target, 'is-empty')) {
                     self.setDate(new Date(self._y, self._m, parseInt(target.innerHTML, 10)));
 	                    window.setTimeout(function() {
 	                        self.hide();
 	                    }, 100);
                     return;
                 }
-                else if (hasClass(target, 'pika-prev')) {
+                else if ($.hasClass(target, 'pika-prev')) {
                     self.prevMonth();
                 }
-                else if (hasClass(target, 'pika-next')) {
+                else if ($.hasClass(target, 'pika-next')) {
                     self.nextMonth();
                 }
             }
-            if (!hasClass(target, 'pika-select')) {
+            if (!$.hasClass(target, 'pika-select')) {
                 if (e.preventDefault) {
                     e.preventDefault();
                 } else {
@@ -336,10 +273,10 @@ var hasEventListeners = !!window.addEventListener,
             var target = e.target || e.srcElement;
             if (!target) return;
             
-            if (hasClass(target, 'pika-select-month')) {
+            if ($.hasClass(target, 'pika-select-month')) {
                 self.gotoMonth(target.value);
             }
-            else if (hasClass(target, 'pika-select-year')) {
+            else if ($.hasClass(target, 'pika-select-year')) {
                 self.gotoYear(target.value);
             }
         };
@@ -377,15 +314,15 @@ var hasEventListeners = !!window.addEventListener,
                 pEl = target;
             if (!target) return;
 
-            if (!hasEventListeners && hasClass(target, 'pika-select')) {
+            if ( $.hasClass(target, 'pika-select') ) {
                 if (!target.onchange) {
                     target.setAttribute('onchange', 'return;');
-                    addEvent(target, 'change', self._onChange);
+                    $.Event.addEvent(target, 'change', self._onChange);
                 }
             }
 
             do {
-                if (hasClass(pEl, 'pika-single')) {
+                if ($.hasClass(pEl, 'pika-single')) {
                     return;
                 }
             }
@@ -399,12 +336,12 @@ var hasEventListeners = !!window.addEventListener,
         self.el = document.createElement('div');
         self.el.className = 'pika-single';
 
-        addEvent(self.el, 'mousedown', self._onMouseDown, true);
-        addEvent(self.el, 'change', self._onChange);
+        $.Event.addEvent(self.el, 'mousedown', self._onMouseDown, true);
+        $.Event.addEvent(self.el, 'change', self._onChange);
 
         if (opts.field) {
 			document.body.appendChild(self.el);
-            addEvent(opts.field, 'change', self._onInputChange);
+            $.Event.addEvent(opts.field, 'change', self._onInputChange);
 
             if (!opts.defaultDate) {
                 opts.defaultDate = new Date(Date.parse(opts.field.value));
@@ -426,9 +363,9 @@ var hasEventListeners = !!window.addEventListener,
 
         this.hide();
         self.el.className += ' is-bound';
-        addEvent(opts.trigger, 'click', self._onInputClick);
-        addEvent(opts.trigger, 'focus', self._onInputFocus);
-        addEvent(opts.trigger, 'blur', self._onInputBlur);
+        $.Event.addEvent(opts.trigger, 'click', self._onInputClick);
+        $.Event.addEvent(opts.trigger, 'focus', self._onInputFocus);
+        $.Event.addEvent(opts.trigger, 'blur', self._onInputBlur);
     };
 
 
@@ -466,7 +403,7 @@ var hasEventListeners = !!window.addEventListener,
                 opts.maxMonth = opts.maxDate.getMonth();
             }
 
-            if (isArray(opts.yearRange)) {
+            if ($.isArray(opts.yearRange)) {
                 var fallback = new Date().getFullYear() - 10;
                 opts.yearRange[0] = parseInt(opts.yearRange[0], 10) || fallback;
                 opts.yearRange[1] = parseInt(opts.yearRange[1], 10) || fallback;
@@ -691,8 +628,8 @@ var hasEventListeners = !!window.addEventListener,
 
         show: function() {
             if (!this._v) {
-                addEvent(document, 'click', this._onClick);
-                removeClass(this.el, 'is-hidden');
+                $.Event.addEvent(document, 'click', this._onClick);
+                $(this.el).removeClass('is-hidden');
                 this._v = true;
                 this.draw();
                 if (typeof this._o.onOpen === 'function') {
@@ -704,9 +641,9 @@ var hasEventListeners = !!window.addEventListener,
         hide: function() {
             var v = this._v;
             if (v !== false) {
-                removeEvent(document, 'click', this._onClick);
+                $.Event.removeEvent(document, 'click', this._onClick);
                 this.el.style.cssText = '';
-                addClass(this.el, 'is-hidden');
+                $(this.el).addClass('is-hidden');
                 this._v = false;
                 if (v !== undefined && typeof this._o.onClose === 'function') {
                     this._o.onClose.call(this);
@@ -717,13 +654,13 @@ var hasEventListeners = !!window.addEventListener,
         /** GAME OVER */
         destroy: function() {
             this.hide();
-            removeEvent(this.el, 'mousedown', this._onMouseDown, true);
-            removeEvent(this.el, 'change', this._onChange);
+            $.Event.removeEvent(this.el, 'mousedown', this._onMouseDown, true);
+            $.Event.removeEvent(this.el, 'change', this._onChange);
             if (this._o.field) {
-                removeEvent(this._o.field, 'change', this._onInputChange);
-                removeEvent(this._o.trigger, 'click', this._onInputClick);
-                removeEvent(this._o.trigger, 'focus', this._onInputFocus);
-                removeEvent(this._o.trigger, 'blur', this._onInputBlur);
+                $.Event.removeEvent(this._o.field, 'change', this._onInputChange);
+                $.Event.removeEvent(this._o.trigger, 'click', this._onInputClick);
+                $.Event.removeEvent(this._o.trigger, 'focus', this._onInputFocus);
+                $.Event.removeEvent(this._o.trigger, 'blur', this._onInputBlur);
             }
             if (this.el.parentNode) {
                 this.el.parentNode.removeChild(this.el);

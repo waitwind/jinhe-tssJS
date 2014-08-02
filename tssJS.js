@@ -89,7 +89,6 @@
         // Give the init function the tssJS prototype for later instantiation
         tssJS.fn.init.prototype = tssJS.fn;
 
-        // 合并内容到第一个参数中，后续大部分功能都通过该函数扩展
         // 通过tssJS.fn.extend扩展的函数，大部分都会调用通过tssJS.extend扩展的同名函数
         tssJS.extend = tssJS.fn.extend = function(fnMap) {
             fnMap = fnMap || {};
@@ -591,9 +590,9 @@
             return result;
         },
 
-        hasClass: function(element, className) {
-            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-            return element.className.match(reg);
+        hasClass: function(el, cn) {
+            var reg = new RegExp('(\\s|^)' + cn + '(\\s|$)');
+            return (' ' + el.className + ' ').match(reg);
         },
 
         // 获取视口大小
@@ -895,12 +894,12 @@
 
             timeout: {},
 
-            addEvent: function(element, eventName, fn) {
-                element.addEventListener(eventName, fn, false);
+            addEvent: function(element, eventName, fn, capture) {
+                element.addEventListener(eventName, fn, !!capture);
             },
 
-            removeEvent: function(element, eventName, fn) {
-                element.removeEventListener(eventName, fn, false);
+            removeEvent: function(element, eventName, fn, capture) {
+                element.removeEventListener(eventName, fn, !!capture);
             },
 
             /* 取消事件 */

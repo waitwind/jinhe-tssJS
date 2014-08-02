@@ -161,22 +161,8 @@
                     return setTimeout(tssJS.ready, 1);
                 }
 
-                if (document.addEventListener) {
-                    document.addEventListener("DOMContentLoaded", DOMContentLoaded, false);
-                    window.addEventListener("load", tssJS.ready, false);
-                } else if (document.attachEvent) {
-                    document.attachEvent("onreadystatechange", DOMContentLoaded);
-                    window.attachEvent("onload", tssJS.ready);
-
-                    var toplevel = false;
-                    try {
-                        toplevel = window.frameElement == null;
-                    } catch(e) {}
-
-                    if (document.documentElement.doScroll && toplevel) {
-                        doScrollCheck();
-                    }
-                }
+                document.addEventListener("DOMContentLoaded", DOMContentLoaded, false);
+                window.addEventListener("load", tssJS.ready, false);
             },
 
             // 是否函数
@@ -251,16 +237,8 @@
             // 解析XML 跨浏览器, parseXML函数也主要是标准API和IE的封装。
             // 标准API是DOMParser对象, 而IE使用的是Microsoft.XMLDOM的 ActiveXObject对象。
             parseXML: function(data) {
-                var xml;
-                if (window.DOMParser) { // Standard 标准XML解析器
-                    var parser = new DOMParser();
-                    xml = parser.parseFromString(data, "text/xml");
-                } 
-                else { // IE IE的XML解析器
-                    xml = new ActiveXObject("Microsoft.XMLDOM");
-                    xml.async = "false";
-                    xml.loadXML(data);
-                }
+                var parser = new DOMParser();
+                var xml = parser.parseFromString(data, "text/xml");
 
                 var tmp = xml.documentElement;
 
@@ -375,11 +353,9 @@
                 return (new Date()).getTime();
             },
 
-            isOpera:  mc(/opera/),
+            isIE: mc(/.net/),
             isChrome: mc(/\bchrome\b/),
             isWebKit: mc(/webkit/),
-            isSafari: mc(/safari/),
-            isIE: !mc(/opera/) && mc(/msie/),
             supportCanvas: !!document.createElement('canvas').getContext,
             isMobile: mc(/ipod|ipad|iphone|android/gi),
         });
@@ -391,34 +367,13 @@
         });
 
         var DOMContentLoaded = (function() {
-            if (document.addEventListener) {
-                return function() {
-                    document.removeEventListener("DOMContentLoaded", DOMContentLoaded, false);
-                    tssJS.ready();
-                };
-            } else if (document.attachEvent) {
-                return function() {
-                    if (document.readyState === "complete") {
-                        document.detachEvent("onreadystatechange", DOMContentLoaded);
-                        tssJS.ready();
-                    }
-                };
-            }
+            return function() {
+                document.removeEventListener("DOMContentLoaded", DOMContentLoaded, false);
+                tssJS.ready();
+            };
         })();
 
-        var doScrollCheck = function() {
-            if (isReady) {
-                return;
-            }
-            try {
-                document.documentElement.doScroll("left");
-            } catch(e) {
-                setTimeout(doScrollCheck, 1);
-                return;
-            }
-            tssJS.ready();
-        }
-
+ 
         rootTssJS = tssJS(document);
 
         // 到这里，tssJS对象构造完成，后边的代码都是对tssJS或tssJS对象的扩展
@@ -502,11 +457,11 @@
         //设置CSS
         css: function(attr, value) {
             for (var i = 0; i < this.length; i++) {
-                var element = this[i];
+                var el = this[i];
                 if (arguments.length == 1) {
-                    return $.getStyle(element, attr);
+                    return $.getStyle(el, attr);
                 }
-                element.style[attr] = value;
+                el.style[attr] = value;
             }
             return this;
         },
@@ -941,21 +896,11 @@
             timeout: {},
 
             addEvent: function(element, eventName, fn) {
-                if(element.addEventListener) {
-                    element.addEventListener(eventName, fn, false);
-                }
-                else if(element.attachEvent) {
-                    element.attachEvent("on" + eventName, fn);
-                }
+                element.addEventListener(eventName, fn, false);
             },
 
             removeEvent: function(element, eventName, fn) {
-                if( element.removeEventListener ) {
-                    element.removeEventListener(eventName, fn, false);
-                }
-                else {
-                    element.detachEvent("on" + eventName, fn);
-                }
+                element.removeEventListener(eventName, fn, false);
             },
 
             /* 取消事件 */
@@ -1053,7 +998,6 @@
     $.extend({
 
         XML : {
-            MSXML_DOCUMENT_VERSION: "Msxml2.DOMDocument.6.0",
             _NODE_TYPE_ELEMENT    : 1,
             _NODE_TYPE_ATTRIBUTE  : 2,
             _NODE_TYPE_TEXT       : 3,
@@ -1068,7 +1012,7 @@
             },
 
             toString: function(element) {
-                if ($.isIE) {
+                if (element.xml) {
                     return element.xml;
                 }
                 else {
@@ -1082,16 +1026,10 @@
             },
 
             EMPTY_XML_DOM: (function() {
-                var xmlDom;
-                if ($.isIE) {
-                    xmlDom = new ActiveXObject(MSXML_DOCUMENT_VERSION);
-                    xmlDom.async = false;
-                }
-                else {
-                    var parser = new DOMParser();
-                    xmlDom = parser.parseFromString("<null/>", "text/xml");
-                    xmlDom.parser = parser;
-                } 
+                var parser = new DOMParser();
+                var xmlDom = parser.parseFromString("<null/>", "text/xml");
+                xmlDom.parser = parser;
+ 
                 return xmlDom;
             })(),
 
@@ -1113,23 +1051,6 @@
                 var cdataNode = $.XML.createCDATA(data);
                 xmlNode.appendChild(cdataNode);
                 return xmlNode;
-            },
-
-            /* 获取解析错误 */
-            getParseError: function(xmlDom) {
-                var parseError = null;
-                if(window.DOMParser) {
-                    var errorNodes = xmlDom.getElementsByTagName("parsererror");
-                    if(errorNodes.length > 0) {
-                        return errorNodes[0].innerHTML;
-                    }
-                } 
-                else {
-                    if( xmlDom.parseError.errorCode != 0 ) {
-                        return xmlDom.parseError;
-                    }
-                }
-                return "";
             },
 
             getCDATA: function(pnode, name) {
@@ -1158,44 +1079,19 @@
                 if( node ) {
                     pnode.removeChild(node);
                 }
+            },
+
+            /* 获取解析错误 */
+            getParseError: function(xmlDom) {
+                if(xmlDom == null) return "";
+
+                var errorNodes = xmlDom.getElementsByTagName("parsererror");
+                if(errorNodes.length > 0) {
+                    return errorNodes[0].innerHTML;
+                }
+                return "";
             }
         }
-
     });
 
-    if ( !$.isIE ) {
-        XMLDocument.prototype.selectNodes = Element.prototype.selectNodes = function(p_xPath) {
-            var m_Evaluator = new XPathEvaluator();
-            var m_Result = m_Evaluator.evaluate(p_xPath, this, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-
-            var m_Nodes = [];
-            if (m_Result) {
-                var m_Element;
-                while (m_Element = m_Result.iterateNext()) {
-                    m_Nodes.push(m_Element);
-                }
-            } 
-            return m_Nodes;
-        };
-
-        XMLDocument.prototype.selectSingleNode = Element.prototype.selectSingleNode = function(p_xPath) {
-            var m_Evaluator = new XPathEvaluator();
-            var m_Result = m_Evaluator.evaluate(p_xPath, this, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-
-            if (m_Result) {
-                return m_Result.singleNodeValue;
-            } else {
-                return null;
-            }
-        };
-    }
-
 })(tssJS);
-
-
-            
-
-
-
-
-            

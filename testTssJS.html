@@ -4,7 +4,7 @@
 	<meta charset="UTF-8" />
 	<title>tssJS test</title>
 
-	<script type="text/javascript" src="tssJS.js"></script>
+	<script src="tssJS.js"></script>
  
 	<style>
 
@@ -99,13 +99,13 @@
  			$.assertEquals("div1234", this.id + x, "tssJSObj.each() error.");
  		}, [234]);
 
-		tssJSObj.css("background-color", "#565656");
-		$.assertEquals("rgb(86, 86, 86)", tssJSObj.css("background-color"), "tssJSObj.css(xx) error.");
+		tssJSObj.css("backgroundColor", "#565656");
+		$.assertEquals("rgb(86, 86, 86)", tssJSObj.css("backgroundColor"), "tssJSObj.css(xx) error.");
 
 		// test class selector
 		tssJSObj = $(".c2");
 		$.assertEquals(4, tssJSObj.size());
-		tssJSObj.css("background-color", "yellow");
+		tssJSObj.css("backgroundColor", "yellow");
 		tssJSObj.addClass("cc");
 
 		$("#d2").removeClass("cc");
@@ -119,7 +119,7 @@
 
 		$("a").click( function() { 
 				$("#d4").show()
-					.css("background-color", "grey")
+					.css("backgroundColor", "grey")
 					.css("height", "50px")
 					.center(200, 50); 
 				console.log( $.absPosition($("#d4")[0]) );
@@ -127,11 +127,11 @@
 		);
 
 		var newElement = $.createElement("div", "cc");
-		$(newElement).html("<br/>new Div<br/>123456").css("background-color", "#396656");
+		$(newElement).html("<br/>new Div<br/>123456").css("backgroundColor", "#396656");
 		document.body.appendChild(newElement);
 
 		newElement = $.createNSElement("Page", "WorkSpace");
-		$(newElement).addClass("cc").html("<br/> new WorkSpace:Page").css("background-color", "red").css("display", "block");
+		$(newElement).addClass("cc").html("<br/> new WorkSpace:Page").css("backgroundColor", "red").css("display", "block");
 		document.body.appendChild(newElement);
 
 		$.assertEquals(1, $.getNSElements(document.body, "Page", "WorkSpace").length);
@@ -144,7 +144,7 @@
 		$.createScript("console.log('test createScript')");
 
 		$.showWaitingLayer();
-		setTimeout($.hideWaitingLayer, 2000);
+		setTimeout($.hideWaitingLayer, 1000);
 
 	 }, "tssJS");
 
@@ -211,7 +211,7 @@
 	$.assertEquals("", $.XML.getText(xmlNode3));
 
 	var cdataNode = $.XML.createCDATA("1<>2");
-	$.assertEquals("<![CDATA[1<>2]]>", $.XML.toString(cdataNode));
+	$.assertEquals("1<>2", $.XML.getText(cdataNode));	
 
 	var xmlNode4 = $.XML.appendCDATA("test", "1<>2");
 	$.assertEquals("<test><![CDATA[1<>2]]></test>",$.XML.toString(xmlNode4));
@@ -222,16 +222,19 @@
 	$.assertEquals("3<>4", $.XML.getCDATA(xmlNode5, "test"));
 
 	$.XML.removeCDATA(xmlNode5, "test");
-	$.assertEquals("<p/>",$.XML.toString(xmlNode5));
+	$.assertEquals("",$.XML.getText(xmlNode5));
 
-	var xmlDom = $.parseXML("<test>1<>2</test>");
-	console.log($.XML.getParseError(xmlDom));
+	// try {
+	// 	var xmlDom = $.parseXML("<test>1<>2</test>");
+	// } catch (e) {
+	// 	console.log($.XML.getParseError(xmlDom));
+	// }
 
-	console.log(xml.selectNodes("/book/year")[0]);
-	console.log(xmlNode.selectNodes("/book/year")[0]);
+	// console.log(xml.selectNodes("/book/year")[0]);
+	// console.log(xmlNode.selectNodes("/book/year")[0]);
 
-	console.log(xml.selectSingleNode("/book/author"));
-	console.log(xmlNode.selectSingleNode("/book/author"));
+	// console.log(xml.selectSingleNode("/book/author"));
+	// console.log(xmlNode.selectSingleNode("/book/author"));
 
 	</script>
 </head>

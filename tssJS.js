@@ -3,7 +3,7 @@
     var _tssJS = (function() {
 
         // 构建tssJS对象
-        var tssJS = function(selector) {
+        var tssJS = function(selector, parent) {
             return new tssJS.fn.init(selector, parent, rootTssJS);
         },
 
@@ -62,7 +62,7 @@
                 }
 
                 if (typeof selector === "string") {
-                    return this.find(selector);
+                    return this.find(selector, parent);
                 }
 
                 if (tssJS.isFunction(selector)) {

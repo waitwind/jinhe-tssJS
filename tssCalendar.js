@@ -7,7 +7,7 @@
     
     'use strict';
 
-var  document = window.document,
+    var  document = window.document,
 
     fireEvent = function(el, eventName, data) {
         var ev;
@@ -229,8 +229,8 @@ var  document = window.document,
     },
 
 
-    /**  Pikaday constructor */
-    Pikaday = function(options) {
+    /**  JCalendar constructor */
+    JCalendar = function(options) {
         var self = this,
             opts = self.config(options);
 
@@ -369,8 +369,8 @@ var  document = window.document,
     };
 
 
-    /** public Pikaday API */
-    Pikaday.prototype = {
+    /** public JCalendar API */
+    JCalendar.prototype = {
 
         config: function(options) {
             if (!this._o) {
@@ -669,5 +669,5 @@ var  document = window.document,
 
     };
 
-    return Pikaday;
+    return JCalendar;
 });

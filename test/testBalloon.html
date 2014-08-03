@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>tssJS test</title>
+
+	<link href="../css/balloon.css" rel="stylesheet">
+	<link href="../css/tss.css" rel="stylesheet">
+
+	<script src="../tssJS.js"></script>
+	<script src="../ui/balloon.js"></script>
+
+<script language="javascript">
+<!--
+
+URL_CORE = "../";
+
+    function test(){
+		var info = "[" + new Date().toString() + "]<br/>测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试";
+        
+        var balloon = new $.Balloon(info);
+
+		var x = 500 * Math.random();
+		var y = 500 * Math.random();
+
+		var obj = $("#cross")[0];
+		obj.style.left = x;
+		obj.style.top = y;
+
+		// balloon.dockTo(x, y);
+		balloon.dockTo(obj);
+    }
+
+//-->
+</script>
+</head>
+
+<body>
+	
+	
+	气球效果演示<br/><br/><br/><br/>
+	<div style="position:absolute;top:100px;left:200px;">
+		<input type="button" value="新气球" onclick="test()"/>
+	</div>
+
+	<div id="cross" style="position:absolute;border:1px solid red;width:2px;height:2px;overflow:hidden">&nbsp;</div>
+</body>
+</html>

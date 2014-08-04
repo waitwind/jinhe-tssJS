@@ -14,7 +14,7 @@
         /* 尺寸 */
         _SIZE_BALLOON_ARROW_HEIGHT = 15,
         _SIZE_BALLOON_CONTENT_WIDTH = 210,
-        _SIZE_BALLOON_CONTENT_HEIGHT = 50,
+        _SIZE_BALLOON_CONTENT_HEIGHT = 44,
 
         NEXT_ZINDEX = 1000,
 
@@ -30,9 +30,7 @@
             $.Event.removeEvent(document, "mousedown", dispose);
         },
  
-        /*
-         *	生成气球型提示界面
-         */
+        /* 生成气球型提示界面 */
         Balloon = function (content) {
             this.object = $.createElement("div", _STYLE_BALLOON);
 
@@ -43,7 +41,7 @@
             html += "</table>";
             this.object.innerHTML = html;
 
-    		// 绑定事件
+    		// 绑定事件，鼠标按下后气球消失
     		$.Event.addEvent(document, "mousedown", dispose);
         };
      
@@ -59,7 +57,7 @@
         Balloon.prototype.dockTo = function(x, y, delay) {
             if(typeof(x) == "object" && x.nodeType) {
                 var position = $.absPosition(x);
-                this.dockTo(position.x + 10, position.y + 10, y);
+                this.dockTo(position.left + x.offsetWidth/2, position.top - x.offsetHeight + 8, y);
             }
     		else if(typeof(x) == "number") {
     			var type = 1;
@@ -74,15 +72,13 @@
     				y -= _SIZE_BALLOON_CONTENT_HEIGHT + _SIZE_BALLOON_ARROW_HEIGHT;            
     			}
 
-    			this.object.style.zIndex = NEXT_ZINDEX++;
-    			this.object.style.left = x;
-                this.object.style.top = y;
+                $(this.object).css("zIndex", NEXT_ZINDEX++).css("left", x + "px").css("top", y + "px");
 
                 /* 添加气球箭头  */
                 var arrow = $.createElement("div", "arrow_" + type);
+                $(arrow).css("width", "30px").css("height", "15px") ;
+
                 var td = $("tr", this.object)[ (type <= 2) ? 2 : 0].childNodes[0];
-                td.height = _SIZE_BALLOON_ARROW_HEIGHT;
-                td.innerHTML = "&nbsp;";
                 td.appendChild(arrow);
                 if(type == 1 || type == 3) {
                     td.insertBefore(arrow, td.firstChild);

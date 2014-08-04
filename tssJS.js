@@ -610,15 +610,15 @@
             }
         },
 
-        // 获取Style
+        // 获取Style。注：computedStyle: style 和 runtimeStyle 的结合
         getStyle: function(element, attr) {
-            var value;
-            if (typeof window.getComputedStyle != 'undefined') { // W3C
-                value = window.getComputedStyle(element, null)[attr];
-            } else if (typeof element.currentStyle != 'undeinfed') { //IE
-                value = element.currentStyle[attr];
+            if (window.getComputedStyle) { // W3C
+                return window.getComputedStyle(element, null)[attr];
+            } 
+            else if (element.currentStyle) { //IE
+                return element.currentStyle[attr];
             }
-            return value;
+            return null;
         },
 
         //  获取绝对位置

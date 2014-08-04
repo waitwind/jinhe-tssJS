@@ -210,8 +210,8 @@
 
 	/* 控制右键菜单项 */
 	var MenuItem = function(itemProperties) {
-		for(var propertyName in itemProperties) {
-			this[propertyName] = itemProperties[propertyName];
+		for(var name in itemProperties) {
+			this[name] = itemProperties[name];
 		}
 
 		this.isEnable = true;

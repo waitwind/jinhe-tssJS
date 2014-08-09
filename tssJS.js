@@ -657,6 +657,8 @@
             var tempDiv = document.createElement("DIV");
             tempDiv.innerHTML = "<" + ns + ":" + tagName + "/>";
             var element = tempDiv.firstChild.cloneNode(false);
+            element.uniqueID = $.getUniqueID();
+
             $.removeNode(tempDiv);
 
             return element;

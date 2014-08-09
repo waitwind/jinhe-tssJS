@@ -10,7 +10,7 @@ WorkSpace\:Tab {
 	color:#575B67;
 	width:100px;
 	height:19px;
-	background-image:url(icons/bg_tab_inactive.gif);
+	background-image:url(../images/ws/bg_tab_inactive.gif);
 	cursor:default;
 	position:relative;
 	display:inline-block;
@@ -18,7 +18,7 @@ WorkSpace\:Tab {
 WorkSpace\:Tab.active {
 	color:#333333;
 	font-weight:bold;
-	background-image:url(icons/bg_tab_active.gif);
+	background-image:url(../images/ws/bg_tab_active.gif);
 }
 WorkSpace\:Tab div {
 	width:90px;
@@ -39,14 +39,14 @@ WorkSpace\:Tab WorkSpace\:Icon {
 	width:10px;
 	height:10px;
 	overflow:hidden;
-	background-image:url(icons/icon_tab_inactive_close.gif);
+	background-image:url(../images/ws/icon_tab_inactive_close.gif);
 	position:absolute;
 	right:6px;
 	top:4px;
 	cursor:hand;
 }
 WorkSpace\:Tab.active WorkSpace\:Icon {
-	background-image:url(icons/icon_tab_active_close.gif);
+	background-image:url(../images/ws/icon_tab_active_close.gif);
 }
 WorkSpace\:Phase {
 	cursor:default;
@@ -54,7 +54,7 @@ WorkSpace\:Phase {
 	height:73px;
 	overflow:hidden;
 	display: block;
-	background-image:url(icons/bg_phase_inactive.gif);
+	background-image:url(../images/ws/bg_phase_inactive.gif);
 }
 WorkSpace\:Phase div {
 	padding:4px 3px 1px 1px;
@@ -65,7 +65,7 @@ WorkSpace\:Phase div {
 	writing-mode:tb-rl;
 }
 WorkSpace\:Phase.active{
-	background-image:url(icons/bg_phase_active.gif);
+	background-image:url(../images/ws/bg_phase_active.gif);
 }
 WorkSpace\:TabBox {
 	cursor:default;
@@ -76,7 +76,7 @@ WorkSpace\:TabBox {
 	overflow:hidden;
 }
 WorkSpace\:TabBox.hasTab {
-	background-image:url(icons/bg_tab_box.gif);
+	background-image:url(../images/ws/bg_tab_box.gif);
 	background-repeat:repeat-x;
 }
 WorkSpace\:Box .rightBox {
@@ -92,7 +92,7 @@ WorkSpace\:Box .rightBox {
 	border-right:1px solid #999999;
 	border-bottom:1px solid #999999;
 	background-color:#BEC5E7;
-	background-image:url(icons/bg_phase_box.gif);
+	background-image:url(../images/ws/bg_phase_box.gif);
 	background-repeat:repeat-y;
 	position:relative;
 	z-index:100;

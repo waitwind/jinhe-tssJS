@@ -11,7 +11,6 @@
 	CSS_CLASS_TAB_BOX_HAS_TAB = "hasTab",
 	CSS_CLASS_TAB_ACTIVE      = "active",
 	CSS_CLASS_PHASE_ACTIVE    = "active",
-	CSS_CLASS_RIGHT_BOX       = "rightBox", 
 
 	/* 点击Phase到展现内容的时间差(ms) */
 	_TIMEOUT_PHASE_CLICK = 100,
@@ -30,7 +29,7 @@
 	Page = function (obj) {	
 		this.object = obj;
 		this.id = obj.id;		
-		this.isActive = ( $.getStyle(obj, "display") == "none" ? false : true ); 
+		this.hide(); 
 	};
 
 	Page.prototype = {
@@ -107,7 +106,10 @@
 			// 执行Tab页上定义的回调方法
 			this.execCallBack("onTabClose");
 
-			if( isCloseActiveTab ) {
+			if( this.ws.noTabOpend() ) {
+	            this.ws.element.style.display = "none";
+	        } 
+	        else if( isCloseActiveTab ) {
 				this.ws.switchToTab(this.ws.getFirstTab());
 			}
 		},
@@ -187,7 +189,7 @@
 				this.phases[phase.id] = phase;
 			}
 
-			this.ws.rightBox.style.display = "inline";  /* 显示右侧容器 */
+			this.ws.phaseBox.style.display = "inline";  /* 显示右侧容器 */
 		},
 
 		/* 清除纵向标签  */
@@ -362,20 +364,17 @@
 				 3、Tab标签控制子页面显示
 				 4、双击Tab标签可关闭 
 	* ***********************************************************************************************/
-	var WorkSpace = function(wsElement) {
-		this.element = wsElement;
+	var WorkSpace = function(ws) {
+		this.element = ws.nodeType ? ws : $("#" + ws)[0];
  
-		this.tabs = {};
+		this.tabs  = {};
 		this.pages = {};
 
 		/* 初始子页面 */
 		var childs = $.getNSElements(this.element, WS_TAG_PAGE, WS_NAMESPACE);
 		for(var i=0; i < childs.length; i++) {
 			var curNode = childs[i]; 
-			var newPage = new Page(curNode);
-			newPage.hide();
-
-			this.pages[curNode.id || curNode.uniqueID] = newPage;
+			this.pages[curNode.id] = new Page(curNode);
 		}
 
 		this.createUI();
@@ -387,9 +386,6 @@
 		createUI: function() {
 			/* 创建Tab标签的容器 */
 			this.tabBox = $.createNSElement(WS_TAG_TAB_BOX, WS_NAMESPACE);
-			var nobr   = $.createElement("nobr");
-
-			this.tabBox.appendChild(nobr);
 			this.element.appendChild(this.tabBox);
 			
 			var refChild = this.element.firstChild;
@@ -397,28 +393,23 @@
 				this.element.insertBefore(this.tabBox, refChild); // 插入到第一个
 			}
 
-			/* 创建右侧容器 */
-			this.rightBox = $.createElement("table", CSS_CLASS_RIGHT_BOX);
-
-			this.element.appendChild(this.rightBox);
-			var refChild = this.element.childNodes[1];
-			if(this.rightBox != refChild && refChild) {
-				this.element.insertBefore(this.rightBox, refChild);
-			}
-
 			/* 创建纵向Tab标签的容器 */
 			this.phaseBox = $.createNSElement(WS_TAG_PHASE_BOX, WS_NAMESPACE);
+			this.element.appendChild(this.phaseBox);
 
-			var row = this.rightBox.insertRow();
-			row.insertCell();
-			row.cells[0].appendChild(this.phaseBox);
+			var refChild = this.element.childNodes[1];
+			if(this.phaseBox != refChild && refChild) {
+				this.element.insertBefore(this.phaseBox, refChild);
+			}
 
 			// 隐藏右侧容器
-			this.rightBox.style.display = "none"; 
+			this.phaseBox.style.display = "none"; 
 		},
 		 
 		/* 打开子页面  */
 		open: function(inf) {
+			this.element.style.display = "";
+
 			var tab;
 			for(var item in this.tabs) {
 				if(inf.SID == this.tabs[item].SID) {
@@ -434,7 +425,7 @@
 
 				var page = this.pages[inf.defaultPage];
 				tab.linkTo(page);
-				tab.dockTo(this.tabBox.firstChild);
+				tab.dockTo(this.tabBox);
 
 				$(this.tabBox).addClass(CSS_CLASS_TAB_BOX_HAS_TAB);
 			}

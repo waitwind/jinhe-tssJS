@@ -11,7 +11,7 @@ WorkSpace\:Tab {
 	width:100px;
 	height:19px;
 	background-image:url(../images/ws/bg_tab_inactive.gif);
-	cursor:default;
+	cursor:pointer;
 	position:relative;
 	display:inline-block;
 }
@@ -22,34 +22,23 @@ WorkSpace\:Tab.active {
 }
 WorkSpace\:Tab div {
 	width:90px;
-	text-align:left;
 	letter-spacing:0px;
 	padding:4px 12px 0px 6px;
-	overflow:hidden;
 	text-overflow:ellipsis;
 	word-break:keep-all;
 }
-WorkSpace\:Tab.active div {
-	letter-spacing:-1px;
-}
 WorkSpace\:Tab WorkSpace\:Icon {
-	font-size:10px;
-	font-family:Arial;
-	line-height:10px;
 	width:10px;
 	height:10px;
-	overflow:hidden;
-	background-image:url(../images/ws/icon_tab_inactive_close.gif);
+	background-image:url(../images/ws/icon_tab_close.gif);
 	position:absolute;
 	right:6px;
 	top:4px;
 	cursor:hand;
 }
-WorkSpace\:Tab.active WorkSpace\:Icon {
-	background-image:url(../images/ws/icon_tab_active_close.gif);
-}
+
 WorkSpace\:Phase {
-	cursor:default;
+	cursor:pointer;
 	width:20px;
 	height:73px;
 	overflow:hidden;
@@ -57,48 +46,22 @@ WorkSpace\:Phase {
 	background-image:url(../images/ws/bg_phase_inactive.gif);
 }
 WorkSpace\:Phase div {
+	height:73px;
 	padding:4px 3px 1px 1px;
 	text-align:center;
-	height:73px;
-	overflow:hidden;
-	text-overflow:ellipsis;
-	writing-mode:tb-rl;
 }
 WorkSpace\:Phase.active{
 	background-image:url(../images/ws/bg_phase_active.gif);
 }
 WorkSpace\:TabBox {
-	cursor:default;
 	width:100%;
 	height:19px;
 	position:relative;
 	display:inline-block;
-	overflow:hidden;
 }
 WorkSpace\:TabBox.hasTab {
 	background-image:url(../images/ws/bg_tab_box.gif);
 	background-repeat:repeat-x;
-}
-WorkSpace\:Box .rightBox {
-	font-size:12px;
-	line-height:14px;
-	width:20px;
-	height:100%;
-	display:inline;
-	overflow:hidden;
-	margin-left:-4px;
-	float:right;
-	cursor:default;
-	border-right:1px solid #999999;
-	border-bottom:1px solid #999999;
-	background-color:#BEC5E7;
-	background-image:url(../images/ws/bg_phase_box.gif);
-	background-repeat:repeat-y;
-	position:relative;
-	z-index:100;
-}
-WorkSpace\:Box .rightBox td{
-	vertical-align:top;
 }
 WorkSpace\:PhaseBox {
 	font-size:12px;
@@ -107,7 +70,18 @@ WorkSpace\:PhaseBox {
 	height:100%;
 	display:inline;
 	overflow:hidden;
-	cursor:default;
+	margin-left:-4px;
+	float:right;
+	border-right:1px solid #999999;
+	border-bottom:1px solid #999999;
+	background-color:#BEC5E7;
+	background-image:url(../images/ws/bg_phase_box.gif);
+	background-repeat:repeat-y;
+	position:relative;
+	z-index:100;
+}
+WorkSpace\:PhaseBox td {
+	vertical-align:top;
 }
  
 WorkSpace\:Page {

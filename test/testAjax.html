@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<HTML XMLNS:WorkSpace>
+<head>
+	<meta charset="UTF-8"/>
+	<title>tssAjax test</title>
+
+	<link href="../css/tss.css" rel="stylesheet">
+
+	<script src="../tssJS.js"></script>
+	<script src="../tssAjax.js"></script>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+
+	$().ready( function () {
+
+		$.ajax({
+			url : 'data/_success.xml',
+			method : "GET"
+		});
+
+		$.ajax({
+			url : 'data/_error.xml',
+			method : "GET"
+		});
+
+		$.ajax({
+			url : 'data/tree.xml',
+			method : "GET",
+			headers : {"token": "1234567890"},
+			params  : {"param1": "xxx", "param2": "yyy"}, 
+			onresult : function() {
+				// alert(this.getResponseXML());
+				alert( $.XML.toXml(this.getNodeValue("ParamTree")) );
+			}
+		});
+
+		$.ajax({
+			url : 'data/1.json',
+			type : "json",
+			method : "GET",
+			ondata : function() { 
+				// alert(this.getResponseText());
+			}
+		});
+	} );
+ 
+</SCRIPT>
+</HEAD>
+
+<BODY>
+ 
+</BODY>
+</HTML>

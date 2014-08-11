@@ -556,6 +556,12 @@
                 this[i].onclick = fn;
             }
             return this;
+        },
+
+        focus: function() {
+            if(this.length > 0) {
+                this[0].focus();
+            }
         }
     });
 })(tssJS);
@@ -1013,13 +1019,7 @@
             },
 
             toString: function(element) {
-                if (element.xml) {
-                    return element.xml;
-                }
-                else {
-                    var xmlSerializer = new XMLSerializer();
-                    return xmlSerializer.serializeToString(element);
-                }
+                return $.XML.toXml(element);
             },
 
             getText: function(node) {
@@ -1058,7 +1058,7 @@
                 var node = pnode.getElementsByTagName(name)[0];
                 node = node || pnode;
 
-                var cdataValue = node.text || node.textContent || "";
+                var cdataValue = $.XML.getText(node);
                 return cdataValue.revertCDATA();
             },
 
@@ -1091,6 +1091,11 @@
                     return errorNodes[0].innerHTML;
                 }
                 return "";
+            },
+
+            toXml: function(xml) {
+                var xmlSerializer = new XMLSerializer();
+                return xmlSerializer.serializeToString(xml.documentElement || xml);
             }
         }
     });

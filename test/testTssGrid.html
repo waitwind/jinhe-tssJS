@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<HTML XMLNS:Grid>
+<head>
+	<meta charset="UTF-8"/>
+	<title>Grid test</title>
+
+	<link href="../css/tss.css" rel="stylesheet">
+	<link href="../css/JMenu.css" rel="stylesheet">
+	<link href="../css/tssGrid.css" rel="stylesheet">
+
+	<script src="../tssJS.js"></script>
+	<script src="../tssAjax.js"></script>
+	<script src="../ui/JMenu.js"></script>
+	<script src="../ui/tssGrid.js"></script>
+
+<style type="text/css">
+ 
+</style>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+
+    function init() {
+
+		initGridMenu();
+
+		Ajax({
+			url : "data.xml",
+			onresult : function() {
+				var gridData = this.getNodeValue("SourceList");
+				var grid = $G("grid", gridData);       
+
+				var gridPage = this.getNodeValue("PageInfo");
+				createGridToolBar(gridPage);			
+
+				$$("grid").onScrollToBottom = function () {
+					grid.load(gridData, true);
+				}
+				$$("grid").onRightClickRow = function () {
+					grid.element.contextmenu.show(event.clientX, event.clientY);						
+				}
+				$$("grid").onDblClickRow = function () {
+					alert($G("grid").getRowAttributeValue("id"));				
+				}
+			},
+			onexception : function(result) {
+				alert("ajax has exception:" + result.description);
+			}
+		});
+    }
+
+    function createGridToolBar(gridPage) {
+        var toolbarObj = $$("gridToolBar");
+			initGridToolBar(toolbarObj, gridPage, function(page) {
+				Ajax({
+					url : "data.xml",
+					onresult : function() {
+						var gridData = this.getNodeValue("SourceList");
+						var grid = $G("grid", gridData);       
+
+						var gridPage = this.getNodeValue("PageInfo");
+						createGridToolBar(gridPage);
+					}
+				});
+			});
+    }
+
+	function initGridMenu() { 
+		ICON = "../images/";
+
+        var item1 = {
+            label:"新增",
+            callback:insertUser
+        }
+		var item2 = {
+            label:"修改",
+            callback:updateUser,
+            icon:ICON + "edit.gif"
+        }
+		var item3 = {
+            label:"删除",
+            callback:deleteUser,
+            icon:ICON + "icon_del.gif"
+        }
+		var item4 = {
+            label:"获取ID列值",
+            callback:getColumnValues
+        }
+
+        var menu1 = new Menu();
+        menu1.addItem(item1);
+		menu1.addItem(item2);
+		menu1.addItem(item3);
+		menu1.addItem(item4);
+ 
+        $$("grid").contextmenu = menu1;
+    }
+
+	function insertUser() {
+		var map = {"loginName":"潜龙勿用", "telephone":"8888888888", "set":"1"};
+		$G("grid").insertRow(map);
+	}
+
+	function updateUser() {
+		$G("grid").modifySelectedRow("loginName", "天地玄黄");
+	}
+
+	function deleteUser() {
+		$G("grid").deleteSelectedRow();
+	}
+
+	function getColumnValues() {
+		alert($G("grid").getColumnValues("id").join("|"));
+	}
+	
+	window.onload = init;
+   
+//-->
+</SCRIPT>
+</head>
+
+<body>
+
+<table id="ttt" style="height:400px;width:900px;">
+  <tr>
+	<td id="gridTitle">
+	  <span class="icon"></span>用户列表<span class="buttonBox" id="gridToolBar"></span>
+	</td>
+  </tr>
+  <tr>
+	<td>
+		<div style="height:100%;overflow:auto;">
+			<Grid:Box id="grid"></Grid:Box>
+		</div>	
+	</td>
+  </tr>
+</table>			
+ 
+</body>
+</html>

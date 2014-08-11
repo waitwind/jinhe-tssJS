@@ -22,12 +22,9 @@
 	 	request.waiting = arg.waiting || false;
 		request.async = arg.async || true;
 
-		for(var item in arg.headers) {
-			request.setHeader(item, arg.headers[item]);
-		}
-		for(var item in arg.params) {
-			request.addParam(item, arg.params[item]);
-		}
+		request.params = arg.params;
+		request.headers = arg.headers;
+
 		if(arg.xformNode) {
 			request.setXFormContent(arg.xformNode);
 		}
@@ -118,9 +115,8 @@
 
 			var nodes = dataNode.querySelectorAll("row *");
 			for(var i = 0; i < nodes.length; i++) {
-				var name  = nodes[i].nodeName;
-				var value = nodes[i].text;
-				this.addParam(name, value);
+				var node = nodes[i];
+				this.addParam(node.nodeName, $.XML.getText(node));
 			}
 		},
 
@@ -146,7 +142,7 @@
 			if(node == null) return;
 
 			var data;
-			var childNodes = node.querySelectorAll("*"); 
+			var childNodes = node.childNodes; 
 			for(var i = 0; i < childNodes.length; i++) {
 				var childNode = childNodes[i];
 				switch (childNode.nodeType) {

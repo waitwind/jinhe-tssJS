@@ -10,6 +10,13 @@ Grid\:Box {
 	display:inline-block;
 }
 
+Grid\:Box div {
+    position:relative;
+    overflow:auto;
+    left:0px;
+    top:0px;
+}
+
 Grid\:Box table {
 	width:100%;
 	table-layout:fixed;
@@ -25,6 +32,7 @@ Grid\:Box .column {
 	border-width: 1 1 1 1;
 	background-color:#E4E6F5;
     height:25px;
+    width:50px;
     font-size:12px;
 }
 

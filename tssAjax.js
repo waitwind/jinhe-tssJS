@@ -12,7 +12,7 @@
 */
 ;(function ($, factory) {
 
-    $.HttpRequest = factory();
+    $.HttpRequest = factory($);
 
     $.ajax = function(arg) {
 		var request = new $.HttpRequest();
@@ -39,7 +39,7 @@
 		request.send();
 	}
 
-})(tssJS, function () {
+})(tssJS, function ($) {
 
     'use strict';
 

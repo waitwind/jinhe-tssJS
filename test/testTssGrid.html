@@ -22,13 +22,18 @@
 
     function init() {
 
+    	/* 禁止鼠标右键 */
+		document.oncontextmenu = function(_event) {
+			$.Event.cancel(_event || window.event);
+		}
+
 		initGridMenu();
 
-		Ajax({
-			url : "data.xml",
+		$.ajax({
+			url : "data/grid.xml",
 			onresult : function() {
 				var gridData = this.getNodeValue("SourceList");
-				var grid = $G("grid", gridData);       
+				var grid = $.G("grid", gridData);       
 
 				var gridPage = this.getNodeValue("PageInfo");
 				createGridToolBar(gridPage);			
@@ -40,7 +45,7 @@
 					grid.element.contextmenu.show(event.clientX, event.clientY);						
 				}
 				$$("grid").onDblClickRow = function () {
-					alert($G("grid").getRowAttributeValue("id"));				
+					alert($.G("grid").getRowAttributeValue("id"));				
 				}
 			},
 			onexception : function(result) {
@@ -50,19 +55,19 @@
     }
 
     function createGridToolBar(gridPage) {
-        var toolbarObj = $$("gridToolBar");
-			initGridToolBar(toolbarObj, gridPage, function(page) {
-				Ajax({
-					url : "data.xml",
-					onresult : function() {
-						var gridData = this.getNodeValue("SourceList");
-						var grid = $G("grid", gridData);       
+        var toolbarObj = $1("gridToolBar");
+		$.initGridToolBar(toolbarObj, gridPage, function(page) {
+			$.ajax({
+				url : "data/grid.xml",
+				onresult : function() {
+					var gridData = this.getNodeValue("SourceList");
+					var grid = $G("grid", gridData);       
 
-						var gridPage = this.getNodeValue("PageInfo");
-						createGridToolBar(gridPage);
-					}
-				});
+					var gridPage = this.getNodeValue("PageInfo");
+					createGridToolBar(gridPage);
+				}
 			});
+		});
     }
 
 	function initGridMenu() { 
@@ -75,7 +80,7 @@
 		var item2 = {
             label:"修改",
             callback:updateUser,
-            icon:ICON + "edit.gif"
+            icon:ICON + "icon_pen.gif"
         }
 		var item3 = {
             label:"删除",
@@ -87,30 +92,30 @@
             callback:getColumnValues
         }
 
-        var menu1 = new Menu();
+        var menu1 = new $.Menu();
         menu1.addItem(item1);
 		menu1.addItem(item2);
 		menu1.addItem(item3);
 		menu1.addItem(item4);
  
-        $$("grid").contextmenu = menu1;
+        $1("grid").contextmenu = menu1;
     }
 
 	function insertUser() {
-		var map = {"loginName":"潜龙勿用", "telephone":"8888888888", "set":"1"};
-		$G("grid").insertRow(map);
+		var map = {"loginName":"潜龙勿用", "telephone":"8888888888", "sex":"1"};
+		$.G("grid").insertRow(map);
 	}
 
 	function updateUser() {
-		$G("grid").modifySelectedRow("loginName", "天地玄黄");
+		$.G("grid").modifySelectedRow("loginName", "天地玄黄");
 	}
 
 	function deleteUser() {
-		$G("grid").deleteSelectedRow();
+		$.G("grid").deleteSelectedRow();
 	}
 
 	function getColumnValues() {
-		alert($G("grid").getColumnValues("id").join("|"));
+		alert($.G("grid").getColumnValues("id").join("|"));
 	}
 	
 	window.onload = init;

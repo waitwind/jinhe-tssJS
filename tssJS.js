@@ -422,6 +422,10 @@
 
     window.tssJS = window.$ = _tssJS;
 
+    window.$1 = window.$$ = function(id) {
+        return $("#" + id)[0];
+    }
+
 })(window);
 
 

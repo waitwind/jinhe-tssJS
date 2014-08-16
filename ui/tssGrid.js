@@ -2,13 +2,13 @@
 
     $.Grid = factory($);
 
-    var GridCache = new Collection();
+    var GridCache = {};
 
     $.G = function(gridId, data) {
- 		var grid = GridCache.get(gridId);
+ 		var grid = GridCache[gridId];
 		if( grid == null || data ) {
 			grid = new $.Grid($("#" + gridId)[0], data);
-			GridCache.add(grid.id, grid);	
+			GridCache[grid.id] = grid;	
 		}
 		
 		return grid;
@@ -22,72 +22,123 @@
     scrollbarSize = 17,
 	cellHeight = 22,  // 数据行高
 
+	bindSortHandler = function(table) {
+		var rows = table.querySelectorAll("tbody tr");
+		var tags = table.querySelectorAll("thead tr td");
+		var direction = 1;
+	 
+		$.each(tags, function(i, tag) {
+			var sortable = tag.getAttribute("sortable");
+			if( sortable == "true") {
+				tag._colIndex = i;
+
+				$(tag).click(function() {
+					// 先清除已有的排序
+					$.each(tags, function(i, _tag) {
+						$(_tag).removeClass("desc").removeClass("asc");
+					});
+					$(this).addClass(direction == 1 ? "asc" : "desc");
+
+					var columnIndex = this._colIndex;
+					this.rows.sort(function(a, b) {
+						var x = a[columnIndex].innerText;
+						var y = b[columnIndex].innerText;
+						var compareValue;
+						if( isNaN(x) ) {
+							compareValue = x.localeCompare(y);
+						}
+						else {
+							compareValue = Number(x) - Number(y);
+						}
+						return compareValue * direction;
+					});
+
+					// 设置排序列的样式
+					this.rows.each(function(i, row) {
+						row.cells.each(function(j, cell){
+							if(j == columnIndex) {
+								$(cell).addClass("sorting");
+							} else {
+								$(cell).removeClass("sorting");
+							}
+						});
+
+						row._index = i + 1;
+					});
+
+					direction = direction * -1;
+				});
+			}	
+		});
+	},
+
 	GridTemplate = function(xmlDom) {
 		this.declare = xmlDom.querySelector("declare");
 		this.script  = xmlDom.querySelector("script");
 		this.columns = this.declare.querySelectorAll("column");
 		this.dataRows = xmlDom.querySelectorAll("data row");
 
-		this.columnsMap = {};
-		this.columns.each(function(index, column) {
-			this.columnsMap[column.getAttribute("name")] = column;
+		var columnsMap = {};
+		$.each(this.columns, function(index, column) {
+			columnsMap[column.getAttribute("name")] = column;
 		});
+		this.columnsMap = columnsMap;
 
 		this.hasHeader    = this.declare.getAttribute("header") == "checkbox";
 		this.needSequence = this.declare.getAttribute("sequence") != "false";
 	};
 
 	GridTemplate.prototype = {
-		toHTML: function(template, startNum, gridID) {
+		toHTML: function(startNum, gridID) {
 			var htmls = [], thead = [], tbody = [];
 
 			thead.push('<thead><tr>');
 			if(this.hasHeader) {
-				thead.push('<td class="column"><input type="checkbox" id="checkAll"/></td>');
+				thead.push('<td><input type="checkbox" id="checkAll"/></td>');
 			}
 			if(this.needSequence) {
-				thead.push('<td class="column" name="sequence">序号</td>');
+				thead.push('<td name="sequence">序号</td>');
 			}
 			$.each(this.columnsMap, function(name, column) {
-				var caption  = column.getAttribute("caption");
-			 	var width    = column.getAttribute("width");
-				width = width ? ' width="' + width + '" ' : '';
-				var _class   = ' class=' + column.getAttribute("display") == "none" ?  "hidden" : "column";
-				var sortable = column.getAttribute("sortable") == "true" ? 'sortable="true"' : '';
-				var align = ' align="' + getAlign(column) + '" ';
-				thead.push('<td name="' + name + '" ' + width + align + _class + sortable + '>' + caption + '</td>');
+				var caption = column.getAttribute("caption");
+			 	var width   = column.getAttribute("width");
+				var style = (width ? ' style="width:' + width + '"': '');
+				var _class   = column.getAttribute("display")  == "none" ? ' class="hidden"' : '';
+				var sortable = column.getAttribute("sortable") == "true" ? ' sortable="true"' : '';
+				thead.push('<td name="' + name + '" ' + _class + style + sortable + '>' + caption + '</td>');
 			});
 			thead.push("</tr></thead>");
  
- 			tbody.push('<tbody class="cell">');
- 			this.dataRows.each(function(i, row) {
+ 			var oThis = this;
+ 			tbody.push('<tbody>');
+ 			$.each(this.dataRows, function(i, row) {
 				var index = startNum + i + 1;
-				tbody.push("<tr _index="" + index + "" >");
+				tbody.push('<tr _index="' + index + '">');
 
-				if(this.hasHeader) {
-					tbody.push('<td align="center" mode="cellheader" name="cellheader">');
-					tbody.push('	<input class="selectHandle" name="' + gridID + '_cb" type="checkbox" >');
+				if(oThis.hasHeader) {
+					tbody.push('<td mode="cellheader" name="cellheader">');
+					tbody.push('	<input name="' + gridID + '_cb" type="checkbox" >');
 					tbody.push("</td>")
 				}
-				if(this.needSequence) {
-					tbody.push('<td align="center" mode="cellsequence" name="cellsequence">' + index + '</td>');
+				if(oThis.needSequence) {
+					tbody.push('<td mode="cellsequence" name="cellsequence">' + index + '</td>');
 				}
 
-				for(var name in this.columnsMap) {
-					var column = this.columnsMap[name];
+				var columnsMap = oThis.columnsMap;
+				for(var name in columnsMap) {
+					var column = columnsMap[name];
 					var value = row.getAttribute(name);
-					value = value || "";
 					
 					var _class = "";
 					if(column.getAttribute("display") == "none") {
 						_class = 'class="hidden"';
 					} 
-					else if(column.getAttribute("highlightCol") == "true") {
+					else if(column.getAttribute("highlight") == "true") {
 						_class = 'class="highlightCol"';
 					}
 
-					var align = 'align="' + getAlign(column) + '"';
-					tbody.push('<td name="' + name + '" ' + _class + align + '>' + value + '</td>');
+					var style = 'style = "text-align:' + getAlign(column) + ';"';
+					tbody.push('<td name="' + name + '" ' + _class + style + '>' + (value || "") + '</td>');
 				}
 
 				tbody.push("</tr>");
@@ -99,22 +150,21 @@
 			htmls.push(tbody.join(""));
 			htmls.push("</table>");
 			return htmls.join("");
-		}
 
-		function getAlign(column) {
-			var align = column.getAttribute("align");
-			if(align) {
-				return align;
-			}
+			function getAlign(column) {
+				var align = column.getAttribute("align");
+				if(align) {
+					return align;
+				}
 
-			switch(column.getAttribute("mode")) {
-				case "number":
-					return "right";
-				case "boolean":
-				case "date":
-					return "center";
-				default:
-					return "left";
+				switch(column.getAttribute("mode")) {
+					case "number":
+						return "right";
+					case "boolean":
+					case "date":
+					default:
+						return "center";
+				}
 			}
 		}
 	}; 
@@ -124,7 +174,7 @@
 		this.element = element;
 
 		this.gridBox = $.createElement("div");
-		this.element.append(this.gridBox);
+		this.element.appendChild(this.gridBox);
 
 		this.gridBox.style.width = element.getAttribute("width")  || "100%";
 		var pointHeight = element.getAttribute("height");
@@ -145,14 +195,14 @@
 
 	Grid.prototype = {
 		load: function(data, append) {
-			if("object" != typeof(data) || data.nodeType != _XML_NODE_TYPE_ELEMENT) {
+			if("object" != typeof(data) || data.nodeType != $.XML._NODE_TYPE_ELEMENT) {
 				alert("传入的Grid数据有问题。")	
 			} 
 
 			// 初始化变量
 			var startNum = append ? this.totalRowsNum : 0;	
 
-			this.template = new GridTemplate(data.node);	
+			this.template = new GridTemplate(data);	
 			var gridTableHtml = this.template.toHTML(startNum, this.id); // 解析成Html
 			
 			if(append) {
@@ -171,11 +221,10 @@
 				
 				Element.ruleObjList = []; // 先清空原来的拖动条
 				for( var i = 0; i < thList.length; i++ ) {
-					Element.attachColResizeII(thList[i]);
-
 					// 给表头添加双击、拖动等事件
 					// 设置隐藏列事件，双击隐藏列
 					// 拖动改变列宽
+					// Element.attachColResizeII(thList[i]);
 				}
 			}
 			
@@ -193,10 +242,10 @@
 		processDataRow: function(curRow) {
 			$(curRow).hover(
 				function() { 
-					this.addClass("rolloverRow"); 
+					$(curRow).addClass("rolloverRow"); 
 			 	}, 
 				function() { 
-					this.removeClass("rolloverRow");
+					$(curRow).removeClass("rolloverRow");
 				} 
 			);
 			
@@ -205,7 +254,7 @@
 				var cell = cells[j];
 				var columnName = cell.getAttribute("name");
 				var columnNode = this.template.columnsMap[columnName]; 
-				if( columnName == null || columnName == "cellsequence" || columnName == "cellheader" || columnNode == null)  {
+				if( columnName == null || columnName == "cellsequence" || columnName == "cellheader" || columnNode == null) {
 					continue;
 				}
 
@@ -226,12 +275,11 @@
 							});
 						}
 						
-						nobrNodeInCell.innerText = value;
-						cell.setAttribute("title", value);								
+						cell.innerText = cell.title = value;							
 						break;
 					case "number":  
 					case "date":
-						cell.setAttribute("title", value);
+						cell.title = value;
 						break;         
 					case "function":                          
 						break;    
@@ -273,7 +321,7 @@
 		// 获取某一列的值
 		getColumnValues: function(columnName) {
 			var values = [];
-			this.rows.each(function(i, row) {
+			$.each(this.rows, function(i, row) {
 				values[i] = row.getAttribute(columnName);
 			});
 			return values;
@@ -303,7 +351,7 @@
 					cell.innerText = this.totalRowsNum;
 				}
 
-				if(map[columnName]) { {
+				if(map[columnName]) {
 					cell.innerText = map[columnName];
 				}
 			});
@@ -359,7 +407,7 @@
 			};
 
 			this.element.onmousewheel = function() {
-				this.gridBox.scrollTop += -Math.round(window.event.wheelDelta / 120) * cellHeight;
+				oThis.gridBox.scrollTop += -Math.round(window.event.wheelDelta / 120) * cellHeight;
 			};
 			
 			this.element.onkeydown = function() {
@@ -455,7 +503,7 @@
 				XmlNode:pageInfo        XmlNode实例
 				function:callback       回调函数
 	 */
-	$.createGridToolBar = function(pageBar, pageInfo, callback) {
+	$.initGridToolBar = function(pageBar, pageInfo, callback) {
 		pageBar.init = function() {
 			this.innerHTML = ""; // 清空内容
 
@@ -501,7 +549,7 @@
 					pageBar.gotoPage(curPage - 1);
 				}
 			});
-			$.Event.addEvent($("#GridPageList")[0], "change", function() {
+			$.Event.addEvent($1("GridPageList"), "change", function() {
 				pageBar.gotoPage(this.value);
 			});
 		}
@@ -529,25 +577,27 @@
 	};
 
 	$.showGrid = function(serviceUrl, dataNodeName, editRowFuction, gridName, page, requestParam, pageBar) {
-		pageBar  = pageBar  || $$("gridToolBar");
+		pageBar  = pageBar  || $1("gridToolBar");
 		gridName = gridName || "grid";
 		page     =  page || "1";
+		var XML_PAGE_INFO = "PageInfo";
 
-		var p = requestParam || new HttpRequestParams();
-		p.url = serviceUrl + "/" + page;
+		var request = new $.HttpRequest(p);
+		request.url = serviceUrl + "/" + page;
+		request.params = requestParam || [];
 
-		var request = new HttpRequest(p);
 		request.onresult = function() {
-			if($$(gridName).getAttribute("height") == null) {
-				$$(gridName).setAttribute("height", $$(gridName).clientHeight); // hack for IE11
+			var grid = $1(gridName);
+			if(grid.getAttribute("height") == null) {
+				grid.setAttribute("height", grid.clientHeight); // hack for IE11
 			}
 			
-			$G(gridName, this.getNodeValue(dataNodeName)); 
+			$.G(gridName, this.getNodeValue(dataNodeName)); 
 	 
 			var gotoPage = function(page) {
-				request.paramObj.url = serviceUrl + "/" + page;
+				request.url = serviceUrl + "/" + page;
 				request.onresult = function() {
-					$G(gridName, this.getNodeValue(dataNodeName)); 
+					$.G(gridName, this.getNodeValue(dataNodeName)); 
 				}				
 				request.send();
 			}
@@ -555,129 +605,45 @@
 			var pageInfoNode = this.getNodeValue(XML_PAGE_INFO);			
 			initGridToolBar(pageBar, pageInfoNode, gotoPage);
 			
-			var gridElement = $$(gridName); 
-			gridElement.onDblClickRow = function(eventObj) {
+			grid.onDblClickRow = function(eventObj) {
 				editRowFuction();
 			}
-			gridElement.onRightClickRow = function() {
-				gridElement.contextmenu.show(event.clientX, event.clientY);
+			grid.onRightClickRow = function() {
+				this.contextmenu.show(event.clientX, event.clientY);
 			}   
-			gridElement.onScrollToBottom = function () {			
+			grid.onScrollToBottom = function () {			
 				var currentPage = pageBar.getCurrentPage();
 				if(pageBar.getTotalPages() <= currentPage) return;
 
 				var nextPage = parseInt(currentPage) + 1; 
-				request.paramObj.url = serviceUrl + "/" + nextPage;
+				request.url = serviceUrl + "/" + nextPage;
 				request.onresult = function() {
-					$G(gridName).load(this.getNodeValue(dataNodeName), true);
+					$.G(gridName).load(this.getNodeValue(dataNodeName), true);
 
 					var pageInfoNode = this.getNodeValue(XML_PAGE_INFO);
-					initGridToolBar(pageBar, pageInfoNode, gotoPage);
+					$.initGridToolBar(pageBar, pageInfoNode, gotoPage);
 				}				
 				request.send();
 			}
 		}
 		request.send();
+	};
+
+	// 删除选中Grid行
+	$.delGridRow = function(url, gridName) {
+		if( !confirm("您确定要删除该行记录吗？") ) return;
+		
+		var grid = $.G(gridName || "grid");
+		var objectID = grid.getRowAttributeValue("id");
+		if( objectID ) {
+			$.ajax({
+				url : url + objectID,
+				method : "DELETE",
+				onsuccess : function() { 
+					grid.deleteSelectedRow();
+				}
+			});	
+		}
 	}
 
 })(tssJS);
-
-function bindSortHandler(table) {
-	this.rows  = table.tBodies[0].rows;
-	this.tags  = table.tHead.rows[0].cells;
-	var defaultClass = [];
-	for(var i=0; i < this.tags.length; i++) {
-		defaultClass[i] = this.tags[i].className;
-	}
-	
-	// 将数据行和列转换成二维数组
-	this._2DArray = [];
-	for(var i=0; i < this.rows.length; i++) {
-		this._2DArray[i] = [];
-		for(var j=0; j < this.tags.length; j++) {
-			var cell = this.rows[i].cells[j];
-			this._2DArray[i].push(cell.innerHTML);
-		}
-	}
-	
-	for(var i=0; i < this.tags.length; i++) {
-		var tag = this.tags[i];
-		var sortable = tag.getAttribute("sortable");
-		if( sortable == "true") {
-			tag._colIndex = i;
-			$.Event.addEvent(tag, "click", bind(tag, sortHandler));
-		}		
-	}
-
-	var oThis = this;
-	var direction = 1;
-	function sortHandler() {
-		for(var i=0; i < oThis.tags.length; i++) {
-			oThis.tags[i].className = defaultClass[i];
-		}
-
-		if(direction == 1) {
-			Element.removeClass(cell, "desc");
-			Element.addClass(this, "asc");
-		} else {
-			Element.removeClass(cell, "asc");
-			Element.addClass(this, "desc");			
-		}
-		sort(direction, this._colIndex);
-		direction = direction * -1;
-
-		//去掉所有的html标记 
-		function killHTML(str) {
-			return str.replace(/<[^>]+>/g, "");
-		}
-
-		function sort(direction, columnIndex) {
-			this._2DArray.sort(function(a, b) {
-				var x = killHTML( a[columnIndex] ).replace(/,/g, '');
-				var y = killHTML( b[columnIndex] ).replace(/,/g, '');
-				var compareValue;
-				if( isNaN(x) ) {
-					compareValue = x.localeCompare(y);
-				}
-				else {
-					compareValue = Number(x) - Number(y);
-				}
-				return compareValue * direction;
-			});
-
-			// 设置排序列的样式
-			for (var i = 0; i < this.rows.length; i++) {
-				for (var j = 0; j < this.tags.length; j++) {
-					var cell = this.rows[i].cells[j];
-					Element.removeClass(cell, "sorting");
-				}
-				Element.addClass(this.rows[i].cells[columnIndex], "sorting");
-			}
-
-			// 将排序后的二维数组重新输出到对应的行和列中
-			for (var i = 0; i < this.rows.length; i++) {
-				for (var j = 0; j < this.tags.length; j++) {
-					var cell = this.rows[i].cells[j];
-					cell.innerHTML = this._2DArray[i][j];
-				}
-			}
-		}
-	}
-}
-
-// 删除选中Grid行
-function delGridRow(url, gridName) {
-	if( !confirm("您确定要删除该行记录吗？") ) return;
-	
-	var grid = $G(gridName || "grid");
-	var userID = grid.getRowAttributeValue("id");
-	if( userID ) {
-		Ajax({
-			url : url + userID,
-			method : "DELETE",
-			onsuccess : function() { 
-				grid.deleteSelectedRow();
-			}
-		});	
-	}
-}

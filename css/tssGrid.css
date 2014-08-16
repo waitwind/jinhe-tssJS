@@ -20,37 +20,38 @@ Grid\:Box div {
 Grid\:Box table {
 	width:100%;
 	table-layout:fixed;
-    border: 0;
-    margin: 0;
+    border: 0px;
+    margin: 0px;
     border-collapse:collapse;
 }
 
-Grid\:Box .column {
+Grid\:Box thead td {
 	text-align:center;
 	border-style:solid;
 	border-color:#FFFFFF #96969E #96969E #FFFFFF;
-	border-width: 1 1 1 1;
+	border-width: 1px 1px 1px 1px;
 	background-color:#E4E6F5;
     height:25px;
     width:50px;
     font-size:12px;
 }
 
-Grid\:Box .cell {
+Grid\:Box tbody {
 	background-color:#F7F8FD;	
 }
 
-Grid\:Box .cell td, Grid\:Box .header td {
-    font-size:12px;
-	border-style:solid;
-	border-color:#FFFFFF #96969E #96969E #FFFFFF;	
-	border-width: 1 1 1 1;
-	overflow:hidden;
-	text-overflow:ellipsis;
+Grid\:Box tbody tr {
+    height:22px;
 }
 
-Grid\:Box .cell tr {
-    height:22px;
+Grid\:Box tbody td {
+    font-size:12px;
+    text-align:center;
+	border-style:solid;
+	border-color:#FFFFFF #96969E #96969E #FFFFFF;	
+	border-width: 1px 1px 1px 1px;
+	overflow:hidden;
+	text-overflow:ellipsis;
 }
 
 Grid\:Box .highlightCol {
@@ -70,10 +71,10 @@ Grid\:Box .hidden {
 }
 
 Grid\:Box .asc {  
-	background: #FFFFCC url(../images/up.gif) no-repeat right 5px;
+	background: #FFFFCC url(../images/direction_up.gif) no-repeat right 5px;
 } 
 Grid\:Box .desc {
-	background: #FFFFCC url(../images/down.gif) no-repeat right 5px;
+	background: #FFFFCC url(../images/direction_down.gif) no-repeat right 5px;
 } 
 Grid\:Box .sorting {
 	background: #F0EFE5;
@@ -115,7 +116,7 @@ Grid\:Box .sorting {
     background-repeat: no-repeat;
     background-position: center;
     cursor: hand;
-    margin:2 2 2 2px;
+    margin:2px;
 }
  
 #gridTitle .refresh {

@@ -22,8 +22,8 @@
 	 	request.waiting = arg.waiting || false;
 		request.async = arg.async || true;
 
-		request.params = arg.params;
-		request.headers = arg.headers;
+		request.params  = arg.params  || {};
+		request.headers = arg.headers || {};
 
 		if(arg.xformNode) {
 			request.setXFormContent(arg.xformNode);
@@ -37,7 +37,9 @@
 			};
 
 		request.send();
-	}
+	};
+
+	$.Ajax = $.AJAX = $.ajax;
 
 })(tssJS, function ($) {
 

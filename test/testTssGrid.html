@@ -61,7 +61,7 @@
 				url : "data/grid.xml",
 				onresult : function() {
 					var gridData = this.getNodeValue("SourceList");
-					var grid = $G("grid", gridData);       
+					var grid = $.G("grid", gridData);       
 
 					var gridPage = this.getNodeValue("PageInfo");
 					createGridToolBar(gridPage);
@@ -115,7 +115,8 @@
 	}
 
 	function getColumnValues() {
-		alert($.G("grid").getColumnValues("id").join("|"));
+		alert($.G("grid").getColumnValues("id").join(" | "));
+		console.log($.G("grid").getColumnValue("id"));
 	}
 	
 	window.onload = init;
@@ -134,9 +135,7 @@
   </tr>
   <tr>
 	<td>
-		<div style="height:100%;overflow:auto;">
-			<Grid:Box id="grid"></Grid:Box>
-		</div>	
+		<Grid:Box id="grid" style="height:100%;overflow:auto;"></Grid:Box>
 	</td>
   </tr>
 </table>			

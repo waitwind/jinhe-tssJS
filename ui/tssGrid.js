@@ -18,31 +18,113 @@
 
     'use strict';
 
-    var 
-    scrollbarSize = 17,
-	cellHeight = 22,  // 数据行高
+    var cellHeight = 22,  // 数据行高
+
+	getAlign = function(column) {
+		var align = column.getAttribute("align");
+		if(align) {
+			return align;
+		}
+
+		switch(column.getAttribute("mode")) {
+			case "number":
+				return "right";
+			case "boolean":
+			case "date":
+			default:
+				return "center";
+		}
+	},
+
+	getCellValue = function(tr, colName) {
+		var cells = curRow.cells;
+		for(var j=0; j < cells.length; j++) {
+			var cell = cells[j];
+			if( cell.getAttribute("name") == colName ) {
+				return cell.getAttribute("value");
+			}
+		}
+	},
+
+	bindAdjustTHHandler = function(table) {
+		var _TH;
+		var thList = table.querySelectorAll("thead tr td");
+		$.each(thList, function(i, th) {
+			
+			$.Event.addEvent(th, "dblclick", function() {
+				var srcElement = $.Event.getSrcElement(event);
+				srcElement.style.display = "none";
+
+				$.each(table.querySelectorAll("tbody tr"), function(j, row) {
+					row.cells[i].style.display = "none";
+				});
+			}) ;
+
+			th.onmousedown = function() {
+				_TH = this;
+				if(event.offsetX > _TH.offsetWidth - 5) {
+					_TH.mouseDown = true;
+					_TH.oldX = event.x;
+					_TH.oldWidth = _TH.offsetWidth;
+				}
+			};
+
+			// 结束宽度调整 
+			th.onmouseup = function() {
+				_TH = _TH || this;
+				_TH.mouseDown = false;
+				$(_TH).css("cursor", "default");
+			};
+
+			th.onmousemove = function() {
+				if(event.offsetX > this.offsetWidth - 5) {
+					$(this).css("cursor", "col-resize");
+				} else {
+					$(this).css("cursor", "default");
+				}
+
+				_TH = _TH || this;
+				if(!!_TH.mouseDown) {
+					$(_TH).css("cursor", "default");
+					if(_TH.oldWidth + event.x > _TH.oldX) {
+						_TH.width = _TH.oldWidth + (event.x - _TH.oldX);
+
+						$(_TH).css("width", (_TH.oldWidth + event.x - _TH.oldX) + "px");
+						$(_TH).css("cursor", "col-resize");
+
+
+					}
+				}
+			}
+		});
+	},
 
 	bindSortHandler = function(table) {
-		var rows = table.querySelectorAll("tbody tr");
-		var tags = table.querySelectorAll("thead tr td");
+		var rows = [];
+		var tbody = table.querySelector("tbody");
+		$.each(tbody.querySelectorAll("tr"), function(i, row) {
+			rows[i] = row;
+		});
+
+		var thList = table.querySelectorAll("thead tr td");
 		var direction = 1;
 	 
-		$.each(tags, function(i, tag) {
-			var sortable = tag.getAttribute("sortable");
+		$.each(thList, function(i, th) {
+			var sortable = th.getAttribute("sortable");
 			if( sortable == "true") {
-				tag._colIndex = i;
+				th._colIndex = i;
 
-				$(tag).click(function() {
+				$(th).click(function() {
 					// 先清除已有的排序
-					$.each(tags, function(i, _tag) {
-						$(_tag).removeClass("desc").removeClass("asc");
+					$.each(thList, function(i, _th) {
+						$(_th).removeClass("desc").removeClass("asc");
 					});
-					$(this).addClass(direction == 1 ? "asc" : "desc");
+					$(this).addClass(direction == 1 ? "desc" : "asc");
 
 					var columnIndex = this._colIndex;
-					this.rows.sort(function(a, b) {
-						var x = a[columnIndex].innerText;
-						var y = b[columnIndex].innerText;
+					rows.sort(function(row1, row2) {
+						var x = row1.cells[columnIndex].innerText;
+						var y = row2.cells[columnIndex].innerText;
 						var compareValue;
 						if( isNaN(x) ) {
 							compareValue = x.localeCompare(y);
@@ -53,17 +135,18 @@
 						return compareValue * direction;
 					});
 
-					// 设置排序列的样式
-					this.rows.each(function(i, row) {
-						row.cells.each(function(j, cell){
+					// 按排序结果对table进行更新，并设置排序列的样式					
+					rows.each(function(i, row) {
+						$.each(row.cells, function(j, cell){
 							if(j == columnIndex) {
 								$(cell).addClass("sorting");
 							} else {
 								$(cell).removeClass("sorting");
 							}
 						});
-
-						row._index = i + 1;
+						
+						tbody.appendChild(row);
+						row.setAttribute("_index", i + 1);
 					});
 
 					direction = direction * -1;
@@ -89,12 +172,12 @@
 	};
 
 	GridTemplate.prototype = {
-		toHTML: function(startNum, gridID) {
+		toHTML: function(startNum) {
 			var htmls = [], thead = [], tbody = [];
 
 			thead.push('<thead><tr>');
 			if(this.hasHeader) {
-				thead.push('<td><input type="checkbox" id="checkAll"/></td>');
+				thead.push('<td name="cellheader"><input type="checkbox" id="checkAll"/></td>');
 			}
 			if(this.needSequence) {
 				thead.push('<td name="sequence">序号</td>');
@@ -116,29 +199,16 @@
 				tbody.push('<tr _index="' + index + '">');
 
 				if(oThis.hasHeader) {
-					tbody.push('<td mode="cellheader" name="cellheader">');
-					tbody.push('	<input name="' + gridID + '_cb" type="checkbox" >');
-					tbody.push("</td>")
+					tbody.push('<td></td>');
 				}
 				if(oThis.needSequence) {
-					tbody.push('<td mode="cellsequence" name="cellsequence">' + index + '</td>');
+					tbody.push('<td></td>');
 				}
 
 				var columnsMap = oThis.columnsMap;
 				for(var name in columnsMap) {
-					var column = columnsMap[name];
-					var value = row.getAttribute(name);
-					
-					var _class = "";
-					if(column.getAttribute("display") == "none") {
-						_class = 'class="hidden"';
-					} 
-					else if(column.getAttribute("highlight") == "true") {
-						_class = 'class="highlightCol"';
-					}
-
-					var style = 'style = "text-align:' + getAlign(column) + ';"';
-					tbody.push('<td name="' + name + '" ' + _class + style + '>' + (value || "") + '</td>');
+					var value  = row.getAttribute(name) || "";
+					tbody.push('<td name="' + name + '" value="' + value + '">' + value + '</td>');
 				}
 
 				tbody.push("</tr>");
@@ -150,33 +220,16 @@
 			htmls.push(tbody.join(""));
 			htmls.push("</table>");
 			return htmls.join("");
-
-			function getAlign(column) {
-				var align = column.getAttribute("align");
-				if(align) {
-					return align;
-				}
-
-				switch(column.getAttribute("mode")) {
-					case "number":
-						return "right";
-					case "boolean":
-					case "date":
-					default:
-						return "center";
-				}
-			}
 		}
 	}; 
 
 	var Grid = function(element, data) {
 		this.id = element.id;
-		this.element = element;
-
-		this.gridBox = $.createElement("div");
-		this.element.appendChild(this.gridBox);
+		this.gridBox = this.element = element;
+		this.gridBox.innerHTML = "";
 
 		this.gridBox.style.width = element.getAttribute("width")  || "100%";
+
 		var pointHeight = element.getAttribute("height");
 		if( pointHeight ) {
 			this.gridBox.style.height = this.windowHeight = pointHeight;
@@ -203,7 +256,7 @@
 			var startNum = append ? this.totalRowsNum : 0;	
 
 			this.template = new GridTemplate(data);	
-			var gridTableHtml = this.template.toHTML(startNum, this.id); // 解析成Html
+			var gridTableHtml = this.template.toHTML(startNum); // 解析成Html
 			
 			if(append) {
 				var tempParent = $.createElement("div");
@@ -217,15 +270,6 @@
 			else {
 				$(this.gridBox).html(gridTableHtml);
 				this.tbody = this.gridBox.querySelector("tbody");
-				var thList = this.gridBox.querySelectorAll("thead tr");	
-				
-				Element.ruleObjList = []; // 先清空原来的拖动条
-				for( var i = 0; i < thList.length; i++ ) {
-					// 给表头添加双击、拖动等事件
-					// 设置隐藏列事件，双击隐藏列
-					// 拖动改变列宽
-					// Element.attachColResizeII(thList[i]);
-				}
 			}
 			
 			var table  = this.gridBox.querySelector("table");
@@ -235,7 +279,8 @@
 				this.processDataRow(this.rows[i]); // 表格行TR
 			}
 			
-			bindSortHandler(table); // table
+			bindAdjustTHHandler(table);
+			bindSortHandler(table);
 		}, 
 
 		/* 处理数据行,将值解析成下拉列表值、图片、选择框等 */
@@ -252,47 +297,70 @@
 			var cells = curRow.cells;
 			for(var j=0; j < cells.length; j++) {
 				var cell = cells[j];
-				var columnName = cell.getAttribute("name");
-				var columnNode = this.template.columnsMap[columnName]; 
-				if( columnName == null || columnName == "cellsequence" || columnName == "cellheader" || columnNode == null) {
+
+				if(this.template.hasHeader && j == 0) {
+					cell.setAttribute("name", "cellheader");
+					cell.innerHTML = '<input name="' + this.id + '_cb" type="checkbox" >';
+					continue;
+				} else if(this.template.needSequence && j <= 1) {
+					cell.setAttribute("name", "sequence");
+					cell.innerText = curRow.getAttribute("_index");
 					continue;
 				}
 
-				var value = cell.innerText;
-				var mode = columnNode.getAttribute("mode") || "string";
-				switch( mode ) {
-					case "string":
-						var editor = columnNode.getAttribute("editor");
-						var editortext = columnNode.getAttribute("editortext");
-						var editorvalue = columnNode.getAttribute("editorvalue");
-						if(editor == "comboedit" && editorvalue && editortext) {
-							var listNames  = editortext.split("|");
-							var listValues = editorvalue.split("|");
-							listValues.each(function(n, optionValue) {
-								if(value == optionValue) {
-									value = listNames[n];
-								}
-							});
-						}
-						
-						cell.innerText = cell.title = value;							
-						break;
-					case "number":  
-					case "date":
-						cell.title = value;
-						break;         
-					case "function":                          
-						break;    
-					case "image":          
-						cell.innerHTML = "<img src='" + value + "'/>";
-						break;    
-					case "boolean":      
-						var checked = (value =="true") ? "checked" : "";
-						cell.innerHTML = "<form><input class='selectHandle' type='radio' " + checked + "/></form>";
-						cell.querySelector("input").disabled = true;
-						break;
-				}							
+				this.processDataCell(cell);						
 			}	
+		},
+
+		processDataCell: function(cell) {
+			var colName = cell.getAttribute("name");
+			var column = this.template.columnsMap[colName]; 
+			if( colName == null || column == null) {
+				return;
+			} 
+
+			if(column.getAttribute("display") == "none") {
+				$(cell).addClass("hidden");
+			} 
+			else if(column.getAttribute("highlight") == "true") {
+				$(cell).addClass("highlightCol");
+			}
+			$(cell).css("text-align", getAlign(column));
+
+			var value = cell.getAttribute("value") || cell.innerText;
+			var mode  = column.getAttribute("mode") || "string";
+			switch( mode ) {
+				case "string":
+					var editor = column.getAttribute("editor");
+					var editortext = column.getAttribute("editortext");
+					var editorvalue = column.getAttribute("editorvalue");
+					if(editor == "comboedit" && editorvalue && editortext) {
+						var listNames  = editortext.split("|");
+						var listValues = editorvalue.split("|");
+						listValues.each(function(n, optionValue) {
+							if(value == optionValue) {
+								value = listNames[n];
+							}
+						});
+					}
+					
+					cell.innerText = cell.title = value;							
+					break;
+				case "number":  
+				case "date":
+					cell.title = value;
+					break;         
+				case "function":                          
+					break;    
+				case "image":          
+					cell.innerHTML = "<img src='" + value + "'/>";
+					break;    
+				case "boolean":      
+					var checked = (value =="true") ? "checked" : "";
+					cell.innerHTML = "<form><input class='selectHandle' type='radio' " + checked + "/></form>";
+					cell.querySelector("input").disabled = true;
+					break;
+			}							
 		},
 
 		/*
@@ -310,74 +378,85 @@
 		},
 
 		// 获取选中行中指定列的值
-		getRowAttributeValue: function(attrName) {
-			var rowIndex = this.element.selectRowIndex; 
+		getColumnValue: function(columnName) {
+			var value;
+			var rowIndex = this.gridBox.selectRowIndex; 
 			if(rowIndex) {
 				var row = this.getRowByIndex(rowIndex);
-				return row.getAttribute(attrName);
+				$.each(row.cells, function(i, cell) {
+					if(cell.getAttribute("name") == columnName) {
+						value = cell.getAttribute("value");
+					}
+				});
 			}
+			return value;
 		},
 
 		// 获取某一列的值
 		getColumnValues: function(columnName) {
 			var values = [];
 			$.each(this.rows, function(i, row) {
-				values[i] = row.getAttribute(columnName);
+				$.each(row.cells, function(j, cell) {
+					if(cell.getAttribute("name") == columnName) {
+						values[i] = cell.getAttribute("value");
+					}
+				});
 			});
 			return values;
 		},
 
 		// 新增一行
 		insertRow: function(map) {
-			var rowIndex = this.totalRowsNum ++ ;
-			var newRow = this.tbody.insertRow(rowIndex);
+			var trList = this.gridBox.querySelectorAll("table tbody tr");
+			var lastRow = trList[trList.length - 1];
 
-			var thList = this.gridBox.querySelectorAll("table thead tr");
-			thList.each(function(i, th) {
-				var columnName = th.getAttribute("name");
+			var newRow = this.tbody.insertRow(this.totalRowsNum ++);
+			newRow.setAttribute("_index", parseInt(lastRow.getAttribute("_index")) + 1);
+
+			var thList = this.gridBox.querySelectorAll("table thead td");
+			$.each(thList, function(i, th) {
+				var colName = th.getAttribute("name");
 				
 				var cell = newRow.insertCell(i);
-				cell.setAttribute( "name", columnName );
-				
-				var column = this.template.columnsMap[columnName];
-				if(column && column.getAttribute("display") == "none" ) {
-					$(cell).addClass("hidden");
-				} 
-				else {
-					$(cell).addClass("column");
-				}
+				cell.setAttribute( "name", colName );
 
-				if(columnName == "sequence") {
-					cell.innerText = this.totalRowsNum;
-				}
-
-				if(map[columnName]) {
-					cell.innerText = map[columnName];
+				if(map[colName]) {
+					cell.innerText = map[colName];
 				}
 			});
  
 			this.processDataRow(newRow);
+
+			bindSortHandler(this.tbody.parentNode);
 		},
 
 		// 删除单行
 		deleteRow: function(row) {
 			this.tbody.removeChild(row);
+			this.totalRowsNum --;
 		},
 
 		deleteRowByIndex: function(rowIndex) {
 			var row = this.getRowByIndex(rowIndex);
 			this.deleteRow(row);
+
+			bindSortHandler(this.tbody.parentNode);
 		},
 
 		deleteSelectedRow: function() {
-			var rowIndex = this.element.selectRowIndex;
+			var rowIndex = this.gridBox.selectRowIndex;
 			this.deleteRowByIndex(rowIndex);
 		},
 			
 		// 更新单行记录的某个属性值
 		modifyRow: function(row, attrName, value) {
-			row.setAttribute(attrName, propertyValue);
-			this.processDataRow(row);
+			var oThis = this;
+			$.each(row.cells, function(i, cell) {
+				if(cell.getAttribute("name") == attrName) {
+					cell.setAttribute("value", value);
+					oThis.processDataCell(cell);
+				}
+			});
 		},
 
 		modifyRowByIndex: function(rowIndex, attrName, value) {
@@ -386,7 +465,7 @@
 		},
 
 		modifySelectedRow: function(attrName, value) {
-			var rowIndex = this.element.selectRowIndex;
+			var rowIndex = this.gridBox.selectRowIndex;
 			this.modifyRowByIndex(rowIndex, attrName, value);
 		},
 
@@ -401,16 +480,16 @@
 			this.gridBox.onscroll = function() {
 				 // 判断是否到达底部 
 				 if(this.scrollHeight - this.scrollTop <= this.clientHeight) {
-					var eventFirer = new $.EventFirer(oThis.element, "onScrollToBottom");
+					var eventFirer = new $.EventFirer(oThis.gridBox, "onScrollToBottom");
 					eventFirer.fire($.Event.createEventObject());
 				 }
 			};
 
-			this.element.onmousewheel = function() {
-				oThis.gridBox.scrollTop += -Math.round(window.event.wheelDelta / 120) * cellHeight;
+			this.gridBox.onmousewheel = function() {
+				this.scrollTop += -Math.round(window.event.wheelDelta / 120) * cellHeight;
 			};
 			
-			this.element.onkeydown = function() {
+			this.gridBox.onkeydown = function() {
 				switch (event.keyCode) {
 				    case 33:	//PageUp
 						oThis.gridBox.scrollTop -= oThis.pageSize * cellHeight;
@@ -439,20 +518,20 @@
 				}
 			};
 		 
-			this.element.onclick = function() { // 单击行
+			this.gridBox.onclick = function() { // 单击行
 				fireClickRowEvent(this, event, "onClickRow");
 			};
 
-			this.element.ondblclick = function() { // 双击行
+			this.gridBox.ondblclick = function() { // 双击行
 				fireClickRowEvent(this, event, "onDblClickRow");
 			};
 
-			this.element.oncontextmenu = function() {
+			this.gridBox.oncontextmenu = function() {
 				fireClickRowEvent(this, event, "onRightClickRow"); // 触发右键事件
 			};
 
 		    // 触发自定义事件
-			function fireClickRowEvent(gridElement, event, firerName) {
+			function fireClickRowEvent(gridBox, event, firerName) {
 				var _srcElement = event.srcElement;
 				if( notOnGridHead(_srcElement) ) { // 确保点击处不在表头
 					var trObj = _srcElement;
@@ -467,8 +546,8 @@
 							rowIndex: rowIndex
 						};
 
-						gridElement.selectRowIndex = rowIndex;
-						var eventFirer = new $.EventFirer(gridElement, firerName);
+						gridBox.selectRowIndex = rowIndex;
+						var eventFirer = new $.EventFirer(gridBox, firerName);
 						eventFirer.fire(oEvent);  // 触发右键事件
 					}	
 				}		

@@ -242,7 +242,7 @@
                 var tmp = xml.documentElement;
 
                 if (!tmp || !tmp.nodeName || tmp.nodeName === "parsererror") {
-                    alert("Invalid XML: " + data);
+                    console.log("Invalid XML: " + data);
                 }
 
                 return xml;
@@ -268,6 +268,7 @@
                     }
                 } catch (e) {
                     alert(e.message);
+                    console.log(e.stack);
                     returnVal = false;
                 }
                 return returnVal;

@@ -135,7 +135,7 @@
 		document.body.appendChild(newElement);
 
 		$.assertEquals(1, $.getNSElements(document.body, "Page", "WorkSpace").length);
-		$.assertEquals(1, $("WorkSpace:Page").size());
+		$.assertEquals(1, $("WorkSpace\\:Page").size());
 
 		$.insertHtml("afterEnd", newElement, "<div>test insertHtml afterEnd</div>");
 		$.insertHtml("afterBegin", newElement, "<div>test insertHtml afterBegin 1</div>");

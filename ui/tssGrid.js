@@ -4,10 +4,10 @@
 
     var GridCache = {};
 
-    $.G = function(gridId, data) {
- 		var grid = GridCache[gridId];
+    $.G = function(id, data) {
+ 		var grid = GridCache[id];
 		if( grid == null || data ) {
-			grid = new $.Grid($("#" + gridId)[0], data);
+			grid = new $.Grid($1(id), data);
 			GridCache[grid.id] = grid;	
 		}
 		
@@ -48,17 +48,14 @@
 
 	bindAdjustTHHandler = function(table) {
 		var _TH;
-		var thList = table.querySelectorAll("thead tr td");
-		$.each(thList, function(i, th) {
+		$("thead tr td", table).each(function(i, th) {
 			
-			$.Event.addEvent(th, "dblclick", function() {
-				var srcElement = $.Event.getSrcElement(event);
-				srcElement.style.display = "none";
-
-				$.each(table.querySelectorAll("tbody tr"), function(j, row) {
-					row.cells[i].style.display = "none";
+			th.ondblclick = function() {
+				$(th).css("display", "none");
+				$("tbody tr", table).each( function(j, row) {
+					$(row.cells[i]).css("display", "none");
 				});
-			}) ;
+			};
 
 			th.onmousedown = function() {
 				_TH = this;
@@ -91,8 +88,6 @@
 
 						$(_TH).css("width", (_TH.oldWidth + event.x - _TH.oldX) + "px");
 						$(_TH).css("cursor", "col-resize");
-
-
 					}
 				}
 			}
@@ -101,22 +96,22 @@
 
 	bindSortHandler = function(table) {
 		var rows = [];
-		var tbody = table.querySelector("tbody");
-		$.each(tbody.querySelectorAll("tr"), function(i, row) {
+		var tbody = $("tbody", table)[0];
+		$("tr", tbody).each( function(i, row) {
 			rows[i] = row;
 		});
 
-		var thList = table.querySelectorAll("thead tr td");
+		var thList = $("thead tr td", table);
 		var direction = 1;
 	 
-		$.each(thList, function(i, th) {
+		thList.each( function(i, th) {
 			var sortable = th.getAttribute("sortable");
 			if( sortable == "true") {
 				th._colIndex = i;
 
 				$(th).click(function() {
 					// 先清除已有的排序
-					$.each(thList, function(i, _th) {
+					thList.each(function(i, _th) {
 						$(_th).removeClass("desc").removeClass("asc");
 					});
 					$(this).addClass(direction == 1 ? "desc" : "asc");
@@ -155,11 +150,11 @@
 		});
 	},
 
-	GridTemplate = function(xmlDom) {
-		this.declare = xmlDom.querySelector("declare");
-		this.script  = xmlDom.querySelector("script");
+	XMLTempalte = function(dataXML) {
+		this.declare = $("declare", dataXML)[0];
+		this.script  = $("script", dataXML)[0];
 		this.columns = this.declare.querySelectorAll("column");
-		this.dataRows = xmlDom.querySelectorAll("data row");
+		this.dataRows = dataXML.querySelectorAll("data row");
 
 		var columnsMap = {};
 		$.each(this.columns, function(index, column) {
@@ -169,9 +164,13 @@
 
 		this.hasHeader    = this.declare.getAttribute("header") == "checkbox";
 		this.needSequence = this.declare.getAttribute("sequence") != "false";
+	},
+
+	JsonTemplate = function(dataJson) {
+		// TODO 支持json格式的数据源
 	};
 
-	GridTemplate.prototype = {
+	XMLTempalte.prototype = {
 		toHTML: function(startNum) {
 			var htmls = [], thead = [], tbody = [];
 
@@ -255,7 +254,7 @@
 			// 初始化变量
 			var startNum = append ? this.totalRowsNum : 0;	
 
-			this.template = new GridTemplate(data);	
+			this.template = new XMLTempalte(data);	
 			var gridTableHtml = this.template.toHTML(startNum); // 解析成Html
 			
 			if(append) {
@@ -269,14 +268,13 @@
 			}
 			else {
 				$(this.gridBox).html(gridTableHtml);
-				this.tbody = this.gridBox.querySelector("tbody");
+				this.tbody = $("tbody", this.gridBox)[0];
 			}
 			
-			var table  = this.gridBox.querySelector("table");
-			this.rows  = this.tbody.rows;
-			this.totalRowsNum = this.rows.length;
+			var table  = $("table", this.gridBox)[0];
+			this.totalRowsNum = this.tbody.rows.length;
 			for(var i = startNum; i < this.totalRowsNum; i++) {
-				this.processDataRow(this.rows[i]); // 表格行TR
+				this.processDataRow(this.tbody.rows[i]); // 表格行TR
 			}
 			
 			bindAdjustTHHandler(table);
@@ -369,8 +367,8 @@
 		 * 返回值：	Row对象
 		 */
 		getRowByIndex: function(index) {
-			for(var i = 0; i < this.rows.length; i++) {
-				var row = this.rows[i];
+			for(var i = 0; i < this.tbody.rows.length; i++) {
+				var row = this.tbody.rows[i];
 				if(row.getAttribute("_index") == index) {
 					return row;
 				}
@@ -395,13 +393,11 @@
 		// 获取某一列的值
 		getColumnValues: function(columnName) {
 			var values = [];
-			$.each(this.rows, function(i, row) {
-				$.each(row.cells, function(j, cell) {
-					if(cell.getAttribute("name") == columnName) {
-						values[i] = cell.getAttribute("value");
-					}
-				});
+			var cells = $("tr>td[name='" + columnName + "']", this.tbody);
+			cells.each(function(i, cell){
+				values[i] = cell.getAttribute("value");
 			});
+
 			return values;
 		},
 
@@ -413,8 +409,8 @@
 			var newRow = this.tbody.insertRow(this.totalRowsNum ++);
 			newRow.setAttribute("_index", parseInt(lastRow.getAttribute("_index")) + 1);
 
-			var thList = this.gridBox.querySelectorAll("table thead td");
-			$.each(thList, function(i, th) {
+			var thList = $("table thead td", this.gridBox);
+			thList.each( function(i, th) {
 				var colName = th.getAttribute("name");
 				
 				var cell = newRow.insertCell(i);
@@ -470,7 +466,7 @@
 		},
 
 		getHighlightRow: function() {
-			return this.tbody.querySelector(".rolloverRow");
+			return $(".rolloverRow", this.tbody)[0];
 		},
 
 		// 添加Grid事件处理
@@ -713,7 +709,7 @@
 		if( !confirm("您确定要删除该行记录吗？") ) return;
 		
 		var grid = $.G(gridName || "grid");
-		var objectID = grid.getRowAttributeValue("id");
+		var objectID = grid.getColumnValue("id");
 		if( objectID ) {
 			$.ajax({
 				url : url + objectID,

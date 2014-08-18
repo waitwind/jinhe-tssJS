@@ -207,10 +207,6 @@
             },
 
             // parseJSON把一个字符串变成JSON对象。
-            // 我们一般使用的是eval。parseJSON封装了这个操作，但是eval被当作了最后手段。
-            // 因为最新JavaScript标准中加入了JSON序列化和反序列化的API。
-            // 如果浏览器支持这个标准，则这两个API是在JS引擎中用Native Code实现的，效率肯定比eval高很多。
-            // 目前来看，Chrome和Firefox4都支持这个API。
             parseJSON: function(data) {
                 if (typeof data !== "string" || !data) {
                     return null;
@@ -226,15 +222,12 @@
 
                 // ... 大致地检查一下字符串合法性
                 if (rvalidchars.test(data.replace(rvalidescape, "@").replace(rvalidtokens, "]").replace(rvalidbraces, ""))) {
-
                     return (new Function("return " + data))();
-
                 }
                 tssJS.error("Invalid JSON: " + data);
             },
 
-            // 解析XML 跨浏览器, parseXML函数也主要是标准API和IE的封装。
-            // 标准API是DOMParser对象, 而IE使用的是Microsoft.XMLDOM的 ActiveXObject对象。
+            // 解析XML 
             parseXML: function(data) {
                 var parser = new DOMParser();
                 var xml = parser.parseFromString(data, "text/xml");
@@ -435,20 +428,8 @@
     $.fn.extend({
 
         find: function(selector, parent) {
-            var elements = [];
-            switch (selector.charAt(0)) {
-            case '#':
-                var temp = $.getElementById(selector.substring(1));
-                if(temp) {
-                    elements.push(temp);
-                }
-                break;
-            case '.':
-                elements = $.getElementsByClass(selector.substring(1), parent);
-                break;
-            default:
-                elements = $.getElementsByTag(selector, parent);
-            }
+            parent = parent || document;
+            var elements = parent.querySelectorAll(selector);
 
             this.length = elements.length;
             for (var i = 0; i < this.length; i++) {
@@ -549,7 +530,7 @@
             var left = ($.getInner().width - (height || 100) ) / 2;
             for (var i = 0; i < this.length; i++) {
                 this[i].style.position = "absolute";
-                this[i].style.top = top + 'px';
+                this[i].style.top  = top + 'px';
                 this[i].style.left = left + 'px';
             }
             return this;
@@ -574,32 +555,6 @@
 // 扩展tssJS操作HTML DOMElement的静态方法
 ; (function($) {
     $.extend({
-        getElementById: function(id) {
-            return document.getElementById(id);
-        },
-
-        getElementsByTag: function(tag, parentNode) {
-            var node = parentNode ? parentNode: document;
-            return node.getElementsByTagName(tag);
-        },
-
-        getElementsByClass: function(cn, parentNode) {
-            var node = parentNode ? parentNode: document;
-            var result = [];
-            var all = [];
-            if ("getElementsByTagName" in node) {
-                all = node.getElementsByTagName("*");
-            } else if ("querySelectorAll" in node) {
-                all = node.querySelectorAll("*");
-            }
-
-            for (var i = 0; i < all.length; i++) {
-                if ($.hasClass(all[i], cn)) {
-                    result.push(all[i]);
-                }
-            }
-            return result;
-        },
 
         hasClass: function(el, cn) {
             var reg = new RegExp('(\\s|^)' + cn + '(\\s|$)');
@@ -749,25 +704,19 @@
         waitingLayerCount: 0,
 
         showWaitingLayer: function () {
-            var waitingDiv = $("#_waitingDiv")[0];
-            if(waitingDiv == null) {
-                waitingDiv = document.createElement("div");    
-                waitingDiv.id = "_waitingDiv";    
-                waitingDiv.style.width ="100%";    
-                waitingDiv.style.height = "100%";    
-                waitingDiv.style.position = "absolute";    
-                waitingDiv.style.left = "0px";   
-                waitingDiv.style.top = "0px";   
-                waitingDiv.style.cursor = "wait"; 
-                waitingDiv.style.zIndex = "10000";
-                waitingDiv.style.background = "black";   
-                $.setOpacity(waitingDiv, 33);
-
+            var waitingObj = $("#_waiting");
+            if(waitingObj.length == 0) {
+                var waitingDiv = document.createElement("div");    
+                waitingDiv.id = "_waiting";
                 document.body.appendChild(waitingDiv);
-            }
 
-            if( waitingDiv ) {
-                waitingDiv.style.display = "block";
+                $(waitingDiv).css("width", "100%").css("height", "100%")
+                             .css("position", "absolute").css("left", "0px").css("top", "0px")
+                             .css("cursor", "wait").css("zIndex", "10000").css("background", "black");
+                $.setOpacity(waitingDiv, 33);
+            }
+            else {
+                waitingObj.css("display", "block");
             }
 
             $.waitingLayerCount ++;
@@ -776,9 +725,9 @@
         hideWaitingLayer: function() {
             $.waitingLayerCount --;
 
-            var waitingDiv = $("#_waitingDiv")[0];
-            if( waitingDiv && $.waitingLayerCount <= 0 ) {
-                waitingDiv.style.display = "none";
+            var waitingObj = $("#_waiting");
+            if( waitingObj.length > 0 && $.waitingLayerCount <= 0 ) {
+                waitingObj.css("display", "none");
             }
         }
 

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<HTML xmlns:XForm>
+<head>
+	<meta charset="UTF-8"/>
+	<title>Form test</title>
+
+	<link href="../css/tss.css" rel="stylesheet">
+	<link href="../css/JBalloon.css" rel="stylesheet">
+	<link href="../css/tssCalendar.css" rel="stylesheet">
+	<link href="../css/tssForm.css" rel="stylesheet">
+
+	<script src="../tssJS.js"></script>
+	<script src="../tssAjax.js"></script>
+	<script src="../ui/JBalloon.js"></script>
+	<script src="../ui/tssCalendar.js"></script>
+	<script src="../ui/tssForm.js"></script>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+
+    URL_XFORM_DEMO = "_xform_user.xml";
+	URL_SAVE_USER  = "_success.xml";
+
+	var cacheID = "user1";
+
+    function init() {
+		var onresult = function() {
+			var dataXmlNode = this.getNodeValue("UserInfo");
+			Cache.XmlDatas.add(cacheID, dataXmlNode);
+
+			var xfomrId = "userForm";
+			var userForm = $X(xfomrId, dataXmlNode);
+
+			attachReminder(xfomrId, userForm); // 离开提醒
+
+			userForm.setColumnEditable("loginName", "false");	
+		}
+
+		$$("btSave").onclick = function() {
+			saveUser(cacheID);
+		}
+
+
+		Ajax({ 
+			url: URL_XFORM_DEMO, 
+			onresult: onresult, 
+			onexception: function() { 
+				alert("ajax has exception"); 
+			} 
+		});
+    }
+
+	function func1() {
+		$X("userForm").updateDataExternal("temp1", "12345678");
+	}
+
+	function f2(value) {
+		$X("userForm").updateDataExternal("sex2", value);
+	}
+ 
+
+    function saveUser(cacheID) {
+        var userForm = $X("userForm");
+        if(  !userForm.checkForm() ) {
+            return;
+        }
+
+        var p = new HttpRequestParams();
+        p.url = URL_SAVE_USER;
+
+        //是否提交
+        var flag = false;
+ 
+		var dataXmlNode = Cache.XmlDatas.get(cacheID);
+		var dataNode = dataXmlNode.selectSingleNode(".//data");
+		if(dataNode) {
+			flag = true;
+			p.setXFormContent(dataNode);
+		}
+
+        if(flag) {
+            var request = new HttpRequest(p);
+            request.onsuccess = function() {
+				alert("成功提交" + dataNode);
+            }
+            request.send();
+        }
+    }
+
+    window.onload = init;
+
+//-->
+</SCRIPT>
+</head>
+
+<body>
+    
+	<div style="background-color:#E8E8E8;padding:10px;margin-left:50px;margin-top:30px;width:900px;">
+		<XForm:Box id="userForm" baseurl="../xform/" editable="true">
+			<div class="loading"></div>
+		</XForm:Box>
+		<input id="btSave" type="button" class="btStrong" value="完成"/>
+	</div>
+	 
+</body>
+</html>

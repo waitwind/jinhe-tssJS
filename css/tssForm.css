@@ -63,9 +63,19 @@ XForm\:Box input.boolean{
     background-color:transparent;
     margin-left:-4px;
 }
-XForm\:Box input.function,XForm\:Box input.date{
+XForm\:Box input.function, XForm\:Box input.date {
     padding-right:18px;
 }
+XForm\:Box .functionIcon {
+    width:20px;
+    height:18px;
+    border:0px;
+    position:relative;
+    top:4px;
+    left:-21px;
+    background-image:url(images/icon_function.gif);
+}
+
 XForm\:Box select{
     font-size:12px;
     height:18px;

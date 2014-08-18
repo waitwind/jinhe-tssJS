@@ -680,7 +680,7 @@
             var head = document.head || document.getElementsByTagName('head')[0];
             if( head ) {
                 var scriptNode = $.createElement("script");
-                scriptNode.text = script;
+                $.XML.setText(scriptNode, script);
                 head.appendChild(scriptNode);
             }
         },
@@ -978,6 +978,13 @@
 
             getText: function(node) {
                 return node.text || node.textContent || ""; // chrome 用 textContent
+            },
+
+            setText: function(node, textValue) {
+                node.text = value;
+                if (node.textContent || node.textContent == "") {
+                    node.textContent = value; // chrome
+                }
             },
 
             EMPTY_XML_DOM: (function() {

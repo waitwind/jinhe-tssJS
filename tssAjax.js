@@ -4,6 +4,7 @@
 		method : "GET",
 		headers : {},
 		params  : {}, 
+		formNode : formNode,
 		ondata : function() { },
 		onresult : function() { },
 		onexception : function() { },
@@ -25,8 +26,8 @@
 		request.params  = arg.params  || {};
 		request.headers = arg.headers || {};
 
-		if(arg.xformNode) {
-			request.setXFormContent(arg.xformNode);
+		if(arg.formNode) {
+			request.setFormContent(arg.formNode);
 		}
 
 		request.ondata = arg.ondata || request.ondata;
@@ -112,8 +113,8 @@
 		},
 
 		/* 设置xform专用格式发送数据 */
-		setXFormContent: function(dataNode) {
-			if(dataNode.nodeName != "data") return;
+		setFormContent: function(dataNode) {
+			if(dataNode == null || dataNode.nodeName != "data") return;
 
 			var nodes = dataNode.querySelectorAll("row *");
 			for(var i = 0; i < nodes.length; i++) {

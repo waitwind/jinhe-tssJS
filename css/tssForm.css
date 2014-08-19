@@ -76,6 +76,12 @@ XForm\:Box .functionIcon {
     background-image:url(images/icon_function.gif);
 }
 
+XForm\:Box .notnull {
+    color:red;
+    margin-left:3px;
+    margin-right:5px;
+}
+
 XForm\:Box select{
     font-size:12px;
     height:18px;

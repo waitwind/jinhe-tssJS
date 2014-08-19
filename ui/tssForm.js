@@ -4,7 +4,7 @@
 
     var FormCache = {};
 
-    $.G = function(id, data) {
+    $.F = function(id, data) {
  		var form = FormCache[id];
  		if( form == null && data == null ) {
 			return null;
@@ -32,6 +32,71 @@
 		}, 100);
 	},
 
+	setFocus = function(){
+		try { this.el.focus(); } catch(e) { }
+	},
+
+	validate = function() {
+		var empty     = this.el.getAttribute("empty");
+		var errorInfo = this.el.getAttribute("errorInfo");
+		var caption   = this.el.getAttribute("caption").replace(/\s/g, "");
+		var inputReg  = this.el.getAttribute("inputReg");
+		
+		var value = this.el.value;
+		if(value == "" && empty == "false") {
+			errorInfo = "[" + caption.replace(/\s/g, "") + "] 不允许为空。";
+		}
+		if(inputReg && !eval(inputReg).test(value)) {
+			errorInfo = errorInfo || "[" + caption + "] 格式不正确，请更正.";
+		}
+
+		if( errorInfo ) {
+			showErrorInfo(errorInfo, this.el);
+
+			if( !!this.isInstance ) {
+				this.setFocus();
+			}
+			if( event ) {
+				$.Event.cancel(event);
+			}
+			return false;
+		}
+		return true;
+	},
+
+	restore = function(el, value) {    
+		var tempEvent = el.onpropertychange;
+		if( tempEvent == null ) {
+			clearTimeout(el.timeout);
+			tempEvent = el._onpropertychange;
+		}
+		else {
+			el._onpropertychange = tempEvent;
+		}
+
+		el.onpropertychange = null;
+		el.timeout = setTimeout(function() {
+			el.value = value;
+			el.onpropertychange = tempEvent;
+		}, 10);
+	},
+
+	fireOnChangeEvent = function(el, newValue) {
+		var onchangeFunc = el.getAttribute("onchange");
+		if(onchangeFunc) {
+			onchangeFunc = onchangeFunc.replace(/\^/g, "'"); // 有些地方的配置無法直接使用引號（如JSON），用^代替，這裡替換回來
+			var rightKH = onchangeFunc.indexOf(")");
+			if(rightKH > 0) {
+				onchangeFunc = onchangeFunc.substring(0, rightKH) + ", '" + newValue + "')"; 
+			}
+			else {
+				onchangeFunc = onchangeFunc + "('" + newValue + "')";
+			}
+
+			eval(onchangeFunc);
+		}
+	},
+
 	XMLTemplate = function(dataXML) {
 		this.sourceXML = dataXML;
 			 
@@ -47,7 +112,7 @@
 		
 		this.rowNode = $("row", this.dataNode)[0];;
 		if(this.rowNode == null) {
-			this.rowNode = $.XML.createElement("row"));
+			this.rowNode = $.XML.createElement("row");
 			this.dataNode.appendChild(this.rowNode);	
 		}
 		
@@ -87,7 +152,7 @@
 				var trNode = trList[i];
 				htmls.push("<tr>");
 
-				var tdList = trNode..querySelectorAll("td");
+				var tdList = trNode.querySelectorAll("td");
 				for(var j=0; j < tdList.length; j++) {
 					var tdNode = tdList[j];
 					htmls.push("<td "+ copyNodeAttribute(tdNode) +">");
@@ -213,43 +278,45 @@
 		attachEditor: function() {
 			var fieldsMap = this.template.fieldsMap;
 			for(var fieldName in fieldsMap) {
-				var column = fieldsMap[fieldName];
+				var field = fieldsMap[fieldName];
 
-				// 取layout中绑定该column的element，如无，则column无需展示。
+				// 取layout中绑定该field column的element，如无，则字段无需展示。
 				var fieldEl = $1(fieldName);
 				if( fieldEl == null) {
 					continue;
 				}
 
 				var fieldObj;
-				var fieldType = column.getAttribute("mode");
+				var fieldType = field.getAttribute("mode");
 				switch(fieldType) {
 					case "string":
-						var colEditor = column.getAttribute("editor");
+						var colEditor = field.getAttribute("editor");
 						if(colEditor == "comboedit") {
-							fieldObj = new Mode_ComboEdit(fieldName, this);
+							fieldObj = new ComboField(fieldName, this);
 						}
 						else {
-							fieldObj = new Mode_String(fieldName, this);
+							fieldObj = new StringField(fieldName, this);
 						}
 						break;
 					case "number":
-						fieldObj = new Mode_String(fieldName, this);
+						fieldObj = new StringField(fieldName, this);
 						break;
 					case "date":
 					case "function":
-						fieldObj = new Mode_Function(fieldName, this);
+						fieldObj = new FunctionField(fieldName, this);
 						break;
 					case "hidden":
-						fieldObj = new Mode_Hidden(fieldName, this);
+						fieldObj = new HiddenFiled(fieldName, this);
 						break;
 				}
 
 				fieldObj.saveAsDefaultValue();
 				this.fieldObjMap[fieldName] = fieldObj;
 
-				if(column.getAttribute('empty') == "false") {
-					$.insertHtml('afterEnd', fieldEl.nextSibling || fieldEl, "<span style='color:red;margin-left:3px;margin-right:5px;'>*</span>");
+				if(field.getAttribute('empty') == "false") {
+					var notnullTag = $.createElement("span", "notnull");
+					notnullTag.innerText = "*";
+					fieldEl.parentNode.appendChild(notnullTag);
 				}
 			}
 
@@ -271,13 +338,13 @@
 		setEditable: function(status) {
 			status = status || this.editable;
 
-			$("buttonBox").css("display", status == "true" ? "block": "none");
+			$(".buttonBox", this.box.parentNode).css("display", status == "true" ? "block": "none");
 
 			var oThis = this, firstEditableField;
 			$.each(this.fieldObjMap, function(name, fieldObj) {
 				var _status = status;
 
-				// 如果column上默认定义为不可编辑，则永远不可编辑
+				// 如果field column上默认定义为不可编辑，则永远不可编辑
 				if (oThis.getFieldConfig(name, "editable") == "false") {
 					_status = "false";
 				} 
@@ -294,7 +361,7 @@
 			}
 		},
 
-		setColumnEditable: function(name, value) {
+		setFieldEditable: function(name, value) {
 			var fieldObj = this.fieldObjMap[name];
 			if( fieldObj ) {
 				fieldObj.setEditable(value);
@@ -496,228 +563,127 @@
 		},
 
 		setFocus : setFocus
-	}
+	};
 
+	// 下拉选择框，单选或多选
+	var ComboField = function(fieldName, form) {
+		this.el = $1(fieldName);
+	    this.multiple = this.el.getAttribute("multiple") == "multiple";
+		
+		var valueNode = this.el.attributes["value"];
+	 	this.el._value = valueNode ? valueNode.nodeValue : "";
 
-// 下拉选择框，单选或多选
-var Mode_ComboEdit = function(fieldName, xform) {
-	this.obj = $$(fieldName);
-    this.multiple = this.obj.getAttribute("multiple") == "multiple";
-	
-	var valueNode = this.obj.attributes["value"];
- 	this.obj._value = valueNode ? valueNode.nodeValue : "";
+		var selectedValues = this.value2List(this.el._value);
+		var selectedIndex = [];
 
-	var selectedValues = {};
-	if(this.obj._value != "") {
-		var valueArr = this.obj._value.split(",");
-		for(var i=0; i < valueArr.length; i++) {
-			selectedValues[ valueArr[i] ] = true;
-		}
-	}
-
-	var valueList = this.obj.getAttribute("editorvalue").split('|');
-	var textList  = this.obj.getAttribute("editortext").split('|');
-	var selectedIndex = [];
-	for(var i=0; i < valueList.length; i++) {
-		var value = valueList[i];
-		this.obj.options[i] = new Option(textList[i], value);
- 
-		if( selectedValues[value] ) {
-			this.obj.options[i].selected = true;
-			selectedIndex[selectedIndex.length] = i;
-		}
-	}
-	if( selectedIndex.length > 0 ){
-		this.obj.defaultSelectedIndex = selectedIndex.join(",");
-	} 
-	else {
-		this.obj.defaultSelectedIndex = this.obj.selectedIndex = -1;
-	}
-
-	if(this.multiple && this.obj.getAttribute("height") == null) {
-		this.obj.style.height = Math.min(Math.max(valueList.length, 4), 4) * 18 + "px";
-	}	
-
-	// 当empty = false(表示不允许为空)时，下拉列表的默认值自动取第一项值
-	if( this.obj._value == "" &&  this.obj.getAttribute('empty') == "false") {
-		this.setValue(valueList[0]);
-		xform.setFieldValue(this.obj.id, valueList[0]);
-	}
-	
-	this.obj.onchange = function() {
-		var x = [];
-		for(var i=0; i < this.options.length; i++) {
-			var option = this.options[i];
-			if(option.selected) {
-				x[x.length] = option.value;
+		var valueList = this.el.getAttribute("editorvalue").split('|');
+		var textList  = this.el.getAttribute("editortext").split('|');
+		for(var i=0; i < valueList.length; i++) {
+			var value = valueList[i];
+			this.el.options[i] = new Option(textList[i], value);
+	 
+			if( selectedValues[value] ) {
+				this.el.options[i].selected = true;
+				selectedIndex[selectedIndex.length] = i;
 			}
 		}
-		this._value = x.join(",");
-		xform.updateData(this);
-		
-		fireOnChangeEvent(this, this._value);
-	}
-}
-
-function fireOnChangeEvent(obj, newValue) {
-	var onchangeFunc = obj.getAttribute("onchange");
-	if(onchangeFunc) {
-		var rightKH = onchangeFunc.indexOf(")");
-		if(rightKH > 0) {
-			onchangeFunc = onchangeFunc.substring(0, rightKH) + ", '" + newValue + "')"; 
-		}
+		if( selectedIndex.length > 0 ){
+			this.el.defaultSelectedIndex = selectedIndex.join(",");
+		} 
 		else {
-			onchangeFunc = onchangeFunc + "('" + newValue + "')";
+			this.el.defaultSelectedIndex = this.el.selectedIndex = -1;
 		}
 
-		eval(onchangeFunc);
-	}
-}
+		if(this.multiple && this.el.getAttribute("height") == null) {
+			this.el.style.height = Math.min(Math.max(valueList.length, 4), 4) * 18 + "px";
+		}	
 
-Mode_ComboEdit.prototype.setValue = function(value) {
-	var valueList = {};
-	var valueArray = value.split(",");
-	for(var i = 0; i < valueArray.length; i++){
-		valueList[valueArray[i]] = true;
-	}
-
-	var noSelected = true;
-	for(var i=0; i < this.obj.options.length; i++){
-		var opt = this.obj.options[i];
-		if(valueList[opt.value]) {
-			opt.selected = true;
-			noSelected = false;
-		}
-	}
-
-	if(noSelected){
-		this.obj.selectedIndex = -1;	
-	}
-
-	this.obj._value = value;
-
-	fireOnChangeEvent(this.obj, value);
-}
-
-Mode_ComboEdit.prototype.setEditable = function(status) {
-	this.obj.disabled  = (status == "true" ? false : true);
-	this.obj.className = (status == "true" ? "comboedit" : "comboedit_disabled");
-	this.obj.editable  = status;
-}
-
-Mode_ComboEdit.prototype.validate = validate;
-
-Mode_ComboEdit.prototype.saveAsDefaultValue = function() {
-	var selectedIndex = [];
-	for(var i=0; i < this.obj.options.length; i++){
-		var opt = this.obj.options[i];
-		if(opt.selected) {
-			selectedIndex[selectedIndex.length] = i;
-		}
-	}
-	this.obj.defaultSelectedIndex = selectedIndex.join(",");
-}
-
-Mode_ComboEdit.prototype.setFocus = setFocus;
-
-
-function Mode_Hidden(fieldName, xform) {
-	this.obj = $$(fieldName);
-}
-Mode_Hidden.prototype.setValue = function(s) {}
-Mode_Hidden.prototype.setEditable = function(s) {}
-Mode_Hidden.prototype.validate = function() { return true; }
-Mode_Hidden.prototype.saveAsDefaultValue = function() {}
-Mode_Hidden.prototype.setFocus = function() {}
-
-
-function setFocus() {
-	try {
-		this.obj.focus();
-	} catch(e) {
-	}
-}
-
-function validate() {
-	var empty     = this.obj.getAttribute("empty");
-	var errorInfo = this.obj.getAttribute("errorInfo");
-	var caption   = this.obj.getAttribute("caption").replace(/\s/g, "");
-	var inputReg  = this.obj.getAttribute("inputReg");
-	
-	var value = this.obj.value;
-	if(value == "" && empty == "false") {
-		errorInfo = "[" + caption.replace(/\s/g, "") + "] 不允许为空。";
-	}
-
-	if(inputReg && !eval(inputReg).test(value)) {
-		errorInfo = errorInfo || "[" + caption + "] 格式不正确，请更正.";
-	}
-
-	if( errorInfo ) {
-		showErrorInfo(errorInfo, this.obj);
-
-		if(this.isInstance != false) {
-			if(this.setFocus) {
-				this.setFocus();
-			}
-		}
-		if( event ) {
-			preventDefault(event);
-		}
-		return false;
-	}
-
-	return true;
-}
-
-
-
-function restore(obj, value) {    
-	var tempEvent = obj.onpropertychange;
-	if( tempEvent == null ) {
-		clearTimeout(obj.timeout);
-		tempEvent = obj._onpropertychange;
-	}
-	else {
-		obj._onpropertychange = tempEvent;
-	}
-
-	obj.onpropertychange = null;
-	obj.timeout = setTimeout(function() {
-		obj.value = value;
-		obj.onpropertychange = tempEvent;
-	}, 10);
-}
-
-function xformExtractData(xformNode, needPrefix) {
-	if( xformNode ) {
-		var dataNode = xformNode.selectSingleNode(".//data");
-
-		var prefix = null;
-		if(needPrefix) {
-			prefix = xformNode.selectSingleNode("./declare").getAttribute("prefix");
+		// 当empty = false(表示不允许为空)时，下拉列表的默认值自动取第一项值
+		if( this.el._value == "" &&  this.el.getAttribute('empty') == "false") {
+			this.setValue(valueList[0]);
+			form.setFieldValue(this.el.id, valueList[0]);
 		}
 		
-		return dataNode2Map(dataNode, prefix);
-	}
-	return null;
-}
-
-function dataNode2Map(dataNode, prefix) {
-	var map = {};
-	if(dataNode && dataNode.nodeName == "data") {
-		var rename = dataNode.getAttribute("name");
-		var nodes = dataNode.selectNodes("./row/*");
-		for(var i = 0; i < nodes.length; i++) {
-			var name = rename || nodes[i].nodeName; // 从data节点上获取保存名，如果没有则用原名
+		this.el.onchange = function() {
+			var x = [];
+			for(var i=0; i < this.options.length; i++) {
+				var option = this.options[i];
+				if(option.selected) {
+					x[x.length] = option.value;
+				}
+			}
+			this._value = x.join(",");
+			form.updateData(this);
 			
-			// 前缀，xform declare节点上设置，以便于把值设置到action的bean对象里
-			if( prefix ) {
-				name = prefix + "." + name;
+			fireOnChangeEvent(this, this._value);
+		}
+	};
+
+	ComboField.prototype = {
+		value2List: function(value) {
+			var valueList = {};
+			if( !$.isNullOrEmpty(value) ) {
+				value.split(",").each(function(i, item){
+					valueList[item] = true;
+				})
+			}			
+
+			return valueList;
+		},
+
+		setValue: function(value) {
+			var valueList = this.value2List(value);
+
+			var noSelected = true;
+			this.el.options.each(function(i, option){
+				if(valueList[option.value]) {
+					option.selected = true;
+					noSelected = false;
+				}
+			});
+ 
+			if(noSelected){
+				this.el.selectedIndex = -1;	
 			}
 
-			map[name] = $.XML.getText(nodes[i]);
-		}
-	}
-	return map;
-}
+			this.el._value = value;
+			fireOnChangeEvent(this.el, value);
+		},
+
+		setEditable: function(status) {
+			this.el.disabled  = (status == "true" ? false : true);
+			this.el.className = (status == "true" ? "comboedit" : "comboedit_disabled");
+			this.el.editable  = status;
+		},
+
+		validate: validate,
+
+		saveAsDefaultValue: function() {
+			var selectedIndex = [];
+			for(var i=0; i < this.el.options.length; i++){
+				var opt = this.el.options[i];
+				if(opt.selected) {
+					selectedIndex[selectedIndex.length] = i;
+				}
+			}
+			this.el.defaultSelectedIndex = selectedIndex.join(",");
+		},
+
+		setFocus: setFocus
+	};
+ 
+ 	// 隐藏hidden字段
+	var HiddenFiled = function(fieldName, form) {
+		this.el = $1(fieldName);
+	};
+
+	HiddenFiled.prototype = {
+		setValue: function(s) {},
+		setEditable: function(s) {},
+		validate: function() { return true; },
+		saveAsDefaultValue: function() {},
+		setFocus: function() {}
+	};
+
+	return Form;
+});

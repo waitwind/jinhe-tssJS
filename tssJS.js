@@ -257,7 +257,11 @@
                         returnVal = callback(param);
                     }
                     else {
-                        returnVal = eval(callback + "(" + param + ")");
+                        var rightKH = callback.indexOf(")");
+                        if(rightKH < 0 && param) {
+                            callback = callback + "('" + param + "')";
+                        }
+                        returnVal = eval(callback);
                     }
                 } catch (e) {
                     alert(e.message);
@@ -981,9 +985,9 @@
             },
 
             setText: function(node, textValue) {
-                node.text = value;
+                node.text = textValue;
                 if (node.textContent || node.textContent == "") {
-                    node.textContent = value; // chrome
+                    node.textContent = textValue; // chrome
                 }
             },
 

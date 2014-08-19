@@ -4,8 +4,8 @@
       <xform>
         <declare>
     		  <column name="id"        caption="ID"   mode="hidden"/>
-    		  <column name="userName"  caption="姓名" mode="string" empty="false" maxLength="100" editable="false"/>
-          <column name="loginName" caption="帐号" mode="string" empty="false" maxLength="100" />
+          <column name="loginName" caption="帐号" mode="string" empty="false" maxLength="100" editable="false"/>
+          <column name="userName"  caption="姓名" mode="string" empty="false" maxLength="100"/>
           <column name="jianjie"   caption="简介" mode="string" maxLength="400" />
           <column name="groupName" caption="组织" mode="string" maxLength="10" />
           <column name="groupId"   caption="组ID" mode="hidden"/>
@@ -21,38 +21,37 @@
         </declare>
         <layout>
           <TR>
-              <TD width="50"><label binding="loginName"/></TD>
+              <TD width="45"><label binding="loginName"/></TD>
               <TD><input binding="loginName"/></TD>
-              <TD width="50"><label binding="userName"/></TD>
+              <TD><label binding="userName"/></TD>
               <TD><input binding="userName"/></TD>
           </TR><TR>
-              <TD width="50"><label binding="sex"/></TD>
+              <TD><label binding="sex"/></TD>
               <TD><input binding="sex"/><input binding="sex2"/></TD>
-              <TD width="50"><label binding="birthday"/></TD>
+              <TD><label binding="birthday"/></TD>
               <TD>
                   <input binding="birthday"/> 格式要求：yyyy-MM-dd
               </TD>
+          </TR>
+          <TR>
+              <TD><label binding="temp1"/></TD><TD><input binding="temp1"/></TD>
+              <TD><label binding="email"/></TD><TD><input binding="email"/></TD>
           </TR><TR>
-              <TD width="50"><label binding="temp1"/></TD>
-              <TD><input binding="temp1"/></TD>
-              <TD width="50"><label binding="email"/></TD>
-              <TD><input binding="email"/></TD>
-          </TR><TR>
-              <TD width="50"><label binding="groupName"/></TD>
+              <TD><label binding="groupName"/></TD>
               <TD><input binding="groupName"/></TD>
-              <TD width="50"><label binding="address"/></TD>
+              <TD><label binding="address"/></TD>
               <TD><input binding="address" style="width:360px;"/></TD>
           </TR><TR>
-		          <TD width="50"><label binding="postCode"/></TD>
+		          <TD><label binding="postCode"/></TD>
               <TD><input binding="postCode"/></TD>              
-              <TD width="50"><label binding="jianjie"/></TD>
+              <TD><label binding="jianjie"/></TD>
               <TD>
 			           <textarea binding="jianjie" style="width:300px;height:100px"/>
               </TD>
           </TR><TR>
-              <TD width="50"><label binding="season"/></TD>
+              <TD><label binding="season"/></TD>
               <TD><input binding="season"/></TD>              
-              <TD width="50"><label binding="temp2"/></TD>
+              <TD><label binding="temp2"/></TD>
               <TD><input binding="temp2"/></TD>
           </TR>
         </layout>

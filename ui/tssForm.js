@@ -11,8 +11,10 @@
 		}
 
 		if( form == null || data ) {
-			form = new $.Form($1(id), data);
+			form = new $.Form($1(id));
 			FormCache[form.id] = form;	
+
+			form.load(data)
 		}
 		
 		return form;
@@ -136,23 +138,24 @@
 
 		toHTML: function() {
 			var htmls = [], oThis = this;
-			htmls.push("<form class='tssform' method='post'>");
+			htmls.push("<form class='tssForm' method='post'>");
 			htmls.push('<table>');
 
 			// 添加隐藏字段			
 			$("column[mode='hidden']", this.declare).each( function(i, column){
+				var name = column.getAttribute("name");
 				var value = oThis.getFieldValue(name);
 				value = value ? "value=\"" + value + "\"" : "";
 				htmls.push('<input type="hidden" ' + value + ' id="' + name + '"/>');
 			} );
 			htmls.push('<input type="hidden" name="xml" id="xml"/>');
 
-			var trList = this.layout.querySelectorAll("tr");
+			var trList = this.layout.querySelectorAll("TR");
 			for(var i=0; i < trList.length; i++) {
 				var trNode = trList[i];
 				htmls.push("<tr>");
 
-				var tdList = trNode.querySelectorAll("td");
+				var tdList = trNode.querySelectorAll("TD");
 				for(var j=0; j < tdList.length; j++) {
 					var tdNode = tdList[j];
 					htmls.push("<td "+ copyNodeAttribute(tdNode) +">");
@@ -160,8 +163,8 @@
 					var childNodes = tdNode.childNodes;
 					for(var n=0; n < childNodes.length; n++) {
 						var childNode = childNodes[n];
-						if(childNode.nodeType != _XML_NODE_TYPE_ELEMENT) {
-							htmls.push(childNode.nodeValue);
+						if(childNode.nodeType != $.XML._NODE_TYPE_ELEMENT) {
+							htmls.push(childNode.value);
 							continue;
 						}
 
@@ -204,17 +207,15 @@
 			 // some private function define
 			 function copyColumnAttribute(column) {
 				var returnVal = " ";
-				column.attributes.each( function(i, attr){
+				$.each(column.attributes, function(i, attr){
 					var name  = attr.nodeName;
-					var value = attr.nodeValue;
-					if(value == null || value == "null") {
-						continue;
+					var value = attr.value;
+					if(value && value != "null") {
+						if(name == "name") {
+							name = "id";
+						}
+						returnVal += name + " = \"" + value + "\" ";
 					}
-
-					if(name == "name") {
-						name = "id";
-					}
-					returnVal += name + " = \"" + value + "\" ";
 				} );
  
 				return returnVal;
@@ -223,12 +224,12 @@
 			 function copyNodeAttribute(node) {
 				var returnVal = "";
 				var hasBinding = node.getAttribute("binding") != null;
-				column.attributes.each( function(i, attr){
+				$.each(node.attributes, function(i, attr){
 					if(attr.nodeName != "style" || !hasBinding) {
-						returnVal += attr.nodeName + "=\"" + attr.nodeValue + "\" ";
+						returnVal += attr.nodeName + "=\"" + attr.value + "\" ";
 					}
 					if(attr.nodeName == "style" && hasBinding) {
-						returnVal += "style=\"" + attr.nodeValue + "\" ";
+						returnVal += "style=\"" + attr.value + "\" ";
 					}
 				} );
 				return returnVal;
@@ -236,14 +237,12 @@
 		}
 	};
  
-	var Form = function(element, data) {
+	var Form = function(element) {
 		this.id   = element.id;
 		this.box  = element;
 
 		this.editable  = element.getAttribute("editable") || "true";
 		this.fieldObjMap = {};
-
-		this.load(data);
 	};
 
 	Form.prototype = {
@@ -267,12 +266,7 @@
 			var form = this.box.querySelector("form");
 			if(form) {
 				$.Event.addEvent(form, "submit", this.checkForm);
-			}
-
-			// 自动聚焦
-			if(this.editable != "false") {
-				this.setFocus();
-			}		
+			}	
 		},
  
 		attachEditor: function() {
@@ -345,11 +339,13 @@
 				var _status = status;
 
 				// 如果field column上默认定义为不可编辑，则永远不可编辑
-				if (oThis.getFieldConfig(name, "editable") == "false") {
+				var mode = oThis.getFieldConfig(name, "mode");
+				var editable = oThis.getFieldConfig(name, "editable");
+				if ( editable == "false" ) {
 					_status = "false";
 				} 
 
-				if(firstEditableField == null && _status == "true") {
+				if(firstEditableField == null && _status == "true" && mode != "hidden") {
 					firstEditableField = fieldObj;
 				}
 
@@ -383,8 +379,8 @@
 				$.XML.setText(CDATANode, value);
 			}
 
-			var eventOndatachange = new EventFirer(this.box, "ondatachange");
-			var eventObj = createEventObject();
+			var eventOndatachange = new $.EventFirer(this.box, "ondatachange");
+			var eventObj = $.Event.createEventObject();
 			eventObj.id = this.id + "_" + name;
 			eventOndatachange.fire(eventObj);  // 触发事件
 		},
@@ -485,8 +481,8 @@
 		setEditable : function(status) {
 			this.el.editable = status || this.el.getAttribute("editable");
 
-			var disabled = (this.obj.editable == "false");
-			this.el.className = disabled ? "string_disabled" : "string";
+			var disabled = (this.el.editable == "false");
+			this.el.className = disabled ? "field_disabled" : "string";
 
 			if(this.el.tagName == "textarea") {
 				this.el.readOnly = disabled;  // textarea 禁止状态无法滚动显示所有内容，所以改为只读
@@ -522,7 +518,7 @@
 				}
 			}
 			else { 
-				var funcIcon = $.createElement("span", "functionIcon"); // 添加点击按钮
+				var funcIcon = $.createElement("span", "functionBt"); // 添加点击按钮
 				this.el.parentNode.appendChild(funcIcon);
  
  				var cmd = this.el.getAttribute("cmd");
@@ -546,12 +542,11 @@
 		
 		setEditable : function(status) {
 			this.el.disabled  = (status == "false");
-			this.el.className = (this.el.disabled ? "function_disabled" : "function");
+			this.el.className = (this.el.disabled ? "field_disabled" : "function");
 
 			// function图标
 			if(!this.isdate) {
-				this.el.nextSibling.disabled  = this.el.disabled;
-				this.el.nextSibling.className = (this.el.disabled ? "bt_disabled" : "");
+				this.el.nextSibling.className = (this.el.disabled ? "hidden" : "functionBt");
 				this.el.readOnly = true;
 			}
 			
@@ -571,7 +566,7 @@
 	    this.multiple = this.el.getAttribute("multiple") == "multiple";
 		
 		var valueNode = this.el.attributes["value"];
-	 	this.el._value = valueNode ? valueNode.nodeValue : "";
+	 	this.el._value = valueNode ? valueNode.value : "";
 
 		var selectedValues = this.value2List(this.el._value);
 		var selectedIndex = [];
@@ -635,7 +630,7 @@
 			var valueList = this.value2List(value);
 
 			var noSelected = true;
-			this.el.options.each(function(i, option){
+			$.each(this.el.options, function(i, option){
 				if(valueList[option.value]) {
 					option.selected = true;
 					noSelected = false;
@@ -652,7 +647,7 @@
 
 		setEditable: function(status) {
 			this.el.disabled  = (status == "true" ? false : true);
-			this.el.className = (status == "true" ? "comboedit" : "comboedit_disabled");
+			this.el.className = (status == "true" ? "comboedit" : "field_disabled");
 			this.el.editable  = status;
 		},
 

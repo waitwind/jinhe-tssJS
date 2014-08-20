@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <ParamTree>
-        <actionSet title="">
-            <treeNode name="全部" id="_rootId" _open="true">
-                <treeNode type="0" parentId="0" isGroup="1" icon="param_group.gif" disabled="0" readOnly="0" name="系统参数" id="-1" _open="true">
-                    <treeNode type="1" decode="0000100001" parentId="-1" icon="param.gif" disabled="0" levelNo="2" name="PAGESIZE" id="3"/>
-                    <treeNode type="1" decode="0000100002" parentId="-1" icon="param.gif" disabled="0" levelNo="2" name="LOGLevel" id="1"/>
-                    <treeNode type="1" decode="0000100003" parentId="-1" icon="param.gif" disabled="0" levelNo="2" name="XXXXXX" id="2"/>
+        <actionSet>
+            <treeNode name="全部" id="_root" _open="true">
+                <treeNode id="-1" parentId="0" icon="param_group.gif" disabled="0" _open="true" name="系统参数" >
+                    <treeNode id="3" parentId="-1" icon="param.gif" disabled="0" name="PAGESIZE" />
+                    <treeNode id="1" parentId="-1" icon="param.gif" disabled="0" name="LOGLevel" />
+                    <treeNode id="2" parentId="-1" icon="param.gif" disabled="0" name="XXXXXX" />
                 </treeNode>
-                <treeNode type="0" parentId="0" isGroup="1" icon="param_group.gif" disabled="0" readOnly="0" name="应用配置" id="-2" _open="true">
-                    <treeNode type="1" decode="0000200001" parentId="-2" icon="param.gif" disabled="0" levelNo="2" name="CMS" id="4"/>
-                    <treeNode type="1" decode="0000200002" parentId="-2" icon="param.gif" disabled="0" levelNo="2" name="PMS" id="5"/>
-                    <treeNode type="1" decode="0000200003" parentId="-2" icon="param.gif" disabled="0" levelNo="2" name="UMS" id="6"/>
+                <treeNode id="-2" parentId="0" icon="param_group.gif" disabled="0" name="应用集合" _open="true">
+                    <treeNode id="4" parentId="-2" icon="param.gif" disabled="0" name="应用1"/>
+                    <treeNode id="5" parentId="-2" icon="param.gif" disabled="0" name="应用2"/>
+                    <treeNode id="6" parentId="-2" icon="param.gif" disabled="0" name="应用3"/>
                 </treeNode>
-				<treeNode type="0" parentId="0" isGroup="1" icon="param_group.gif" disabled="0" readOnly="0" name="用户组" id="-3" _open="true">
-                    <treeNode type="1" decode="0000300006" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组1" id="7"/>
-                    <treeNode type="1" decode="0000300012" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组2" id="8">
-						<treeNode type="1" decode="000030001200001" parentId="8" icon="param.gif" disabled="0" levelNo="2" name="子组2-1" id="10"/>
-					</treeNode>
-                    <treeNode type="1" decode="0000300018" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组3" id="9"/>
-					<treeNode type="1" decode="0000300019" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组4" id="10"/>
-					<treeNode type="1" decode="0000300020" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组5" id="11"/>
-					<treeNode type="1" decode="0000300021" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组6" id="12"/>
-					<treeNode type="1" decode="0000300022" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组7" id="13"/>
-					<treeNode type="1" decode="0000300023" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组8" id="14"/>
-					<treeNode type="1" decode="0000300024" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组9" id="15"/>
-                    <treeNode type="1" decode="0000300025" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组8" id="16"/>
-                    <treeNode type="1" decode="0000300026" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组9" id="17"/>
-                    <treeNode type="1" decode="0000300027" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组8" id="18"/>
-                    <treeNode type="1" decode="0000300028" parentId="-3" icon="param.gif" disabled="0" levelNo="2" name="子组9" id="19"/>
+    			<treeNode id="-3" parentId="0" icon="param_group.gif" disabled="0" name="用户组" _open="true">
+                    <treeNode id="7" parentId="-3" icon="param.gif" disabled="0" name="子组1"/>
+                    <treeNode id="8" parentId="-3" icon="param.gif" disabled="0" name="子组2">
+    					<treeNode id="9" parentId="8" icon="param.gif" disabled="0" name="子组2-1"/>
+    				</treeNode>
+                    <treeNode id="10" parentId="-3" icon="param.gif" disabled="0" name="子组3" />
+    				<treeNode id="11" parentId="-3" icon="param.gif" disabled="0" name="子组4" />
+    				<treeNode id="12" parentId="-3" icon="param.gif" disabled="0" name="子组5" />
+    				<treeNode id="13" parentId="-3" icon="param.gif" disabled="0" name="子组6" />
+    				<treeNode id="14" parentId="-3" icon="param.gif" disabled="0" name="子组7" />
+    				<treeNode id="15" parentId="-3" icon="param.gif" disabled="0" name="子组8" />
+    				<treeNode id="16" parentId="-3" icon="param.gif" disabled="0" name="子组9" />
+                    <treeNode id="17" parentId="-3" icon="param.gif" disabled="0" name="子组8" />
+                    <treeNode id="18" parentId="-3" icon="param.gif" disabled="0" name="子组9" />
+                    <treeNode id="19" parentId="-3" icon="param.gif" disabled="0" name="子组8" />
+                    <treeNode id="20" parentId="-3" icon="param.gif" disabled="0" name="子组9" />
                 </treeNode>
             </treeNode>
         </actionSet>

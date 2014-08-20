@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<HTML XMLNS:Tree>
+<head>
+	<meta charset="UTF-8"/>
+	<title>Tree test</title>
+
+	<link href="../css/tss.css" rel="stylesheet">
+	<link href="../css/JMenu.css" rel="stylesheet">
+	<link href="../css/tssTree.css" rel="stylesheet">
+
+	<script src="../tssJS.js"></script>
+	<script src="../tssAjax.js"></script>
+	<script src="../ui/JMenu.js"></script>
+	<script src="../ui/tssTree.js"></script>
+
+<style type="text/css">
+ 
+</style>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+
+URL_SOURCE_TREE = "data/tree.xml?";
+URL_SORT_NODE   = "data/_success.xml?";
+URL_NODE_DELETE = "data/_success.xml?";
+
+function init() {
+	$.ajax({
+		url: URL_SOURCE_TREE,
+		onresult: function() {
+			var treeData = this.getNodeValue("ParamTree");
+			var tree1 = $.T("tree", treeData);	
+			// var tree2 = $T("tree2", treeData);	
+
+			//tree2.loadDefaultCheckedByIds("2,4,6", true);
+			//tree2.loadDefaultCheckedByIds("7,8,10", false);
+
+			// 测试树控件事件
+			// tree1.element.onTreeNodeActived = function(eventObj) {
+
+			// }
+			// tree1.element.onTreeNodeDoubleClick = function(eventObj) {
+			// 	alert("编辑树节点：" + getTreeAttribute("name"));
+			// }
+			// tree1.element.onTreeNodeMoved = function(eventObj) {
+			// 	sortTreeNode(URL_SORT_NODE, eventObj);
+			// }
+			// tree1.element.onTreeNodeRightClick = function(eventObj) {
+			// 	// 显示右键菜单
+			// 	var menu = tree1.element.contextmenu;
+			// 	if(menu == null) {
+			// 		return;
+			// 	}
+
+			// 	menu.show(eventObj.clientX, eventObj.clientY);
+			// }
+		},
+
+		onexception: function() {
+			alert("ajax has exception");
+		}
+	});
+ 
+
+	initMenus();
+}
+
+function initMenus() {
+    var item1 = {
+        label:"编辑",
+        callback:function() {
+            alert("编辑树节点：" + getTreeAttribute("name"));
+        }
+    }
+    var item2 = {
+        label:"删除",
+        callback:function() {
+            delTreeNode(URL_NODE_DELETE);
+        }
+    }
+    var item3 = {
+        label:"新建",
+        callback:function() {
+           
+        }
+    }
+
+    var menu1 = new $.Menu();
+    menu1.addItem(item1);
+    menu1.addItem(item2);
+	menu1.addItem(item3);
+
+    $$("tree").contextmenu = menu1;
+}
+
+// function insertTreeNode () {
+// 	var tree = $T('tree')
+// 	var node = tree.getTreeNodeById(9); 
+// 	var xmlNode = node.getXmlNode();
+// 	appendTreeNode(-1, xmlNode, 'tree');
+// }
+
+window.onload = init;
+   
+//-->
+</SCRIPT>
+</head>
+
+<body>
+
+	<table height="450">
+	 	<tr>
+			<td width="400">-单选树</td>
+			<td width="400">-多选树</td>
+		</tr>
+		<tr height="350">
+			<td>
+				<Tree:Box id="tree" treeType="single"></Tree:Box>
+			</td>
+			<td>
+				<Tree:Box id="tree2" treeType="multi" selectSelf="false"></Tree:Box>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input type="button" value="getIDs" onclick="alert($T('tree').getIds(false));"/>
+				<input type="button" value="新建节点" onclick="insertTreeNode();"/>
+				<input type="button" value="修改节点" onclick="modifyTreeNode(6, 'name', '天地玄黄', true);"/>
+				<br/><br/>
+				<input type="button" value="精确搜索" onclick="$T('tree').searchNode('CMS', true);"/>
+				<input type="button" value="模糊搜索" onclick="$T('tree').searchNode('子组', false);"/>
+				<input type="button" value="下一个" onclick="$T('tree').searchNext();"/>
+			</td>
+			<td>
+				<input type="button" value="getIDs" onclick="alert($T('tree2').getIds(false));"/>
+			</td>
+		</tr>
+	</table>
+
+</body>
+</html>

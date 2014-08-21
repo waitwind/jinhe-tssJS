@@ -25,10 +25,17 @@
     				<treeNode id="14" parentId="-3" icon="param.gif" disabled="0" name="子组7" />
     				<treeNode id="15" parentId="-3" icon="param.gif" disabled="0" name="子组8" />
     				<treeNode id="16" parentId="-3" icon="param.gif" disabled="0" name="子组9" />
-                    <treeNode id="17" parentId="-3" icon="param.gif" disabled="0" name="子组8" />
-                    <treeNode id="18" parentId="-3" icon="param.gif" disabled="0" name="子组9" />
-                    <treeNode id="19" parentId="-3" icon="param.gif" disabled="0" name="子组8" />
-                    <treeNode id="20" parentId="-3" icon="param.gif" disabled="0" name="子组9" />
+                    <treeNode id="17" parentId="-3" icon="param.gif" disabled="0" name="子组10" />
+                    <treeNode id="18" parentId="-3" icon="param.gif" disabled="0" name="子组11" />
+                    <treeNode id="19" parentId="-3" icon="param.gif" disabled="0" name="子组12" />
+                    <treeNode id="20" parentId="-3" icon="param.gif" disabled="0" name="子组20" />
+                    <treeNode id="21" parentId="-3" icon="param.gif" disabled="0" name="子组21" />
+                    <treeNode id="22" parentId="-3" icon="param.gif" disabled="0" name="子组22" />
+                    <treeNode id="23" parentId="-3" icon="param.gif" disabled="0" name="子组23" />
+                    <treeNode id="24" parentId="-3" icon="param.gif" disabled="0" name="子组24" />
+                    <treeNode id="25" parentId="-3" icon="param.gif" disabled="0" name="子组25" />
+                    <treeNode id="26" parentId="-3" icon="param.gif" disabled="0" name="子组26" />
+                    <treeNode id="27" parentId="-3" icon="param.gif" disabled="0" name="子组27" />
                 </treeNode>
             </treeNode>
         </actionSet>

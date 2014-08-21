@@ -27,13 +27,16 @@
 		
 		/* 树节点的选择状态：没选、半选、全选、禁选  0/1/2/-1 */
 		_TREE_NODE_CHECK_STATE = "checkState",  
-		_STYLE_NODE_CHECKED = "checked",
-		_STYLE_NODE_UN_CHECKED = "unChecked",
-		_STYLE_NODE_HALF_CHECKED = "halfChecked",
-		_STYLE_NODE_CHECK_DISABLED = "disableCheck",
+		_STYLE_NODE_UN_CHECKED = "checkstate_0",
+		_STYLE_NODE_HALF_CHECKED = "checkstate_1",
+		_STYLE_NODE_CHECKED = "checkstate_2",
+		_STYLE_NODE_UN_CHECKED_DISABLED = "checkstate_0_disable",
+		_STYLE_NODE_HALF_CHECKED_DISABLED = "checkstate_1_disable",
+		_STYLE_NODE_CHECKED_DISABLED = "checkstate_2_disable",
 
-		_STYLE_NODE_EXPAND = "expand",
-		_STYLE_NODE_COLLAPSE = "collapse",		
+		_STYLE_NODE_EXPAND = "node_open",
+		_STYLE_NODE_COLLAPSE = "node_close",	
+		_STYLE_NODE_LEAF = "node_leaf",		
 		
 		_STYLE_TREE_NODE_HOVER = "hover",
 		_STYLE_TREE_NODE_MOVING = "moving",
@@ -41,7 +44,6 @@
 		_STYLE_TREE_NODE_CLICKED = "clicked",
 
 	TreeNode = function(nodeInfo, parent) {
-		this.tree = tree;
 
 		this.id   = nodeInfo[_TREE_NODE_ID];
 		this.name = nodeInfo[_TREE_NODE_NAME];
@@ -62,16 +64,21 @@
 		this.checkState = parseInt(nodeInfo[_TREE_NODE_CHECK_STATE] || "0"); /* 节点的选择状态 */
 
 		var oThis = this;
-		this.toHTMLElement = function() {
+		this.toHTMLEl = function() {
 			var li = $.createElement("li");
+			li.setAttribute("nodeID", this.id);
 			li.node = this;
 
+			// 节点打开、关闭开关
+			var switchIcon = $.createElement("span", "switch");
+			li.appendChild(switchIcon);
+
 			// checkbox
-			var checkbox = $.createElement("span");
+			var checkbox = $.createElement("span", "checkbox");
 			li.appendChild(checkbox);
 
 			// 自定义图标
-			var selfIcon = $.createElement("span");
+			var selfIcon = $.createElement("div", "selfIcon");
 			li.appendChild(selfIcon);
 
 			// 节点名称
@@ -80,16 +87,45 @@
 			li.appendChild(a);
 
 			if(this.children.length > 0) {
-				var ul = $.createElement("ul");
-				this.children.each(function(i, child) {
-					ul.appendChild(oThis.toHTMLElement(child));
-				});
+ 				var ul = $.createElement("ul");
+ 				ul.setAttribute("pID", this.id);
+ 				li.appendChild(ul);
+
+ 				$(switchIcon).addClass("node_close");
+ 				$(selfIcon).addClass("folder");
+ 				$(checkbox).addClass("checkstate_1");
 			}
-			else {
-				// is leaf
+			else { // is leaf
+				$(switchIcon).addClass("node_leaf");
+				$(checkbox).addClass("checkstate_2");
+				$(selfIcon).addClass("leaf");
 			}
 
 			return li;
+		};
+
+		this.toHTMLTree = function() {
+			var stack = [];
+			stack.push(this);
+
+			var current, currentEl, rootEl, ul;
+			while(stack.length > 0) {
+				current = stack.pop();
+				var currentEl = current.toHTMLEl(current);
+				if(rootEl == null) {
+					rootEl = currentEl;
+				}
+				else {
+					ul = rootEl.querySelector("ul[pID ='" + current.parent.id + "']");
+					ul.insertBefore(currentEl, ul.firstChild);
+				}
+
+				current.children.each(function(i, child) {
+					stack.push(child);
+				});
+			}
+ 
+			return rootEl;
 		}
 	};
 
@@ -137,7 +173,7 @@
 
 			var ul = $.createElement("ul");
 			this.rootList.each(function(i, root){
-				var li = root.toHTMLElement();
+				var li = root.toHTMLTree();
 				ul.appendChild(li);
 			});
 			this.el.appendChild(ul);
@@ -150,26 +186,23 @@
 		// 定义Tree私有方法
 		var oThis = this;
 		var loadXML = function(node, parent) {
-			for(var i = 0; i < node.childNodes.length; i++) {
-				var childNode = node.childNodes[i];
-
-				if(childNode.nodeType != $.XML._NODE_TYPE_ELEMENT) {
-					continue;
-				}
-
+			var xmlNodes = node.querySelectorAll("treeNode");
+			var parents = {};
+			$.each(xmlNodes, function(i, xmlNode) {
 				var nodeAttrs = {};
-				$.each(childNode.attributes, function(j, attr) {
+				$.each(xmlNode.attributes, function(j, attr) {
 					nodeAttrs[attr.nodeName] = attr.value;
-				})
+				});
 
+				var parentId = xmlNode.parentNode.getAttribute(_TREE_NODE_ID);
+				var parent = parents[parentId];
 				var treeNode = new TreeNode(nodeAttrs, parent);
 
 				if(parent == null) {
 					oThis.rootList.push(treeNode); // 可能存在多个根节点
-				}				
-
-				loadXML(childNode, treeNode);
-			}
+				}	
+				parents[treeNode.id] = treeNode;
+			});
 		};
 
 		var loadJson = function(data) {
@@ -240,6 +273,12 @@
  		/* 获取查询结果的下一个结果 */	
  		searchNext: function() {
  			this.searcher.next();
+ 		},
+
+ 		/* 将节点滚动到可视范围之内 */
+ 		scrollTo: function(treeNode) {
+ 			// first open the node
+ 			// this.el.scrollTop += 100;
  		}
 
 	};

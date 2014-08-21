@@ -379,7 +379,7 @@
 				$.XML.setText(CDATANode, value);
 			}
 
-			var eventOndatachange = new $.EventFirer(this.box, "ondatachange");
+			var eventOndatachange = new $.EventFirer(this, "ondatachange");
 			var eventObj = $.Event.createEventObject();
 			eventObj.id = this.id + "_" + name;
 			eventOndatachange.fire(eventObj);  // 触发事件

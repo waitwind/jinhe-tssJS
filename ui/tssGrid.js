@@ -227,6 +227,11 @@
 		this.gridBox = this.element = element;
 		this.gridBox.innerHTML = "";
 
+		// Grid控件上禁用默认右键
+		(element.parentNode || document).oncontextmenu = function(_event) {
+			$.Event.cancel(_event || window.event);
+		}	
+
 		this.gridBox.style.width = element.getAttribute("width")  || "100%";
 
 		var pointHeight = element.getAttribute("height");
@@ -476,8 +481,8 @@
 			this.gridBox.onscroll = function() {
 				 // 判断是否到达底部 
 				 if(this.scrollHeight - this.scrollTop <= this.clientHeight) {
-					var eventFirer = new $.EventFirer(oThis.gridBox, "onScrollToBottom");
-					eventFirer.fire($.Event.createEventObject());
+					var eventFirer = new $.EventFirer(oThis, "onScrollToBottom");
+					eventFirer.fire();
 				 }
 			};
 
@@ -543,7 +548,7 @@
 						};
 
 						gridBox.selectRowIndex = rowIndex;
-						var eventFirer = new $.EventFirer(gridBox, firerName);
+						var eventFirer = new $.EventFirer(oThis, firerName);
 						eventFirer.fire(oEvent);  // 触发右键事件
 					}	
 				}		

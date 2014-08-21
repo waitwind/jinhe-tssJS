@@ -919,15 +919,16 @@
 
     $.extend({
 
-        EventFirer: function(element, eventName) {
+        EventFirer: function(obj, eventName) {
             this.fire = function (event) {
-                var func = element.getAttribute(eventName) || eval("element." + eventName);
+                var func = obj[eventName];
                 if( func ) {
                     var funcType = typeof(func);
                     if("string" == funcType) {
                         eval(func);
                     }
                     else if ("function" == funcType) {
+                        if(event) event._source = obj;
                         func(event);
                     }
                 }

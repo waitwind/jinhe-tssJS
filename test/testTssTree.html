@@ -25,6 +25,7 @@ URL_SORT_NODE   = "data/_success.xml?";
 URL_NODE_DELETE = "data/_success.xml?";
 
 function init() {
+ 
 	$.ajax({
 		url: URL_SOURCE_TREE,
 		onresult: function() {
@@ -36,24 +37,24 @@ function init() {
 			//tree2.loadDefaultCheckedByIds("7,8,10", false);
 
 			// 测试树控件事件
-			// tree1.element.onTreeNodeActived = function(eventObj) {
+			tree1.onTreeNodeActived = function(event) {
+				console.log(event.node.id);
+			}
+			tree1.onTreeNodeDoubleClick = function(event) {
+				alert("编辑树节点：" + event.node.name);
+			}
+			tree1.onTreeNodeMoved = function(event) {
+				// sortTreeNode(URL_SORT_NODE, eventObj);
+			}
+			tree1.onTreeNodeRightClick = function(event) {
+				// 显示右键菜单
+				var menu = tree1.el.contextmenu;
+				if(menu == null) {
+					return;
+				}
 
-			// }
-			// tree1.element.onTreeNodeDoubleClick = function(eventObj) {
-			// 	alert("编辑树节点：" + getTreeAttribute("name"));
-			// }
-			// tree1.element.onTreeNodeMoved = function(eventObj) {
-			// 	sortTreeNode(URL_SORT_NODE, eventObj);
-			// }
-			// tree1.element.onTreeNodeRightClick = function(eventObj) {
-			// 	// 显示右键菜单
-			// 	var menu = tree1.element.contextmenu;
-			// 	if(menu == null) {
-			// 		return;
-			// 	}
-
-			// 	menu.show(eventObj.clientX, eventObj.clientY);
-			// }
+				menu.show(event.clientX, event.clientY);
+			}
 		},
 
 		onexception: function() {

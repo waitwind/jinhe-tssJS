@@ -18,125 +18,6 @@
 
 	'use strict';
 
-	var 
-		_TREE_NODE = "treeNode",
-		_TREE_NODE_ID = "id",
-		_TREE_NODE_NAME = "name",
-		_TREE_ROOT_NODE_ID = "_root",  /* “全部”节点的ID值  */
-		_TREE_NODE_STATE = "disabled",       // 停用、启用
-		
-		/* 树节点的选择状态：没选、半选、全选、禁选  0/1/2/-1 */
-		_TREE_NODE_CHECK_STATE = "checkState",  
-		_STYLE_NODE_UN_CHECKED = "checkstate_0",
-		_STYLE_NODE_HALF_CHECKED = "checkstate_1",
-		_STYLE_NODE_CHECKED = "checkstate_2",
-		_STYLE_NODE_UN_CHECKED_DISABLED = "checkstate_0_disable",
-		_STYLE_NODE_HALF_CHECKED_DISABLED = "checkstate_1_disable",
-		_STYLE_NODE_CHECKED_DISABLED = "checkstate_2_disable",
-
-		_STYLE_NODE_EXPAND = "node_open",
-		_STYLE_NODE_COLLAPSE = "node_close",	
-		_STYLE_NODE_LEAF = "node_leaf",		
-		
-		_STYLE_TREE_NODE_HOVER = "hover",
-		_STYLE_TREE_NODE_MOVING = "moving",
-		_STYLE_TREE_NODE_FINDED = "finded",
-		_STYLE_TREE_NODE_CLICKED = "clicked",
-
-	TreeNode = function(nodeInfo, parent) {
-
-		this.id   = nodeInfo[_TREE_NODE_ID];
-		this.name = nodeInfo[_TREE_NODE_NAME];
-
-		// 维护成可双向树查找
-		this.children = [];
-
-		this.parent = parent;
-		if(this.parent) {
-			this.level = this.parent.level + 1;
-			this.parent.children.push(this);
-		} else {
-			this.level = 1;
-		}				
-
-		this.opened = (nodeInfo._open == "true");
-		this.state = parseInt(nodeInfo[_TREE_NODE_STATE] || "0");  // 状态： 停用/启用  1/0
-		this.checkState = parseInt(nodeInfo[_TREE_NODE_CHECK_STATE] || "0"); /* 节点的选择状态 */
-
-		var oThis = this;
-		this.toHTMLEl = function() {
-			var li = $.createElement("li");
-			li.setAttribute("nodeID", this.id);
-			li.node = this;
-
-			// 节点打开、关闭开关
-			var switchIcon = $.createElement("span", "switch");
-			li.appendChild(switchIcon);
-
-			// checkbox
-			var checkbox = $.createElement("span", "checkbox");
-			li.appendChild(checkbox);
-
-			// 自定义图标
-			var selfIcon = $.createElement("div", "selfIcon");
-			li.appendChild(selfIcon);
-
-			// 节点名称
-			var a = $.createElement("a");
-			a.innerText = a.title = this.name;
-			li.appendChild(a);
-
-			if(this.children.length > 0) {
- 				var ul = $.createElement("ul");
- 				ul.setAttribute("pID", this.id);
- 				li.appendChild(ul);
-
- 				$(switchIcon).addClass("node_close");
- 				$(selfIcon).addClass("folder");
- 				$(checkbox).addClass("checkstate_1");
-			}
-			else { // is leaf
-				$(switchIcon).addClass("node_leaf");
-				$(checkbox).addClass("checkstate_2");
-				$(selfIcon).addClass("leaf");
-			}
-
-			return li;
-		};
-
-		this.toHTMLTree = function() {
-			var stack = [];
-			stack.push(this);
-
-			var current, currentEl, rootEl, ul;
-			while(stack.length > 0) {
-				current = stack.pop();
-				var currentEl = current.toHTMLEl(current);
-				if(rootEl == null) {
-					rootEl = currentEl;
-				}
-				else {
-					ul = rootEl.querySelector("ul[pID ='" + current.parent.id + "']");
-					ul.insertBefore(currentEl, ul.firstChild);
-				}
-
-				current.children.each(function(i, child) {
-					stack.push(child);
-				});
-			}
- 
-			return rootEl;
-		}
-	};
-
-	TreeNode.prototype = {
-		
-		disable: function() {
-
-		}
-	};
-
-
 	var
 		_TREE_TYPE = "treeType",
 		_TREE_TYPE_SINGLE = "single",
@@ -150,12 +31,12 @@
 
 	Tree = function(el, data) {
 		/*  自定义事件 */
-		var eventTreeReady       = new $.EventFirer(el, "onLoad"),
-		 	eventTreeChange      = new $.EventFirer(el, "onChange"),
-			eventNodeActived     = new $.EventFirer(el, "onTreeNodeActived"), 
-			eventNodeDoubleClick = new $.EventFirer(el, "onTreeNodeDoubleClick"),
-			eventNodeRightClick  = new $.EventFirer(el, "onTreeNodeRightClick"),
-			eventNodeMoved       = new $.EventFirer(el, "onTreeNodeMoved");
+		var eventTreeReady       = new $.EventFirer(this, "onLoad"),
+		 	eventTreeChange      = new $.EventFirer(this, "onChange"),
+			eventNodeActived     = new $.EventFirer(this, "onTreeNodeActived"), 
+			eventNodeDoubleClick = new $.EventFirer(this, "onTreeNodeDoubleClick"),
+			eventNodeRightClick  = new $.EventFirer(this, "onTreeNodeRightClick"),
+			eventNodeMoved       = new $.EventFirer(this, "onTreeNodeMoved");
 
 		this.el = el;
 		this.treeType  = el.getAttribute(_TREE_TYPE) || _TREE_TYPE_SINGLE;
@@ -209,10 +90,199 @@
 
 		};
 
-		/********************************************* 以下添加树事件 *********************************************/
-		/* 鼠标双击响应函数，触发自定义双击事件。 */
-		this.el.ondblclick = function(event) {
-			var srcElement
+		// 树控件上禁用默认右键
+		this.el.oncontextmenu = function(_event) {
+			$.Event.cancel(_event || window.event);
+		}		
+
+		/********************************************* 以下定义树节点TreeNode *********************************************/
+		var 
+			_TREE_NODE = "treeNode",
+			_TREE_NODE_ID = "id",
+			_TREE_NODE_NAME = "name",
+			_TREE_ROOT_NODE_ID = "_root",  /* “全部”节点的ID值  */
+			_TREE_NODE_STATE = "disabled",       // 停用、启用
+			
+			/* 树节点的选择状态：没选、半选、全选、禁选  0/1/2/-1 */
+			_TREE_NODE_CHECK_STATE = "checkState",  
+			_STYLE_NODE_UN_CHECKED = "checkstate_0",
+			_STYLE_NODE_HALF_CHECKED = "checkstate_1",
+			_STYLE_NODE_CHECKED = "checkstate_2",
+			_STYLE_NODE_UN_CHECKED_DISABLED = "checkstate_0_disable",
+			_STYLE_NODE_HALF_CHECKED_DISABLED = "checkstate_1_disable",
+			_STYLE_NODE_CHECKED_DISABLED = "checkstate_2_disable",
+
+			_STYLE_NODE_EXPAND = "node_open",
+			_STYLE_NODE_COLLAPSE = "node_close",	
+			_STYLE_NODE_LEAF = "node_leaf",		
+			
+			_STYLE_TREE_NODE_HOVER = "hover",
+			_STYLE_TREE_NODE_MOVING = "moving",
+			_STYLE_TREE_NODE_FINDED = "finded",
+			_STYLE_TREE_NODE_CLICKED = "clicked",
+
+			closeNode = function(node) {
+				$(node.li.switchIcon).removeClass("node_open").addClass("node_close");
+				if(node.li.ul) {
+					$(node.li.ul).addClass("hidden");
+				}
+				node.opened = false;
+			},
+
+			openNode = function(node) {
+				$(node.li.switchIcon).removeClass("node_close").addClass("node_open");
+				if(node.li.ul) {
+					$(node.li.ul).removeClass("hidden");
+				}
+				node.opened = true;
+			};
+
+		var TreeNode = function(nodeInfo, parent) {
+
+			this.id   = nodeInfo[_TREE_NODE_ID];
+			this.name = nodeInfo[_TREE_NODE_NAME];
+
+			this.opened = (nodeInfo._open == "true");
+			this.disabled = nodeInfo[_TREE_NODE_STATE] || "0";  // 状态： 停用/启用  1/0
+			this.checkState = nodeInfo[_TREE_NODE_CHECK_STATE] || "0"; /* 节点的选择状态 */
+
+			// 维护成可双向树查找
+			this.children = [];
+
+			this.parent = parent;
+			if(this.parent) {
+				this.level = this.parent.level + 1;
+				this.parent.children.push(this);
+			} else {
+				this.level = 1;
+			}				
+
+			var oThis = this;
+
+			this.toHTMLTree = function() {
+				var stack = [];
+				stack.push(this);
+
+				var current, currentEl, rootEl, ul;
+				while(stack.length > 0) {
+					current = stack.pop();
+					var currentEl = current.toHTMLEl(current);
+					if(rootEl == null) {
+						rootEl = currentEl;
+					}
+					else {
+						ul = rootEl.querySelector("ul[pID ='" + current.parent.id + "']");
+						ul.insertBefore(currentEl, ul.firstChild);
+					}
+
+					current.children.each(function(i, child) {
+						stack.push(child);
+					});
+				}
+	 
+				return rootEl;
+			};
+		};
+
+		TreeNode.prototype = {
+			toHTMLEl: function() {
+				var li = $.createElement("li");
+				li.setAttribute("nodeID", this.id);
+				li.node = this;
+				this.li = li;
+
+				// 节点打开、关闭开关
+				var switchIcon = $.createElement("span", "switch");
+				li.appendChild(switchIcon);
+				li.switchIcon = switchIcon;
+
+				// checkbox
+				var checkbox = $.createElement("span", "checkbox");
+				li.appendChild(checkbox);
+				li.checkbox = checkbox;
+
+				// 自定义图标
+				var selfIcon = $.createElement("div", "selfIcon");
+				li.appendChild(selfIcon);
+
+				// 节点名称
+				var a = $.createElement("a");
+				a.innerText = a.title = this.name;
+				li.appendChild(a);
+				li.a = a;
+				if( !this.isEnable() ) {
+					this.disable();
+				}
+
+				if(this.children.length > 0) {
+	 				var ul = $.createElement("ul");
+	 				ul.setAttribute("pID", this.id);
+	 				li.appendChild(ul);
+	 				li.ul = ul;
+
+	 				if( !this.opened ) {
+	 					closeNode(this);
+	 				} else {
+	 					openNode(this);
+	 				}
+	 				$(switchIcon).toggle( 
+	 					function() { 
+	 						if(li.node.opened) closeNode(li.node); 
+	 						else openNode(li.node);
+		 				}
+	 				);
+
+	 				$(checkbox).addClass("checkstate_1");
+	 				$(selfIcon).addClass("folder");
+				}
+				else { // is leaf
+					$(switchIcon).addClass("node_leaf");
+					$(checkbox).addClass("checkstate_2");
+					$(selfIcon).addClass("leaf");
+				}
+
+				// 添加事件
+				a.onclick = function(event) {
+					oThis.active();
+
+					event.node = oThis;
+					eventNodeActived.fire(event);
+				};
+				a.ondblclick = function(event) {
+					oThis.active();
+
+					event.node = oThis;
+					eventNodeDoubleClick.fire(event);
+				};
+				a.oncontextmenu = function(event) {
+					oThis.active();
+
+					// 触发右键激活节点事件
+					var _event = $.Event.createEventObject();
+					_event.treeNode = oThis;
+					_event.clientX = event.clientX;
+					_event.clientY = event.clientY;
+					eventNodeRightClick.fire(_event);
+				};
+
+				return li;
+			},
+			
+			disable: function() {
+				this.disabled = "1";
+				$(this.li.a).addClass("disable");
+			},
+
+			isEnable: function() {
+				return this.disabled != "1";
+			},
+
+			active: function() {
+				if(this.isEnable()) {
+					$(this.li.a).addClass("active");
+				}
+			}
+
 		};
 
 		this.init();

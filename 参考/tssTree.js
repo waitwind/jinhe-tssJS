@@ -78,48 +78,7 @@
 	
 	/********************************************* 以下定义树事件 *********************************************/
 	
-	/* 鼠标双击响应函数，触发自定义双击事件。 */
-	this.element.ondblclick = function() {
-		var srcElement = window.event.srcElement;
-		var row = getRow(srcElement);
-		if(row instanceof Row) {
-			var treeNode = instanceTreeNode(row.node, treeThis);
-		}
-		if( (treeNode instanceof TreeNode) && treeNode.isCanSelected() && (srcElement == row.label || srcElement == row.icon)) {	
-			var eventObj = createEventObject();
-			eventObj.treeNode = treeNode;
-			eventNodeDoubleClick.fire(eventObj);  // 触发双击事件
-		}		
-	}
-
-	/*
-	 * 	鼠标右键单击事件响应函数。
-	 *	如果点击的是文字连接，则激活该节点，同时触发右键单击事件。
-	 */
-	this.element.oncontextmenu = function() {
-		var srcElement = window.event.srcElement;
-		preventDefault(event);
-
-		var row = getRow(srcElement);
-		if(row instanceof Row) {
-			var treeNode = instanceTreeNode(row.node, treeThis);
-		}
-		if( treeNode instanceof TreeNode ) {
-			// 设置节点为激活
-			if(treeNode.isCanSelected()) {
-				treeThis.setActiveNode(treeNode);
-			}
-
-			// 触发右键激活节点事件
-			var eventObj = createEventObject();
-			eventObj.treeNode = treeNode;
-			eventObj.clientX = event.clientX;
-			eventObj.clientY = event.clientY;
-			eventNodeRightClick.fire(eventObj); 
-
-			treeThis.display.reload();  
-		}
-	}
+  
 
 	/*
 	 * 	鼠标单击事件响应函数
@@ -147,24 +106,6 @@
 			}
 			treeThis.display.reload();
 		}
-	}
-
-	/*  鼠标移到元素上。*/
-	this.element.onmouseover = function() {
-		var srcElement = window.event.srcElement;
-		var row = getRow(srcElement);
-		if( (row instanceof Row) && row.label == srcElement) {
-			row.setClassName(treeThis.getStyleClass(row.node, _TREE_NODE_OVER_STYLE));
-		}
-	}
-
-	/* 鼠标离开元素时。*/
-	this.element.onmouseout = function() {
-		var srcElement = window.event.srcElement;
-		var row = getRow(srcElement);
-		if( (row instanceof Row) && row.label == srcElement) {
-			row.setClassName(treeThis.getStyleClass(row.node));
-		}	
 	}
 
 	/********************************************* 节点拖动相关事件 *********************************************/
@@ -283,97 +224,8 @@
 		}	
 	}
 
-	/********************************************* 节点拖动结束 *********************************************/
-	
-	/********************************************* 事件相关函数 *********************************************/
-	
-	/*
-	 * 根据显示的对象，获取相应的Row对象
-	 * 参数：	obj	节点显示在页面上的对象
-	 * 返回值：	Row对象
-	 */
-	function getRow(obj) {
-		if(!/^(a|img)$/.test(obj.tagName.toLowerCase())) {
-			return null;
-		}
-		 
-		try{
-			var index = getRowIndex(obj);
-			return treeThis.display.getRowByIndex(index);
-		} catch(e) {		
-		}	
-	}
-	
-	/*
-	 * 获取对象在树控件可视区域中的位置（对象上边缘距可视区域上边缘的距离）, 获取对象相对于控件顶部的距离。
-	 * 参数：	obj	对象
-	 * 返回：	int
-	 */
-	function getTop(obj, element) {
-		var top = 0;
-		while (obj && obj != element && obj != document.body) {
-			top = top + obj.offsetTop;
-			obj = obj.offsetParent;
-		}
-		return top;
-	}
-
-	/*
-	 * 如果拖到页面的最上、下方，相应的滚动树
-	 * 参数：	obj	事件触发对象
-	 */
-	function startScrollTree(obj) {
-		if(obj == null) return;
-		
-		if(isLastLine(obj, treeThis.display)) {
-			scrollDown(treeThis.element);
-		}
-		if(isFirstLine(obj)) {
-			scrollUp(treeThis.element);
-		}
-	}
-
-	/* 定时向上滚动 */
-	function scrollUp(element) {
-		if(element.scroller) {
-			clearTimeout(element.scroller);
-			element.scroller = null;
-		}
-		treeThis.display.scrollUp();
-		
-		element.scroller = setTimeout(scrollUp, _TREE_SCROLL_REPEAT_DELAY_TIME);
-	}
-
-	/* 定时向下滚动 */
-	function scrollDown(element, display) {
-		if(element.scroller ) {
-			clearTimeout(element.scroller);
-			element.scroller=null;
-		}
-		display.scrollDown();
-		
-		element.scroller = setTimeout(scrollDown, _TREE_SCROLL_REPEAT_DELAY_TIME);
-	}
-
-	/*
-	 * 如果拖到的不是页面的最上、下方，或者停止拖动，则停止滚动树
-	 * 参数：	obj	事件触发对象
-	 */
-	function stopScrollTree(obj) {
-		if(obj && (isLastLine(obj, treeThis.display) || isFirstLine(obj))) {
-			return;
-		}
-		
-		if (treeThis.element.scroller) {
-			window.clearTimeout(treeThis.element.scroller);
-			treeThis.element.scroller = null;
-		}
-	}
-	
-}
  
-
- 	
+ 
 
 /*
  * 根据给定的数据，处理树节点的默认选中状态

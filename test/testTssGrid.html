@@ -21,12 +21,7 @@
 <!--
 
     function init() {
-
-    	/* 禁止鼠标右键 */
-		document.oncontextmenu = function(_event) {
-			$.Event.cancel(_event || window.event);
-		}
-
+ 
 		initGridMenu();
 
 		$.ajax({
@@ -38,14 +33,14 @@
 				var gridPage = this.getNodeValue("PageInfo");
 				createGridToolBar(gridPage);			
 
-				$$("grid").onScrollToBottom = function () {
+				grid.onScrollToBottom = function () {
 					grid.load(gridData, true);
 				}
-				$$("grid").onRightClickRow = function () {
+				grid.onRightClickRow = function () {
 					grid.element.contextmenu.show(event.clientX, event.clientY);						
 				}
-				$$("grid").onDblClickRow = function () {
-					alert($.G("grid").getRowAttributeValue("id"));				
+				grid.onDblClickRow = function () {
+					alert($.G("grid").getColumnValue("id"));				
 				}
 			},
 			onexception : function(result) {

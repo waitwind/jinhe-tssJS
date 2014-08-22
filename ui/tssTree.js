@@ -26,9 +26,6 @@
 		_TREE_NODE_MOVEABLE = "moveable",    // 是否可以移动树节点，默认false
 		_TREE_NODE_CHECK_SELF = "justSelf",  // 选中节点时只改变自己的选择状态，与父、子节点无关
 
-		_STYLE_NODE_MOVE_TO_SHOW_LINE   = "1px solid #333399", // 目标节点划线样式
-		_STYLE_NODE_MOVE_TO_HIDDEN_LINE = "1px solid #ffffff", // 目标节点隐藏划线样式
-
 	Tree = function(el, data) {
 		/*  自定义事件 */
 		var eventTreeReady       = new $.EventFirer(this, "onLoad"),
@@ -61,11 +58,11 @@
 
 			// this.seacher = new Seacher();
 
-			eventTreeReady.fire($.Event.createEventObject()); // 触发载入完成事件
+			eventTreeReady.fire(); // 触发载入完成事件
 		}
 
 		// 定义Tree私有方法
-		var oThis = this;
+		var tThis = this;
 		var loadXML = function(node, parent) {
 			var xmlNodes = node.querySelectorAll("treeNode");
 			var parents = {};
@@ -80,7 +77,7 @@
 				var treeNode = new TreeNode(nodeAttrs, parent);
 
 				if(parent == null) {
-					oThis.rootList.push(treeNode); // 可能存在多个根节点
+					tThis.rootList.push(treeNode); // 可能存在多个根节点
 				}	
 				parents[treeNode.id] = treeNode;
 			});
@@ -90,12 +87,12 @@
 
 		};
 
-		// 树控件上禁用默认右键
-		this.el.oncontextmenu = function(_event) {
+		// 树控件上禁用默认右键和选中文本（默认双击会选中节点文本）
+		this.el.oncontextmenu = this.el.onselectstart = function(_event) {
 			$.Event.cancel(_event || window.event);
 		}		
 
-		/********************************************* 以下定义树节点TreeNode *********************************************/
+		/********************************************* 定义树节点TreeNode start *********************************************/
 		var 
 			_TREE_NODE = "treeNode",
 			_TREE_NODE_ID = "id",
@@ -103,48 +100,72 @@
 			_TREE_ROOT_NODE_ID = "_root",  /* “全部”节点的ID值  */
 			_TREE_NODE_STATE = "disabled",       // 停用、启用
 			
-			/* 树节点的选择状态：没选、半选、全选、禁选  0/1/2/-1 */
+			/* 
+			 * 树节点的选择状态：没选(UN_CHECKED)、半选(HALF_CHECKED)、全选(CHECKED)  0/1/2/ 
+			 * 禁选(CHECKED_DISABLED)状态下，也分没选、半选、全选
+			 */
 			_TREE_NODE_CHECK_STATE = "checkState",  
-			_STYLE_NODE_UN_CHECKED = "checkstate_0",
-			_STYLE_NODE_HALF_CHECKED = "checkstate_1",
-			_STYLE_NODE_CHECKED = "checkstate_2",
-			_STYLE_NODE_UN_CHECKED_DISABLED = "checkstate_0_disable",
-			_STYLE_NODE_HALF_CHECKED_DISABLED = "checkstate_1_disable",
-			_STYLE_NODE_CHECKED_DISABLED = "checkstate_2_disable",
 
-			_STYLE_NODE_EXPAND = "node_open",
-			_STYLE_NODE_COLLAPSE = "node_close",	
-			_STYLE_NODE_LEAF = "node_leaf",		
-			
-			_STYLE_TREE_NODE_HOVER = "hover",
-			_STYLE_TREE_NODE_MOVING = "moving",
-			_STYLE_TREE_NODE_FINDED = "finded",
-			_STYLE_TREE_NODE_CLICKED = "clicked",
+		clickSwich = function(node) {
+			node.opened = !node.opened;
 
-			closeNode = function(node) {
-				$(node.li.switchIcon).removeClass("node_open").addClass("node_close");
-				if(node.li.ul) {
+			var styles = ["node_close", "node_open"],
+				index = node.opened ? 0 : 1;
+
+			$(node.li.switchIcon).removeClass(styles[index]).addClass(styles[++index % 2]);
+
+			if(node.li.ul) {
+				if(node.opened) {
+					$(node.li.ul).removeClass("hidden");
+				} else {
 					$(node.li.ul).addClass("hidden");
 				}
-				node.opened = false;
-			},
+			}
+		},
 
-			openNode = function(node) {
-				$(node.li.switchIcon).removeClass("node_close").addClass("node_open");
-				if(node.li.ul) {
-					$(node.li.ul).removeClass("hidden");
-				}
-				node.opened = true;
-			};
+		/* 根据现有状态改成下一个选择状态，0-->2,  1|2-->0 */
+		checkNode = function(node) {
+			var oldState = node.checkState;
+			switch(oldState) {
+				case 0:
+					node.checkState = 2;
+					break;
+				case 1:
+				case 2:
+					node.checkState = 0;
+					break;
+			}
 
-		var TreeNode = function(nodeInfo, parent) {
+			setNodeState(node, oldState);
 
+			// TODO 改变子节点及父节点的check状态
+			var parent = node;
+			while(parent = parent.parent) {
+				var oldState = parent.checkState;
+				parent.checkState = Math.max(oldState, 1);
+				setNodeState(parent, oldState);
+			}
+
+			if(!tThis.checkSelf) {
+				node.children.each(function(i, child) {
+					child.checkState = 2;
+					setNodeState(child);
+				});
+			}
+		},
+
+		setNodeState = function(node, oldState) {
+			$(node.li.checkbox).removeClass("checkstate_" + oldState + "_" + node.disabled)
+				.addClass("checkstate_" + node.checkState + "_" + node.disabled);
+		},
+
+		TreeNode = function(nodeInfo, parent) {			
 			this.id   = nodeInfo[_TREE_NODE_ID];
 			this.name = nodeInfo[_TREE_NODE_NAME];
 
 			this.opened = (nodeInfo._open == "true");
 			this.disabled = nodeInfo[_TREE_NODE_STATE] || "0";  // 状态： 停用/启用  1/0
-			this.checkState = nodeInfo[_TREE_NODE_CHECK_STATE] || "0"; /* 节点的选择状态 */
+			this.checkState = parseInt(nodeInfo[_TREE_NODE_CHECK_STATE] || "0"); /* 节点的选择状态 */
 
 			// 维护成可双向树查找
 			this.children = [];
@@ -156,8 +177,6 @@
 			} else {
 				this.level = 1;
 			}				
-
-			var oThis = this;
 
 			this.toHTMLTree = function() {
 				var stack = [];
@@ -179,7 +198,7 @@
 						stack.push(child);
 					});
 				}
-	 
+
 				return rootEl;
 			};
 		};
@@ -214,56 +233,53 @@
 					this.disable();
 				}
 
+				if(tThis.treeType == _TREE_TYPE_SINGLE) {
+					$(checkbox).addClass("hidden");
+				}
+
 				if(this.children.length > 0) {
 	 				var ul = $.createElement("ul");
 	 				ul.setAttribute("pID", this.id);
 	 				li.appendChild(ul);
 	 				li.ul = ul;
 
-	 				if( !this.opened ) {
-	 					closeNode(this);
-	 				} else {
-	 					openNode(this);
-	 				}
-	 				$(switchIcon).toggle( 
-	 					function() { 
-	 						if(li.node.opened) closeNode(li.node); 
-	 						else openNode(li.node);
-		 				}
-	 				);
+	 				this.opened = !this.opened;
+	 				clickSwich(this);
 
-	 				$(checkbox).addClass("checkstate_1");
 	 				$(selfIcon).addClass("folder");
 				}
 				else { // is leaf
-					$(switchIcon).addClass("node_leaf");
-					$(checkbox).addClass("checkstate_2");
+					$(switchIcon).addClass("node_leaf").css("cursor", "default");
 					$(selfIcon).addClass("leaf");
 				}
 
 				// 添加事件
+				var nThis = this;
 				a.onclick = function(event) {
-					oThis.active();
+					nThis.active();
 
-					event.node = oThis;
+					event.node = nThis;
 					eventNodeActived.fire(event);
 				};
 				a.ondblclick = function(event) {
-					oThis.active();
+					nThis.active();
 
-					event.node = oThis;
+					event.node = nThis;
 					eventNodeDoubleClick.fire(event);
 				};
 				a.oncontextmenu = function(event) {
-					oThis.active();
+					nThis.active();
 
 					// 触发右键激活节点事件
 					var _event = $.Event.createEventObject();
-					_event.treeNode = oThis;
+					_event.treeNode = nThis;
 					_event.clientX = event.clientX;
 					_event.clientY = event.clientY;
 					eventNodeRightClick.fire(_event);
 				};
+
+				$(switchIcon).click( function() { clickSwich(nThis); } );
+				$(checkbox).click( function() { checkNode(nThis); } );
 
 				return li;
 			},
@@ -271,6 +287,7 @@
 			disable: function() {
 				this.disabled = "1";
 				$(this.li.a).addClass("disable");
+				setNodeState(this.li.node);
 			},
 
 			isEnable: function() {
@@ -278,14 +295,17 @@
 			},
 
 			active: function() {
+				$.each(tThis.el.querySelectorAll("li"), function(i, li) {
+					$(li.a).removeClass("active");
+				});
 				if(this.isEnable()) {
 					$(this.li.a).addClass("active");
 				}
-			}
-
+			},
 		};
+		/********************************************* 定义树节点TreeNode end *********************************************/
 
-		this.init();
+		tThis.init();
 	};
 
 	Tree.prototype = {

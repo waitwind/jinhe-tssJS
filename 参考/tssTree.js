@@ -452,104 +452,6 @@ function instanceTreeNode(xmlNode, treeObj) {
 		return 0;
 	}
 
-	/*
-	 * 根据现有状态改成下一个选择状态，如为1，2则返回0，否则返回1
-	 * 参数：noChildren	选中节点时不包含子节点（按住shift键）
-	 */
-	this.changeSelectedState = function(noChildren) {
-		this.setSelectedState(this.treeObj.getNextState(this), noChildren);
-	}
-	/*
-	 * 设置选中状态，同时刷新相关节点的选择状态
-	 * 参数：	state	选择状态
-	 *			noChildren	只选中自己节点（不选中子节点）
-	 */
-	this.setSelectedState = function(state, noChildren) {
-		if( !this.isCanSelected() ) {	// 不可选择
-			return;
-		}
-
-		justSelected(this, state, noChildren);
-		
-		if( !this.isActive() && state == 1 && (this.treeObj instanceof SingleCheckTree) ) {
-			justActive(this);
-		}
-	}
-
-	/* 获取父节点的TreeNode对象 */
-	this.getParent = function() {
-		return instanceTreeNode(this.node.parentNode, this.treeObj);
-	}
-	
-	this.getId = function() {
-		return this.node.getAttribute(_TREE_NODE_ID);
-	}
-
-	this.getName = function() {
-		return this.node.getAttribute(_TREE_NODE_NAME);
-	}
- 
-	/*
-	 * 激活节点
-	 * 参数：noChildren		选中节点时，是否不包含子节点
-	 */
-	this.setActive = function(noChildren) {
-		if( !this.isCanSelected() ) {
-			return;
-		}
-		
-        justActive(this);
-		justSelected(this, this.treeObj.getNextState(this), noChildren);
-	}
-
-	/* 打开节点，让节点出现在可视区域内。*/
-	this.focus = function() {
-		// 打开未被打开的父节点，父节点的父节点，以此类推。
-		openNode(this.node.parentNode);
-
-		var display = this.treeObj.display;
-		display.resetTotalTreeNodes();	
-		display.scrollTo(this.node); // 如果节点没有在可视区域内，则滚动节点到可是区域
-	}
- 
-	/* 点击文字标签时，改变节点伸缩状态 */
-	this.changeFolderStateByActive = function() {
-		this.treeObj.changeOpenStateByActive(this);
-	}
-
-	/* 改变节点的伸缩状态 */
-	this.changeFolderState = function() {
-		if(this.isOpened()) {	
-			this.close();	// 关闭子节点
-		} 
-		else {
-			this.open();	// 打开子节点
-		}
-	}
-
-	/* 打开子节点, 如果节点或其打开的子节点没有在可视区域内，则滚动节点使其及其子节点全部出现在可视区或使其在最上端 */
-	this.open = function() {
-		this.node.setAttribute("_open", "true");	// 标记当前节点为打开状态
-
-		// 此节点打开，打开因此节点关闭而关闭的子枝节点，同时去除标记。
-		openChildNodesCloseByThisNode(this.node);
-
-		var display = this.treeObj.display;
-		display.resetTotalTreeNodes();	
-		display.scrollTo(this.node);
-		
-	}
-
-	/* 关闭子节点 */
-	this.close = function() {
-		this.node.setAttribute("_open", "false");	//标记当前节点为关闭状态
-
-		//此节点关闭，关闭此节点的打开的子枝节点，同时标记关闭的原因。
-		closeOpendChildNodes(this.node);
-
-		this.treeObj.display.resetTotalTreeNodes();
-	}
-
 	/* 删除当前节点  */
 	this.remove = function() {
 		this.node.parentNode.removeChild(this.node); // 删除xml中的此节点
@@ -602,56 +504,7 @@ function instanceTreeNode(xmlNode, treeObj) {
 		this.treeObj.display.resetTotalTreeNodes();
 		return true;
 	}
-
-	/* 获取当前节点的XML节点对象，该对象是一个浅拷贝对象（不包含当前节点子节点）。*/
-	this.toElement = function() {
-		return this.node.cloneNode(false);
-	}
  
-	this.toString = function() {
-		return this.toElement().xml;
-	}
-
-	/* 获取节点属性值 */
-	this.getAttribute = function(name) {
-		return this.node.getAttribute(name);
-	}
-
-	/* 设置节点属性值 */
-	this.setAttribute = function(name, value) {
-		value = value || "";
-
-		if(name == _TREE_NODE_CHECKTYPE) { //修改checkType
-			this.setSelectedState(value);
-		} 
-		else {	// 修改其他属性
-			this.node.setAttribute(name, value);
-		}
-	}
-
-	/* 打开因此节点关闭而关闭的节点，即子节点本身是打开的，只是此节点关闭才不显示的 */
-	function openChildNodesCloseByThisNode(node) {
-		var nodes = node.selectNodes(".//treeNode[@_closeBy = '" + node.getAttribute(_TREE_NODE_ID) + "']");
-		for(var i = 0; i < nodes.length; i++) {
-			nodes[i].setAttribute("_open", "true");
-			nodes[i].removeAttribute("_closeBy");	//去除因父节点关闭而不显示的标记
-		}
-	}
-
-	/* 关闭此节点下已经打开的子节点，即此节点关闭的话，打开的字节点也应关闭 */
-	function closeOpendChildNodes(node) {
-		var nodes = node.selectNodes(".//treeNode[@_open = 'true']");
-		for(var i = 0; i < nodes.length; i++) {
-			nodes[i].setAttribute("_open", "false");
-			nodes[i].setAttribute("_closeBy", node.getAttribute(_TREE_NODE_ID));	// 因此节点关闭而不显示
-		}
-	}
-
-	/* 激活节点，触发相应事件 */
-	function justActive(treeNode) {
-		treeNode.treeObj.setActiveNode(treeNode);	
-	}
-
 	/* 选中节点 */
 	function justSelected(treeNode, state, noChildren) {
         if( !treeNode.treeObj.isMenu() ) {
@@ -665,15 +518,7 @@ function instanceTreeNode(xmlNode, treeObj) {
             refreshStatesByNode(treeNode, noChildren);	 
         }
 	}
-	
-	/*
-	 * 根据给定的节点的选中状态，刷新相应节点的选中状态
-	 * 参数：	TreeNode节点对象
-	 *			noChildren	选中节点时，只选中自己节点，不影响子节点
-	 */
-	function refreshStatesByNode(treeNode, noChildren) {
-		treeNode.treeObj.refreshStates(treeNode, noChildren);
-	}
+ 
 }
 
 //////////////////////////////////////////////////////////////////////////////

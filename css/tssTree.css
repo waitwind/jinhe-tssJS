@@ -65,13 +65,13 @@ Tree\:Box li>span.checkbox {
 	background-repeat:no-repeat; 
 	background-image:url("../images/tree/checkbox.png"); 
 }
-Tree\:Box li>span.checkstate_0 {background-position:0px 0px;}
-Tree\:Box li>span.checkstate_1 {background-position:0px -36px;}
-Tree\:Box li>span.checkstate_2 {background-position:0px -24px;}
+Tree\:Box li>span.checkstate_0_0 {background-position:0px 0px;}
+Tree\:Box li>span.checkstate_1_0 {background-position:0px -36px;}
+Tree\:Box li>span.checkstate_2_0 {background-position:0px -24px;}
 
-Tree\:Box li>span.checkstate_0_disable {background-position:0px -72px;}
-Tree\:Box li>span.checkstate_1_disable {background-position:0px -48px;}
-Tree\:Box li>span.checkstate_2_disable {background-position:0px -48px;}
+Tree\:Box li>span.checkstate_0_1 {background-position:0px -72px;}
+Tree\:Box li>span.checkstate_1_1 {background-position:0px -48px;}
+Tree\:Box li>span.checkstate_2_1 {background-position:0px -48px;}
 
 Tree\:Box li>span.switch{width:18px; height:18px;}
 Tree\:Box li>span.node_open {background-image:url("../images/tree/minus.gif");}

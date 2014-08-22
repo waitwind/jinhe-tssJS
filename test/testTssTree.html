@@ -123,14 +123,11 @@ window.onload = init;
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td>-
 				<input type="button" value="getIDs" onclick="alert($T('tree').getIds(false));"/>
 				<input type="button" value="新建节点" onclick="insertTreeNode();"/>
 				<input type="button" value="修改节点" onclick="modifyTreeNode(6, 'name', '天地玄黄', true);"/>
-				<br/><br/>
-				<input type="button" value="精确搜索" onclick="$T('tree').searchNode('CMS', true);"/>
-				<input type="button" value="模糊搜索" onclick="$T('tree').searchNode('子组', false);"/>
-				<input type="button" value="下一个" onclick="$T('tree').searchNext();"/>
+				<input type="button" value="搜索" onclick="$.T('tree').searchNode('子组');"/>
 			</td>
 			<td>
 				<input type="button" value="getIDs" onclick="alert($T('tree2').getIds(false));"/>

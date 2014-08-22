@@ -8,7 +8,7 @@
  		var tree = TreeCache[id];
 		if( tree == null || data ) {
 			tree = new $.Tree($1(id), data);
-			TreeCache[tree.id] = tree;	
+			TreeCache[id] = tree;	
 		}
 		
 		return tree;
@@ -55,8 +55,6 @@
 				ul.appendChild(li);
 			});
 			this.el.appendChild(ul);
-
-			// this.seacher = new Seacher();
 
 			eventTreeReady.fire(); // 触发载入完成事件
 		}
@@ -298,14 +296,18 @@
 				$.each(tThis.el.querySelectorAll("li"), function(i, li) {
 					$(li.a).removeClass("active");
 				});
-				if(this.isEnable()) {
-					$(this.li.a).addClass("active");
-				}
+
+				$(this.li.a).addClass("active");
 			},
+
+			openNode: function() {
+				clickSwich(this);
+			}
 		};
 		/********************************************* 定义树节点TreeNode end *********************************************/
 
 		tThis.init();
+		tThis.searcher = new Searcher(tThis);
 	};
 
 	Tree.prototype = {
@@ -354,24 +356,64 @@
  			}
  		},
 
- 		searchNode: function(searchStr, exact) {
- 			if(this.searcher.search(searchStr, exact)) {
-				this.searcher.first();
-			}
- 		},
-
- 		/* 获取查询结果的下一个结果 */	
- 		searchNext: function() {
- 			this.searcher.next();
+ 		searchNode: function(searchStr) {
+ 			this.searcher.search(searchStr)
  		},
 
  		/* 将节点滚动到可视范围之内 */
  		scrollTo: function(treeNode) {
- 			// first open the node
- 			// this.el.scrollTop += 100;
+ 			var temp = treeNode;
+ 			while(temp = temp.parent) {
+ 				if(!temp.opened) {
+					temp.openNode();
+				}
+ 			}
+
+ 			this.el.scrollTop = treeNode.li.offsetTop - this.el.clientHeight / 2;
  		}
 
 	};
+
+	/********************************************* 定义树查找对象 start *********************************************/
+
+	var Searcher = function(tree) {
+		var findedNodes, currentIndex, lastSearchStr;
+
+		this.search = function(searchStr) {
+			if($.isNullOrEmpty(searchStr)) {
+				return alert("查询条件不能为空！");
+			}
+
+			if(lastSearchStr == searchStr) {
+				this.next();
+				return; 
+			}
+
+			findedNodes = [];
+			currentIndex = -1;
+			lastSearchStr = searchStr;
+
+			var aNodeList = tree.el.querySelectorAll("li>a[title*='" + searchStr + "']");
+			$.each(aNodeList, function(i, aNode) {
+				findedNodes.push(aNode.parentNode.node);
+			});
+
+			this.next();
+		}
+
+		this.next = function() {
+			if(findedNodes.length == 0) {
+				return;
+			}
+
+			var node = findedNodes[++ currentIndex % findedNodes.length];
+			
+			node.active();
+			tree.scrollTo(node);
+		}
+	}
+
+	/********************************************* 定义树查找对象 end *********************************************/
 
 	return Tree;
 });

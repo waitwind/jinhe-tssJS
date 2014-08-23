@@ -134,27 +134,20 @@
 					break;
 			}
 
-			setNodeState(node, oldState);
+			node.refreshCheckState();
 
 			// TODO 改变子节点及父节点的check状态
 			var parent = node;
 			while(parent = parent.parent) {
 				var oldState = parent.checkState;
-				parent.checkState = Math.max(oldState, 1);
-				setNodeState(parent, oldState);
+				parent.refreshCheckState(Math.max(oldState, 1));
 			}
 
 			if(!tThis.checkSelf) {
 				node.children.each(function(i, child) {
-					child.checkState = 2;
-					setNodeState(child);
+					child.refreshCheckState(2);
 				});
 			}
-		},
-
-		setNodeState = function(node, oldState) {
-			$(node.li.checkbox).removeClass("checkstate_" + oldState + "_" + node.disabled)
-				.addClass("checkstate_" + node.checkState + "_" + node.disabled);
 		},
 
 		TreeNode = function(nodeInfo, parent) {			
@@ -285,7 +278,7 @@
 			disable: function() {
 				this.disabled = "1";
 				$(this.li.a).addClass("disable");
-				setNodeState(this.li.node);
+				this.li.node.refreshCheckState();
 			},
 
 			isEnable: function() {
@@ -302,30 +295,48 @@
 
 			openNode: function() {
 				clickSwich(this);
+			},
+
+			refreshCheckState: function(newState) {
+				this.checkState = newState || this.checkState;
+				$(this.li.checkbox).removeClass("checkstate_0_" + this.disabled)
+					.removeClass("checkstate_1_" + this.disabled)
+				    .removeClass("checkstate_2_" + this.disabled)
+				    .addClass("checkstate_" + this.checkState + "_" + this.disabled);
 			}
 		};
 		/********************************************* 定义树节点TreeNode end *********************************************/
 
 		tThis.init();
 		tThis.searcher = new Searcher(tThis);
+
+		tThis.checkNode = checkNode;
 	};
 
 	Tree.prototype = {
 		getTreeNodeById: function(id) {
-			var li = this.el.querySelector("li[id='" + id + "']");
+			var li = this.el.querySelector("li[nodeId='" + id + "']");
 			return li ? li.node : null;
 		},
 
-		/* 获取当前高亮（激活）的节点（被激活的节点一次只有一个）。如果没有激活的节点，则返回null。*/
+		/* 获取当前高亮（激活）的节点（被激活的节点一次只有一个）。如没有，则返回null。*/
 		getActiveTreeNode: function() {
+			var lis = this.el.querySelectorAll("li[nodeId]");
+ 			var activeNode;
+ 			$.each(lis, function(i, li) {
+ 				if( $(li.a).hasClass("active") ) {
+ 					activeNode = li.node;
+ 				}
+ 			});
 
+ 			return activeNode
 		},
 
-		/* 设定相应id的节点为激活状态。如果节点尚未被打开，那么先打开此节点。*/
 		setActiveTreeNode: function(id) {
 			var treeNode = this.getTreeNodeById(id);
 			if(treeNode) {
-				// 设置当前节点高亮，且显示其所有父节点及其兄弟节点；去掉原先高亮的节点；让节点出现在可视区域内
+				treeNode.active();
+				this.scrollTo(treeNode);
 			}
 		},
 
@@ -334,7 +345,8 @@
 		},
 
 		removeTreeNode: function(treeNode) {
-
+			// 删除li
+			// 并从其parent.children中去除
 		},
 
 		/*
@@ -347,13 +359,14 @@
 			from.moveTo(to, direction);
 		},
 
- 		getIDs: function(includeHalfChecked) {
- 			if(includeHalfChecked) {
- 				this.el.querySelectorAll("li>span[checkType=1]");
- 				this.el.querySelectorAll("li>span[checkType=2]");
- 			} else {
- 				this.el.querySelectorAll("li>span[checkType=2]");
- 			}
+ 		getIds: function(includeHalfChecked) {
+ 			var checkedNodes = this.getCheckedNodes(includeHalfChecked);
+ 			var checkedNodeIds = [];
+			checkedNodes.each(function(i, node){
+				checkedNodeIds.push(node.id);
+			});
+
+			return checkedNodeIds;
  		},
 
  		searchNode: function(searchStr) {
@@ -370,7 +383,42 @@
  			}
 
  			this.el.scrollTop = treeNode.li.offsetTop - this.el.clientHeight / 2;
- 		}
+ 		},
+
+ 		getCheckedNodes: function(includeHalfChecked) {
+ 			var lis = this.el.querySelectorAll("li[nodeId]");
+ 			var checkedNodes = [];
+ 			$.each(lis, function(i, li) {
+ 				if( $(li.checkbox).hasClass("checkstate_2_0") || $(li.checkbox).hasClass("checkstate_2_1") ) {
+ 					checkedNodes.push(li.node);
+ 				}
+
+ 				if(includeHalfChecked) {
+ 					if( $(li.checkbox).hasClass("checkstate_1_0") || $(li.checkbox).hasClass("checkstate_1_1") ) {
+	 					checkedNodes.push(li.node);
+	 				}
+ 				}
+ 			});
+
+ 			return checkedNodes;
+ 		},
+
+ 		setCheckValues: function(checkedIds, clearOld) {
+			var checkedNodes = this.getCheckedNodes(true);
+			checkedNodes.each(function(i, node){
+				node.refreshCheckState(0);
+			});
+
+			checkedIds = (checkedIds || "").split(',');
+			for(var i = 0; i < checkedIds.length; i++) {
+				var li = this.el.querySelector("li[nodeId='" + checkedIds[i] + "']");
+				if(li) {
+					this.checkNode(li.node);
+				}
+			} 
+ 		},
+
+ 		// calculateParent
 
 	};
 

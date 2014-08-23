@@ -455,6 +455,13 @@
             return this;
         },
 
+        hasClass: function(className) {
+            if(this.length == 0) {
+                return false;
+            }
+            return $.hasClass(this[0], className);
+        },
+
         // 添加Class
         addClass: function(className) {
             for (var i = 0; i < this.length; i++) {
@@ -472,7 +479,7 @@
             for (var i = 0; i < this.length; i++) {
                 var element = this[i];
                 if ($.hasClass(element, className)) {
-                    element.className = element.className.replace(reg, ' ');
+                    element.className = element.className.replace(reg, ' ').trim();
                 }
             }
             return this;

@@ -393,7 +393,16 @@
             }
         }
         return false;
-    }
+    };
+
+    Array.prototype.remove = function(item) {
+        for(var i=0, n=0; i < this.length; i++) {
+            if(this[i] != item) {
+                this[n++] = this[i];
+            }
+        }
+        this.length -= 1;
+    };
 
     Date.prototype.format = function(format) {
         var o = {
@@ -416,7 +425,7 @@
             }
         }
         return format;
-    }
+    };
 
     window.tssJS = window.$ = _tssJS;
 
@@ -482,6 +491,15 @@
                     element.className = element.className.replace(reg, ' ').trim();
                 }
             }
+            return this;
+        },
+
+        removeClasses: function(classNames) {
+            var tjObj = this;
+            classNames.split(",").each(function(i, className){
+                tjObj.removeClass(className);
+            });
+
             return this;
         },
 

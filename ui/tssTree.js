@@ -49,6 +49,8 @@
 				loadJson(data);
 			}
 
+			$(this.el).html("");
+
 			var ul = $.createElement("ul");
 			this.rootList.each(function(i, root){
 				var li = root.toHTMLTree();
@@ -204,63 +206,67 @@
 				this.li = li;
 
 				// 节点打开、关闭开关
-				var switchIcon = $.createElement("span", "switch");
-				li.appendChild(switchIcon);
-				li.switchIcon = switchIcon;
+				li.switchIcon = $.createElement("span", "switch");
+				li.appendChild(li.switchIcon);
 
 				// checkbox
-				var checkbox = $.createElement("span", "checkbox");
-				li.appendChild(checkbox);
-				li.checkbox = checkbox;
+				li.checkbox = $.createElement("span", "checkbox");
+				li.appendChild(li.checkbox);
 
 				// 自定义图标
 				var selfIcon = $.createElement("div", "selfIcon");
 				li.appendChild(selfIcon);
+				li.selfIcon = $(selfIcon);
+
+				if(this.attrs["icon"]) {
+					li.selfIcon.css("backgroundImage", "url(" + this.attrs["icon"] + ")");
+					li.selfIcon.addClass = function(cn) {
+						return this; // 如果已经自定义了图标，则忽略后面的folder、leaf等图标设置
+					}
+				}
 
 				// 节点名称
-				var a = $.createElement("a");
-				a.innerText = a.title = this.name;
-				li.appendChild(a);
-				li.a = a;
+				li.a = $.createElement("a");
+				li.a.innerText = li.a.title = this.name;
+				li.appendChild(li.a);
 				if( !this.isEnable() ) {
 					this.disable();
 				}
 
 				if(tThis.treeType == _TREE_TYPE_SINGLE) {
-					$(checkbox).addClass("hidden");
+					$(li.checkbox).addClass("hidden");
 				}
 
 				if(this.children.length > 0) {
-	 				var ul = $.createElement("ul");
-	 				ul.setAttribute("pID", this.id);
-	 				li.appendChild(ul);
-	 				li.ul = ul;
+	 				li.ul = $.createElement("ul");
+	 				li.ul.setAttribute("pID", this.id);
+	 				li.appendChild(li.ul);
 
 	 				this.opened = !this.opened;
 	 				clickSwich(this);
 
-	 				$(selfIcon).addClass("folder");
+	 				li.selfIcon.addClass("folder");
 				}
 				else { // is leaf
-					$(switchIcon).addClass("node_leaf").css("cursor", "default");
-					$(selfIcon).addClass("leaf");
+					$(li.switchIcon).addClass("node_leaf").css("cursor", "default");
+					li.selfIcon.addClass("leaf");
 				}
 
 				// 添加事件
 				var nThis = this;
-				a.onclick = function(event) {
+				li.a.onclick = function(event) {
 					nThis.active();
 
 					event.node = nThis;
 					eventNodeActived.fire(event);
 				};
-				a.ondblclick = function(event) {
+				li.a.ondblclick = function(event) {
 					nThis.active();
 
 					event.node = nThis;
 					eventNodeDoubleClick.fire(event);
 				};
-				a.oncontextmenu = function(event) {
+				li.a.oncontextmenu = function(event) {
 					nThis.active();
 
 					// 触发右键激活节点事件
@@ -271,8 +277,8 @@
 					eventNodeRightClick.fire(_event);
 				};
 
-				$(switchIcon).click( function() { clickSwich(nThis); } );
-				$(checkbox).click( function() { checkNode(nThis); } );
+				$(li.switchIcon).click( function() { clickSwich(nThis); } );
+				$(li.checkbox).click( function() { checkNode(nThis); } );
 
 				return li;
 			},
@@ -366,9 +372,9 @@
 				parent.li.ul = $.createElement("ul");
  				parent.li.ul.setAttribute("pID", parent.id);
  				parent.li.appendChild(parent.li.ul);
- 				
- 				$(parent.li.switchIcon).removeClass("node_leaf").removeClass("node_close").addClass("node_open");
-				$(".selfIcon", parent.li).removeClass("leaf").addClass("folder");
+
+ 				$(parent.li.switchIcon).removeClasses("node_leaf,node_close").addClass("node_open");
+				parent.li.selfIcon.removeClass("leaf").addClass("folder");
 			}
 
 			parent.li.ul.appendChild(treeNode.toHTMLEl());
@@ -386,8 +392,8 @@
 			var parent = treeNode.parent;
 			parent.children.remove(treeNode);
 			if(parent.children.length == 0) {
-				$(parent.li.switchIcon).removeClass("node_open").removeClass("node_close").addClass("node_leaf");
-				$(".selfIcon", parent.li).removeClass("folder").addClass("leaf");
+				$(parent.li.switchIcon).removeClasses("node_open,node_close").addClass("node_leaf");
+				parent.li.selfIcon.removeClass("folder").addClass("leaf");
 			}
 		},
 
@@ -398,7 +404,7 @@
 		 *			direction		移动方向，-1为目标节点上方，1为目标节点下方
 		 */
 		sortTreeNode: function(from, to, direction) {
-			
+			// TODO
 		},
 
 		moveTreeNode: function(from, to) {
@@ -522,15 +528,6 @@
 	}
 
 	/********************************************* 定义树查找对象 end *********************************************/
-
-	Array.prototype.remove = function(item) {
-        for(var i=0,n=0; i < this.length; i++) {
-            if(this[i] != item) {
-                this[n++] = this[i];
-            }
-        }
-        this.length -= 1;
-    };
 
 	return Tree;
 });

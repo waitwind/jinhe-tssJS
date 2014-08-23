@@ -76,7 +76,7 @@ Tree\:Box li>span.checkstate_2_1 {background-position:0px -48px;}
 Tree\:Box li>span.switch{width:18px; height:18px;}
 Tree\:Box li>span.node_open {background-image:url("../images/tree/minus.gif");}
 Tree\:Box li>span.node_close{background-image:url("../images/tree/plus.gif");}
-Tree\:Box li>span.node_leaf {background:none;}
+Tree\:Box li>span.node_leaf {background:none;cursor:default;}
 
 Tree\:Box li>div.selfIcon {
 	width:16px; height:16px; 

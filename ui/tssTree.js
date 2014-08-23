@@ -150,13 +150,15 @@
 			}
 		},
 
-		TreeNode = function(nodeInfo, parent) {			
-			this.id   = nodeInfo[_TREE_NODE_ID];
-			this.name = nodeInfo[_TREE_NODE_NAME];
+		TreeNode = function(attrs, parent) {			
+			this.id   = attrs[_TREE_NODE_ID];
+			this.name = attrs[_TREE_NODE_NAME];
 
-			this.opened = (nodeInfo._open == "true");
-			this.disabled = nodeInfo[_TREE_NODE_STATE] || "0";  // 状态： 停用/启用  1/0
-			this.checkState = parseInt(nodeInfo[_TREE_NODE_CHECK_STATE] || "0"); /* 节点的选择状态 */
+			this.opened = (attrs._open == "true");
+			this.disabled = attrs[_TREE_NODE_STATE] || "0";  // 状态： 停用/启用  1/0
+			this.checkState = parseInt(attrs[_TREE_NODE_CHECK_STATE] || "0"); /* 节点的选择状态 */
+
+			this.attrs = attrs;
 
 			// 维护成可双向树查找
 			this.children = [];
@@ -176,7 +178,7 @@
 				var current, currentEl, rootEl, ul;
 				while(stack.length > 0) {
 					current = stack.pop();
-					var currentEl = current.toHTMLEl(current);
+					var currentEl = current.toHTMLEl();
 					if(rootEl == null) {
 						rootEl = currentEl;
 					}
@@ -311,9 +313,11 @@
 		tThis.searcher = new Searcher(tThis);
 
 		tThis.checkNode = checkNode;
+		tThis.TreeNode = TreeNode;
 	};
 
 	Tree.prototype = {
+
 		getTreeNodeById: function(id) {
 			var li = this.el.querySelector("li[nodeId='" + id + "']");
 			return li ? li.node : null;
@@ -332,6 +336,10 @@
  			return activeNode
 		},
 
+		getActiveTreeNodeAttr: function(key) {
+			return this.getActiveTreeNode().attrs[key];
+		}, 
+
 		setActiveTreeNode: function(id) {
 			var treeNode = this.getTreeNodeById(id);
 			if(treeNode) {
@@ -340,13 +348,47 @@
 			}
 		},
 
-		addTreeNode: function(nodeInfo, parent) {
-			// 让新增节点出现在可视区域内。
+		// 让新增节点出现在可视区域内。
+		addTreeNode: function(newNode, parent) {
+			parent = parent || this.getActiveTreeNode();
+
+			if(newNode.nodeType) { // xml
+				var nodeAttrs = {};
+				$.each(newNode.attributes, function(j, attr) {
+					nodeAttrs[attr.nodeName] = attr.value;
+				});
+
+				newNode = nodeAttrs;
+			}
+
+			var treeNode = new this.TreeNode(newNode, parent);
+			if(parent.li.ul == null) {
+				parent.li.ul = $.createElement("ul");
+ 				parent.li.ul.setAttribute("pID", parent.id);
+ 				parent.li.appendChild(parent.li.ul);
+ 				
+ 				$(parent.li.switchIcon).removeClass("node_leaf").removeClass("node_close").addClass("node_open");
+				$(".selfIcon", parent.li).removeClass("leaf").addClass("folder");
+			}
+
+			parent.li.ul.appendChild(treeNode.toHTMLEl());
+
+			this.scrollTo(treeNode);
 		},
 
-		removeTreeNode: function(treeNode) {
-			// 删除li
-			// 并从其parent.children中去除
+		// 删除li, 并从其parent.children中去除
+		removeTreeNode: function(treeNode, retainEl) {
+			retainEl = retainEl || false;
+			if( !retainEl ) {
+				$.removeNode(treeNode.li);
+			}
+
+			var parent = treeNode.parent;
+			parent.children.remove(treeNode);
+			if(parent.children.length == 0) {
+				$(parent.li.switchIcon).removeClass("node_open").removeClass("node_close").addClass("node_leaf");
+				$(".selfIcon", parent.li).removeClass("folder").addClass("leaf");
+			}
 		},
 
 		/*
@@ -355,19 +397,30 @@
 		 *			to		目标节点TreeNode对象
 		 *			direction		移动方向，-1为目标节点上方，1为目标节点下方
 		 */
-		moveTreeNode: function(from, to, direction) {
-			from.moveTo(to, direction);
+		sortTreeNode: function(from, to, direction) {
+			
 		},
 
- 		getIds: function(includeHalfChecked) {
- 			var checkedNodes = this.getCheckedNodes(includeHalfChecked);
- 			var checkedNodeIds = [];
-			checkedNodes.each(function(i, node){
-				checkedNodeIds.push(node.id);
-			});
+		moveTreeNode: function(from, to) {
+			var temp = to;
+			while(temp == to.parent) {
+				if(temp == from) {
+					return alert("不能向自己的内部节点移动。"); // 不能移动到子节点里
+				}
+			}
 
-			return checkedNodeIds;
- 		},
+			this.removeTreeNode(from); // 将from从其原parent.children里剔除
+
+			from.parent = to;
+			to.parent.children.push(from);
+
+			if(to.li.ul == null) {
+				to.li.ul = $.createElement("ul");
+ 				to.li.ul.setAttribute("pID", to.id);
+ 				to.li.appendChild(to.li.ul);
+			}
+			to.li.ul.appendChild(from.li);
+		},
 
  		searchNode: function(searchStr) {
  			this.searcher.search(searchStr)
@@ -383,6 +436,16 @@
  			}
 
  			this.el.scrollTop = treeNode.li.offsetTop - this.el.clientHeight / 2;
+ 		},
+
+ 		getCheckedIds: function(includeHalfChecked) {
+ 			var checkedNodes = this.getCheckedNodes(includeHalfChecked);
+ 			var checkedNodeIds = [];
+			checkedNodes.each(function(i, node){
+				checkedNodeIds.push(node.id);
+			});
+
+			return checkedNodeIds;
  		},
 
  		getCheckedNodes: function(includeHalfChecked) {
@@ -416,10 +479,7 @@
 					this.checkNode(li.node);
 				}
 			} 
- 		},
-
- 		// calculateParent
-
+ 		}
 	};
 
 	/********************************************* 定义树查找对象 start *********************************************/
@@ -462,6 +522,15 @@
 	}
 
 	/********************************************* 定义树查找对象 end *********************************************/
+
+	Array.prototype.remove = function(item) {
+        for(var i=0,n=0; i < this.length; i++) {
+            if(this[i] != item) {
+                this[n++] = this[i];
+            }
+        }
+        this.length -= 1;
+    };
 
 	return Tree;
 });

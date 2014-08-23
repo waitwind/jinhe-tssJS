@@ -342,7 +342,7 @@
             /* 负责生成对象唯一编号（为了兼容FF） */
             "uid": 0,
             "getUniqueID": function(prefix) {
-                return (prefix || "_default_id_") + String($.uid ++ );
+                return (prefix || "_") + String($.uid ++ );
             },
 
             // 获取当前时间的便捷函数

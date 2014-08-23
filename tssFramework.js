@@ -1,3 +1,325 @@
+//////////////////////////////////////////////////////////////////////////////
+//		                      Tree 的 公用函数	   	                                //
+//////////////////////////////////////////////////////////////////////////////
+  
+
+
+function getActiveTreeNode(treeName) {
+	var tree = $T(treeName || "tree");
+	var treeNode = tree.getActiveTreeNode();
+	return treeNode; 
+}
+
+/*
+ *	获取树节点属性
+ *	参数：	string:name         属性名
+ *	返回值：string:value        属性值
+ */
+function getTreeAttribute(name, treeName) {
+	var treeNode = getActiveTreeNode();
+	if( treeNode ) {
+		return treeNode.getAttribute(name);
+	}
+	return null;   
+}
+
+function getTreeNodeId() {
+	return getTreeAttribute(_TREE_NODE_ID);
+}
+
+function getTreeNodeName() {
+	return getTreeAttribute(_TREE_NODE_NAME);
+}
+
+function isTreeNodeDisabled() {
+	return getTreeAttribute(_TREE_NODE_STATE) == "1";
+}
+
+function isTreeRoot() {
+	return "_rootId" == getTreeNodeId();
+}
+
+/*
+ *	修改树节点属性
+ *	参数：  string:id               树节点id
+			string:attrName         属性名
+			string:attrValue        属性值
+			string:refresh          是否刷新树
+ *	返回值：
+ */
+function modifyTreeNode(id, attrName, attrValue, refresh, treeName) {
+	var tree = $T(treeName || "tree");
+	var treeNode = tree.getTreeNodeById(id);
+	if( treeNode ) {
+		treeNode.setAttribute(attrName, attrValue);
+	}
+	if( refresh ) {
+		tree.reload();
+	}
+}
+
+/*
+ *	添加子节点
+ *	参数：	string:id           树节点id
+			XmlNode:xmlNode     XmlNode实例
+ */
+function appendTreeNode(id, xmlNode, treeName) {
+	var tree = $T(treeName || "tree");
+	var treeNode = tree.getTreeNodeById(id);
+	if( treeNode && xmlNode ) {
+		tree.insertTreeNodeXml(xmlNode, treeNode);
+	}
+}
+
+/*
+ *	获取树全部节点id数组
+ *	参数：	XmlNode:xmlNode         XmlNode实例
+			string:xpath            选取节点xpath
+ *	返回值：Array:Ids               节点id数组
+ */
+function getTreeNodeIds(xmlNode, xpath) {
+	  var idArray = [];
+	  var treeNodes = xmlNode.selectNodes(xpath || "./treeNode//treeNode");
+	  for(var i=0; i < treeNodes.length; i++) {
+		  var curNode = treeNodes[i];
+		  var id = curNode.getAttribute(_TREE_NODE_ID);
+		  if( id ) {
+			  idArray.push(id);
+		  }
+	  }
+	  return idArray;
+}
+ 
+/*
+ *	清除tree数据
+ *	参数：	Element:treeObj         tree控件对象
+ */
+function clearTreeData(treeObj) {
+	var xmlReader = new XmlReader("<actionSet/>");
+	var emptyNode = new XmlNode(xmlReader.documentElement);
+	treeObj.load(emptyNode.node);
+}    
+
+/* 根据条件将部分树节点设置为不可选状态 */
+function disableTreeNodes(treeXML, xpath) {
+	var nodeLsit = treeXML.selectNodes(xpath);
+	if(nodeLsit) {
+		for(var i = 0; i < nodeLsit.length; i++) {
+			nodeLsit[i].setAttribute("canselected", "0");
+		}
+	}
+}
+
+function disableSingleTreeNode(treeXML, xpath) {
+	var node = treeXML.selectSingleNode(xpath);
+	if(node) {
+		node.setAttribute("canselected", "0");
+	}
+}
+			
+/*
+ *	删除树选中节点
+ *	参数：	Element:treeObj         tree控件对象
+			Array:exceptIds         例外的id
+ */
+function removeTreeNode(treeObj, exceptIds) {
+	exceptIds = exceptIds || ["_rootId"];
+
+	var selectedNodes = treeObj.getSelectedTreeNode();
+	for(var i=0; i < selectedNodes.length; i++) {
+		var curNode = selectedNodes[i];
+		var id = curNode.getId();
+
+		var flag = true;
+		for(var j=0; j < exceptIds.length; j++) {
+			if(id == exceptIds[j]) {
+				flag = false;
+				break;
+			}
+		}
+
+		if(flag) {
+			treeObj.removeTreeNode(curNode);
+		}
+	}
+}
+
+/*
+ *	将树选中节点添加到另一树中(注：过滤重复id节点，并且结果树只有一层结构)
+ *	参数：	Element:fromTree         树控件
+			Element:toTree           树控件
+			Function:checkFunction      检测单个节点是否允许添加
+ */
+function addTreeNode(fromTree, toTree, checkFunction) {	
+	var reload = false;
+	var selectedNodes = fromTree.getSelectedTreeNode(false);	
+	for(var i=0; i < selectedNodes.length; i++) {
+		var curNode = selectedNodes[i];
+
+		if("0" == curNode.getAttribute("canselected")) {
+			continue;  // 过滤不可选择的节点
+		}
+
+		curNode.setSelectedState(0, true, true);
+
+		if( checkFunction ) {
+			var result = checkFunction(curNode);
+			if( result && result.error ) {
+				// 显示错误信息
+				if( result.message ) {
+					var balloon = Balloons.create(result.message);
+					balloon.dockTo(toTree.element);
+				}
+
+				if( result.stop ) {
+					return;
+				}
+				continue;
+			}
+		}
+
+		var groupName = curNode.getName();
+		var id = curNode.getId();
+
+		var sameAttributeTreeNode = hasSameAttributeTreeNode(toTree, _TREE_NODE_ID, id);
+		if("_rootId" != id && false == sameAttributeTreeNode) {
+			// 至少有一行添加才刷新Tree
+			reload = true;
+
+			// 排除子节点
+			var treeNode = toTree.getTreeNodeById("_rootId");
+			if( treeNode ) {
+				var cloneNode = curNode.node.cloneNode(false);
+				toTree.insertTreeNodeXml(cloneNode, treeNode);
+			}
+		}
+	}
+
+	if( reload ) {
+		toTree.reload();
+	}
+	fromTree.reload();
+}
+
+/*
+ *	检测是否有相同属性节点
+ *	参数：	Element:treeObj         tree控件对象
+			string:attrName         属性名
+			string:attrValue        属性值
+ */
+function hasSameAttributeTreeNode(treeObj, attrName, attrValue) {
+	var flag = false;
+	var root = treeObj.getTreeNodeById("_rootId").node;
+	var treeNode = root.selectSingleNode(".//treeNode[@" + attrName + "='" + attrValue + "']");
+	if( treeNode ) {
+		flag = true;
+		flag.treeNode = treeNode;
+	}
+	return flag;
+}
+
+// 删除选中节点，适用于多层结构树
+function delTreeNode(url, treeName) {
+	if( !confirm("您确定要删除该节点吗？") )  return;
+
+	var tree = $T(treeName || "tree");
+	var treeNode = tree.getActiveTreeNode();
+	Ajax({
+		url : (url || URL_DELETE_NODE) + treeNode.getId(),
+		method : "DELETE",
+		onsuccess : function() { 
+			var parentNode = treeNode.getParent();
+			if( parentNode ) {
+				tree.setActiveTreeNode(parentNode.getId());
+			}
+			tree.removeTreeNode(treeNode);
+		}
+	});	
+}
+
+/*
+ *	停用启用节点
+ *	参数：	url      请求地址
+			state    状态
+ */
+function stopOrStartTreeNode(state, url, treeName) {	
+	if( state == "1" && !confirm("您确定要停用该节点吗？") )  return;
+		
+	var tree = $T(treeName || "tree");
+	var treeNode = tree.getActiveTreeNode();
+	Ajax({
+		url : (url || URL_STOP_NODE) + treeNode.getId() + "/" + state,
+		onsuccess : function() { 
+			// 刷新父子树节点停用启用状态: 启用上溯，停用下溯
+			var curNode = new XmlNode(treeNode.node);
+			refreshTreeNodeState(curNode, state);
+	
+			if("1" == state) {
+				var childNodes = curNode.selectNodes(".//treeNode");
+				for(var i=0; i < childNodes.length; i++) {                
+					refreshTreeNodeState(childNodes[i], state);
+				}
+			} else if ("0" == state) {
+				while( curNode && curNode.getAttribute(_TREE_NODE_ID) > 0 ) {
+					refreshTreeNodeState(curNode, state);
+					curNode = curNode.getParent();
+				}            
+			}
+			
+			tree.reload(); 
+		}
+	});
+}
+
+function refreshTreeNodeState(xmlNode, state) {
+	xmlNode.setAttribute(_TREE_NODE_STATE, state);
+
+	var iconPath = xmlNode.getAttribute("icon");
+	iconPath = iconPath.replace( /_[0,1].gif/gi, "_" + state + ".gif");
+	xmlNode.setAttribute("icon", iconPath); 
+}
+
+// 对同层的树节点进行排序
+function sortTreeNode(url, eventObj, treeName) {
+	var movedNode  = eventObj.movedTreeNode;
+	var targetNode = eventObj.toTreeNode;
+	var direction  = eventObj.moveState; // -1: 往上, 1: 往下
+	var movedNodeID = movedNode.getId();
+ 
+	if(targetNode) {
+		Ajax({
+			url : url + movedNodeID + "/" + targetNode.getId() + "/" + direction,
+			onsuccess : function() { 
+				 $T(treeName || "tree").moveTreeNode(movedNode, targetNode, direction);
+			}
+		});
+	}
+}
+
+// 移动树节点
+function moveTreeNode(tree, id, targetId, url) {
+	Ajax({
+		url : (url || URL_MOVE_NODE) + id + "/" + targetId,
+		onsuccess : function() {  // 移动树节点					
+			var treeNode = tree.getTreeNodeById(id);
+			var xmlNode = new XmlNode(treeNode.node);
+			var parentNode = tree.getTreeNodeById(targetId);
+
+			// 父节点停用则下溯
+			var parentNodeState = parentNode.node.getAttribute(_TREE_NODE_STATE);
+			if("1" == parentNodeState) {
+				refreshTreeNodeState(xmlNode, "1");
+			}
+			parentNode.node.appendChild(treeNode.node);
+			parentNode.node.setAttribute("_open", "true");
+
+			clearOperation(xmlNode);
+
+			tree.reload();
+		}
+	});
+}
+
 Element.show = function(element) {
   element.style.display = "block"; 
   element.style.position = "absolute";  

@@ -123,33 +123,62 @@
 			}
 		},
 
-		/* 根据现有状态改成下一个选择状态，0-->2,  1|2-->0 */
-		checkNode = function(node) {
+		/* 根据现有状态改成下一个选择状态，0-->2,  1|2-->0, 同时改变子节点及父节点的check状态 */
+		checkNode = function(node, excludeDisabledNode) {
+			if( !node.isEnable() && (excludeDisabledNode || true) ) {
+				return;
+			}
+
 			var oldState = node.checkState;
 			switch(oldState) {
 				case 0:
 					node.checkState = 2;
+
+					var parent = node;
+					while(parent = parent.parent) {
+						var oldState = parent.checkState;
+						parent.refreshCheckState(Math.max(oldState, 1));
+					}
+
+					if(!tThis.checkSelf && node.li.ul) {
+						$("li", node.li.ul).each(function(i, childLi){
+							childLi.node.refreshCheckState(2);
+						});
+					}
 					break;
 				case 1:
 				case 2:
 					node.checkState = 0;
+
+					if(!tThis.checkSelf) {
+						$("li", node.li).each(function(i, childLi){
+							childLi.node.refreshCheckState(0);
+						});
+ 
+						var parent = node;
+						while(parent = parent.parent) {
+							calculateParentState(parent);
+						}
+					}
+
 					break;
 			}
 
 			node.refreshCheckState();
+		},
 
-			// TODO 改变子节点及父节点的check状态
-			var parent = node;
-			while(parent = parent.parent) {
-				var oldState = parent.checkState;
-				parent.refreshCheckState(Math.max(oldState, 1));
-			}
+		// 计算父亲节点的checkSate。判断兄弟节点还有没有选中状态的，有则所有父节点一律为半选，无则一律不选
+		calculateParentState = function(parent) {
+			if(parent == null) return;
 
-			if(!tThis.checkSelf) {
-				node.children.each(function(i, child) {
-					child.refreshCheckState(2);
-				});
-			}
+			var hasCheckedChilds = false;
+			parent.children.each(function(i, child){
+				if(child.checkState > 0) {
+					hasCheckedChilds = true;
+				}
+			});
+
+			parent.refreshCheckState( hasCheckedChilds ? 1 : 0 );
 		},
 
 		TreeNode = function(attrs, parent) {			
@@ -306,7 +335,7 @@
 			},
 
 			refreshCheckState: function(newState) {
-				this.checkState = newState || this.checkState;
+				this.checkState = newState != null ? newState : this.checkState;
 				$(this.li.checkbox).removeClass("checkstate_0_" + this.disabled)
 					.removeClass("checkstate_1_" + this.disabled)
 				    .removeClass("checkstate_2_" + this.disabled)
@@ -482,7 +511,7 @@
 			for(var i = 0; i < checkedIds.length; i++) {
 				var li = this.el.querySelector("li[nodeId='" + checkedIds[i] + "']");
 				if(li) {
-					this.checkNode(li.node);
+					this.checkNode(li.node, false);
 				}
 			} 
  		}

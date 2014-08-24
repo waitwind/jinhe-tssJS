@@ -215,6 +215,7 @@
 					}
 					else {
 						ul = rootEl.querySelector("ul[pID ='" + current.parent.id + "']");
+						ul.pNode = current;
 						ul.insertBefore(currentEl, ul.firstChild);
 					}
 
@@ -231,6 +232,7 @@
 			toHTMLEl: function() {
 				var li = $.createElement("li");
 				li.setAttribute("nodeID", this.id);
+				li.draggable = tThis.moveable;
 				li.node = this;
 				this.li = li;
 
@@ -262,15 +264,16 @@
 					this.disable();
 				}
 
+				// 每个节点都可能成为父节点
+				li.ul = $.createElement("ul");
+ 				li.ul.setAttribute("pID", this.id);
+ 				li.appendChild(li.ul);
+
 				if(tThis.treeType == _TREE_TYPE_SINGLE) {
 					$(li.checkbox).addClass("hidden");
 				}
 
-				if(this.children.length > 0) {
-	 				li.ul = $.createElement("ul");
-	 				li.ul.setAttribute("pID", this.id);
-	 				li.appendChild(li.ul);
-
+				if(this.children.length > 0) {	 				
 	 				this.opened = !this.opened;
 	 				clickSwich(this);
 
@@ -308,6 +311,43 @@
 
 				$(li.switchIcon).click( function() { clickSwich(nThis); } );
 				$(li.checkbox).click( function() { checkNode(nThis); } );
+
+				// 添加拖到事件处理
+				$.Event.addEvent(li, "dragstart", function(ev){
+		            var dt = ev.dataTransfer;
+		            dt.effectAllowed = 'move';
+		            dt.setData("text", li.node.id);
+		        }, true);        
+
+		        $.Event.addEvent(li, "dragend", function(ev) {
+		        	ev.dataTransfer.clearData("text");
+			        ev.preventDefault(); // 不执行默认处理，拒绝被拖放
+			    }, true);
+
+
+				$.Event.addEvent(li, "drop", function(ev){
+			        var dt = ev.dataTransfer;
+			        var nodeId = dt.getData("text");
+			        var dragEL = $("li[nodeId='" + nodeId + "']")[0];
+
+			        // 平级拖动，用以排序；暂不支持跨级拖动
+			        if( this.node.parent == dragEL.node.parent ) {
+			        	this.parentNode.insertBefore(dragEL, this);
+
+			        	//触发自定义事件
+						var eObj = $.Event.createEventObject();
+						eObj.dragNode = dragEL.node;
+						eObj.destNode = this.node;
+						eObj.ownTree  = tThis;
+						eventNodeMoved.fire(eObj); 
+			        }					
+
+			        ev.preventDefault();
+			    }, true);
+
+			    $.Event.addEvent(li, "dragover", function(ev) {
+				    ev.preventDefault();
+				}, true);
 
 				return li;
 			},
@@ -397,11 +437,7 @@
 			}
 
 			var treeNode = new this.TreeNode(newNode, parent);
-			if(parent.li.ul == null) {
-				parent.li.ul = $.createElement("ul");
- 				parent.li.ul.setAttribute("pID", parent.id);
- 				parent.li.appendChild(parent.li.ul);
-
+			if( $("li", parent.li.ul).length == 0 ) {
  				$(parent.li.switchIcon).removeClasses("node_leaf,node_close").addClass("node_open");
 				parent.li.selfIcon.removeClass("leaf").addClass("folder");
 			}
@@ -449,11 +485,6 @@
 			from.parent = to;
 			to.parent.children.push(from);
 
-			if(to.li.ul == null) {
-				to.li.ul = $.createElement("ul");
- 				to.li.ul.setAttribute("pID", to.id);
- 				to.li.appendChild(to.li.ul);
-			}
 			to.li.ul.appendChild(from.li);
 		},
 

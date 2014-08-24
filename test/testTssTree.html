@@ -50,10 +50,12 @@ function init() {
 				console.log(event.node.id);
 			}
 			tree1.onTreeNodeDoubleClick = function(event) {
-				alert("编辑树节点：" + event.node.name);
+				alert("双击树节点：" + event.node.name);
 			}
 			tree1.onTreeNodeMoved = function(event) {
-				// sortTreeNode(URL_SORT_NODE, eventObj);
+				console.log(event.dragNode.name);
+				console.log(event.destNode.name);
+				// do move
 			}
 			tree1.onTreeNodeRightClick = function(event) {
 				// 显示右键菜单
@@ -73,6 +75,22 @@ function init() {
  
 
 	initMenus();
+
+	$1("tempUL").ondrop = function(ev){
+        var dt = ev.dataTransfer;
+        var nodeId = dt.getData("text");
+        this.appendChild($("li[nodeId='" + nodeId + "']")[0]);
+
+        ev.preventDefault();
+    };
+
+    $1("tempUL").ondragover = function(ev) {
+	    ev.preventDefault();
+	};
+
+    $1("tempUL").ondragenter = function(ev) {
+	    this.style.backgroundColor = "yellow";
+	};
 }
 
 function initMenus() {
@@ -162,7 +180,7 @@ window.onload = init;
 		</tr>
 		<tr height="350">
 			<td>
-				<Tree:Box id="tree" treeType="single"></Tree:Box>
+				<Tree:Box id="tree" treeType="single" moveable="true"></Tree:Box>
 			</td>
 			<td>
 				<Tree:Box id="tree2" treeType="multi" selectSelf="false"></Tree:Box>
@@ -174,7 +192,7 @@ window.onload = init;
 				<input type="button" value="移动节点" onclick="moveTreeNode(9, -2);"/>
 				<input type="button" value="隐藏图标" onclick="hideSelfIcon();"/>
 				<br/>-
-				<input type="button" value="搜索" onclick="$.T('tree').searchNode('子组');"/>
+				<input type="button" value="搜索[研发]" onclick="$.T('tree').searchNode('研发');"/>
 			</td>
 			<td>-
 				<input type="button" value="获取选中节点" onclick="alert($.T('tree2').getCheckedIds(false));"/>
@@ -182,6 +200,8 @@ window.onload = init;
 			</td>
 		</tr>
 	</table>
+
+	<ul id="tempUL" style="height:30px;width:100px;background-color:red;"></ul>
 
 </body>
 </html>

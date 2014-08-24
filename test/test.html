@@ -1,163 +1,111 @@
-<!DOCTYPE HTML>
-<html>
-    
-    <head>
-        <meta charset="utf8">
-        <title> table </title>
-    </head>
-    
-    <body>
-        <table id="tb_1" cellspacing="0" cellpadding="2" width="100%" border="1">
-            <tbody>
-                <tr align="center" bgcolor="#dcdcdc">
-                    <td style="width:100px;">
-                        用户编号
-                    </td>
-                    <td>
-                        试用时间
-                    </td>
-                    <td>
-                        转正时间
-                    </td>
-                    <td>
-                        性别
-                    </td>
-                    <td>
-                        姓名拼音
-                    </td>
-                    <td>
-                        生日时间
-                    </td>
-                    <td>
-                        民族
-                    </td>
-                    <td>
-                        身高
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        2000001
-                    </td>
-                    <td>
-                        1997-3-13
-                    </td>
-                    <td>
-                        1997-3-13
-                    </td>
-                    <td>
-                        1
-                    </td>
-                    <td>
-                        WZJ
-                    </td>
-                    <td>
-                        1965-3-13
-                    </td>
-                    <td>
-                        汉
-                    </td>
-                    <td>
-                        171
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        2000045
-                    </td>
-                    <td>
-                        2001-2-15
-                    </td>
-                    <td>
-                        2001-3-15
-                    </td>
-                    <td>
-                        0
-                    </td>
-                    <td>
-                        WY
-                    </td>
-                    <td>
-                        1978-8-5
-                    </td>
-                    <td>
-                        汉
-                    </td>
-                    <td>
-                        162
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        2000046
-                    </td>
-                    <td>
-                        2001-2-23
-                    </td>
-                    <td>
-                        2001-3-23
-                    </td>
-                    <td>
-                        0
-                    </td>
-                    <td>
-                        LQ
-                    </td>
-                    <td>
-                        2001-2-23
-                    </td>
-                    <td>
-                        汉
-                    </td>
-                    <td>
-                        171
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <script type="text/javascript">
-            var tTD; //用来存储当前更改宽度的Table Cell,避免快速移动鼠标的问题 
-            var table = document.getElementById("tb_1");
-            for (j = 0; j < table.rows[0].cells.length; j++) {
-                table.rows[0].cells[j].onmousedown = function() {
-                    //记录单元格 
-                    tTD = this;
-                    if (event.offsetX > tTD.offsetWidth - 10) {
-                        tTD.mouseDown = true;
-                        tTD.oldX = event.x;
-                        tTD.oldWidth = tTD.offsetWidth;
-                    }
-                };
-                table.rows[0].cells[j].onmouseup = function() {
-                    // 结束宽度调整 
-                    if (tTD == undefined) tTD = this;
-                    tTD.mouseDown = false;
-                    tTD.style.cursor = 'default';
-                };
-                table.rows[0].cells[j].onmousemove = function() {
-                    //更改鼠标样式 
-                    if (event.offsetX > this.offsetWidth - 10) this.style.cursor = 'col-resize';
-                    else this.style.cursor = 'default';
-                    //取出暂存的Table Cell 
-                    if (tTD == undefined) tTD = this;
-                    //调整宽度 
-                    if (tTD.mouseDown != null && tTD.mouseDown == true) {
-                        tTD.style.cursor = 'default';
-                        
-                        if (tTD.oldWidth + (event.x - tTD.oldX) > 0) tTD.width = tTD.oldWidth + (event.x - tTD.oldX);
-                        //调整列宽 
-                        tTD.style.width = tTD.width;
-                        tTD.style.cursor = 'col-resize';
-                        //调整该列中的每个Cell 
-                        table = tTD;
-                        while (table.tagName != 'TABLE') table = table.parentElement;
-                        for (j = 0; j < table.rows.length; j++) {
-                            table.rows[j].cells[tTD.cellIndex].width = tTD.width;
-                        }
-                    }
-                };
-            }
-        </script>
-    </body>
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>html5 drag &amp; drop 拖拽与拖放测试</title>
+<style>
+body{font-size:84%;}
+.dustbin{width:100px; height:260px; line-height:1.4; background-color:gray; font-size:36px; font-family:"微软雅黑", "Yahei Mono"; text-align:center; text-shadow:-1px -1px #bbb; float:left;}
+.dragbox{width:500px; padding-left:20px; float:left;}
+.draglist{padding:10px; margin-bottom:5px; border:2px dashed #ccc; background-color:#eee; cursor:move;}
+.draglist:hover{border-color:#cad5eb; background-color:#f0f3f9;}
+.dragremind{padding-top:2em; clear:both;}
+</style>
+</head>
+
+<body>
+<div class="dustbin"><br />垃<br />圾<br />箱</div>
+<div class="dragbox">
+    <div class="draglist" title="拖拽我" draggable="true">列表1</div>
+    <div class="draglist" title="拖拽我" draggable="true">列表2</div>
+    <div class="draglist" title="拖拽我" draggable="true">列表3</div>
+    <div class="draglist" title="拖拽我" draggable="true">列表4</div>
+    <div class="draglist" title="拖拽我" draggable="true">列表5</div>
+    <div class="draglist" title="拖拽我" draggable="true">列表6</div>
+</div>
+<div class="dragremind"></div>
+<script>
+var $ = function(selector) {
+    if (!selector) { return []; }
+    var arrEle = [];
+    if (document.querySelectorAll) {
+        arrEle = document.querySelectorAll(selector);
+    } else {
+        var oAll = document.getElementsByTagName("div"), lAll = oAll.length;
+        if (lAll) {
+            var i = 0;
+            for (i; i<lAll; i+=1) {
+                if (/^\./.test(selector)) {
+                    if (oAll[i].className === selector.replace(".", "")) {
+                        arrEle.push(oAll[i]);
+                    }
+                } else if(/^#/.test(selector)) {
+                    if (oAll[i].id === selector.replace("#", "")) {
+                        arrEle.push(oAll[i]);
+                    }
+                }
+            }
+        }
+    }
+    return arrEle;
+};
+
+var eleDustbin = $(".dustbin")[0], 
+    eleDrags = $(".draglist"), 
+    lDrags = eleDrags.length, 
+    eleRemind = $(".dragremind")[0], 
+    eleDrag = null;
+
+for (var i=0; i<lDrags; i+=1) {
+    eleDrags[i].onselectstart = function() {
+        return false;
+    };
+    eleDrags[i].ondragstart = function(ev) {
+        ev.dataTransfer.effectAllowed = "move";
+        ev.dataTransfer.setData("text", ev.target.innerHTML);
+        ev.dataTransfer.setDragImage(ev.target, 0, 0);
+        eleDrag = ev.target;
+        return true;
+    };
+    eleDrags[i].ondragend = function(ev) {
+        ev.dataTransfer.clearData("text");
+        eleDrag = null;
+        return false
+    };
+}
+
+eleDustbin.ondragover = function(ev) {
+    ev.preventDefault();
+    return true;
+};
+
+eleDustbin.ondragenter = function(ev) {
+    this.style.color = "#ffffff";
+    return true;
+};
+eleDustbin.ondrop = function(ev) {
+    if (eleDrag) {
+        eleRemind.innerHTML = '<strong>"' + eleDrag.innerHTML + '"</strong>被扔进了垃圾箱';
+        eleDrag.parentNode.removeChild(eleDrag);
+    }
+    this.style.color = "#000000";
+    return false;
+};
+
+</script>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-11205167-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script');
+     ga.type = 'text/javascript';
+     ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+</body>
 </html>

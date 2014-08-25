@@ -1,8 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
-//		                      Tree 的 公用函数	   	                                //
-//////////////////////////////////////////////////////////////////////////////
-  
-
+/*********************** Tree 的 公用函数 **********************************/
 
 function getActiveTreeNode(treeName) {
 	var tree = $T(treeName || "tree");
@@ -10,11 +6,6 @@ function getActiveTreeNode(treeName) {
 	return treeNode; 
 }
 
-/*
- *	获取树节点属性
- *	参数：	string:name         属性名
- *	返回值：string:value        属性值
- */
 function getTreeAttribute(name, treeName) {
 	var treeNode = getActiveTreeNode();
 	if( treeNode ) {
@@ -44,17 +35,15 @@ function isTreeRoot() {
  *	参数：  string:id               树节点id
 			string:attrName         属性名
 			string:attrValue        属性值
-			string:refresh          是否刷新树
- *	返回值：
  */
-function modifyTreeNode(id, attrName, attrValue, refresh, treeName) {
+function modifyTreeNode(id, attrName, attrValue, treeName) {
 	var tree = $T(treeName || "tree");
 	var treeNode = tree.getTreeNodeById(id);
 	if( treeNode ) {
-		treeNode.setAttribute(attrName, attrValue);
-	}
-	if( refresh ) {
-		tree.reload();
+		treeNode.attrs[attrName] = attrValue;
+		if(attrName == "name") {
+			treeNode.li.a.innerText = activeNode.li.a.title = "天地玄黄";
+		}
 	}
 }
 

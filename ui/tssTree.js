@@ -330,11 +330,9 @@
 			        var nodeId = dt.getData("text");
 			        var dragEL = $("li[nodeId='" + nodeId + "']")[0];
 
-			        // 平级拖动，用以排序；暂不支持跨级拖动
+			        // 平级拖动，用以排序.暂不支持跨级拖动
 			        if( this.node.parent == dragEL.node.parent ) {
-			        	this.parentNode.insertBefore(dragEL, this);
-
-			        	//触发自定义事件
+			        	// 触发自定义事件
 						var eObj = $.Event.createEventObject();
 						eObj.dragNode = dragEL.node;
 						eObj.destNode = this.node;
@@ -380,6 +378,18 @@
 					.removeClass("checkstate_1_" + this.disabled)
 				    .removeClass("checkstate_2_" + this.disabled)
 				    .addClass("checkstate_" + this.checkState + "_" + this.disabled);
+			},
+
+			getAttribute: function(name) {
+				return this.attrs["name"];
+			},
+
+			setAttribute: function(name, value) {
+				if(value) {
+					this.attrs["name"] = value;
+				} else {
+					delete this.attrs["name"];
+				}
 			}
 		};
 		/********************************************* 定义树节点TreeNode end *********************************************/
@@ -463,15 +473,10 @@
 		},
 
 		/*
-		 * 跟据目标节点和移动状态，移动节点位置。
+		 * 移动节点位置。
 		 * 参数：	from	移动节点TreeNode对象
 		 *			to		目标节点TreeNode对象
-		 *			direction		移动方向，-1为目标节点上方，1为目标节点下方
 		 */
-		sortTreeNode: function(from, to, direction) {
-			// TODO
-		},
-
 		moveTreeNode: function(from, to) {
 			var temp = to;
 			while(temp == to.parent) {
@@ -486,6 +491,10 @@
 			to.parent.children.push(from);
 
 			to.li.ul.appendChild(from.li);
+		},
+
+		sortTreeNode: function(dragNode, destNode) {
+			destNode.li.parentNode.insertBefore(dragNode.li, destNode.li);
 		},
 
  		searchNode: function(searchStr) {
@@ -549,7 +558,6 @@
 	};
 
 	/********************************************* 定义树查找对象 start *********************************************/
-
 	var Searcher = function(tree) {
 		var findedNodes, currentIndex, lastSearchStr;
 
@@ -586,8 +594,6 @@
 			tree.scrollTo(node);
 		}
 	}
-
-	/********************************************* 定义树查找对象 end *********************************************/
 
 	return Tree;
 });

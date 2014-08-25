@@ -643,7 +643,6 @@
             if (className) {
                 $(element).addClass(className)
             }
- 
             return element;
         },
 
@@ -950,11 +949,11 @@
                 if( func ) {
                     var funcType = typeof(func);
                     if("string" == funcType) {
-                        eval(func);
+                        return eval(func);
                     }
                     else if ("function" == funcType) {
                         if(event) event._source = obj;
-                        func(event);
+                        return func(event);
                     }
                 }
             }

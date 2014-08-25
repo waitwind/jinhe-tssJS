@@ -55,7 +55,7 @@ function init() {
 			tree1.onTreeNodeMoved = function(event) {
 				console.log(event.dragNode.name);
 				console.log(event.destNode.name);
-				// do move
+				event.ownTree.sortTreeNode(event.dragNode, event.destNode);
 			}
 			tree1.onTreeNodeRightClick = function(event) {
 				// 显示右键菜单

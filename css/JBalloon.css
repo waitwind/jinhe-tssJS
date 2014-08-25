@@ -9,7 +9,7 @@
 	font-size: 12px;
 	vertical-align:top;
 	word-break:break-all;
-	background-image:url(../images/balloon_bg.gif);
+	background-image:url(../images/balloon/bg.gif);
 }
 .balloon .content div {
 	height:40px;
@@ -18,19 +18,19 @@
  
 .balloon .arrow_1 {
 	margin-top:-3px;
-	background-image:url(../images/balloon_01.gif);
+	background-image:url(../images/balloon/01.gif);
 }
 .balloon .arrow_2 {
 	margin-top:-3px;
 	margin-left:-30px;
-	background-image:url(../images/balloon_02.gif);	
+	background-image:url(../images/balloon/02.gif);	
 }
 .balloon .arrow_3{
 	margin-top:1px;
-	background-image:url(../images/balloon_03.gif);
+	background-image:url(../images/balloon/03.gif);
 }
 .balloon .arrow_4{
 	margin-top:1px;
 	margin-left:-30px;
-	background-image:url(../images/balloon_04.gif);
+	background-image:url(../images/balloon/04.gif);
 }

@@ -4,14 +4,14 @@
 	<meta charset="UTF-8"/>
 	<title>Tree test</title>
 
-	<link href="../css/tss.css" rel="stylesheet">
-	<link href="../css/JMenu.css" rel="stylesheet">
-	<link href="../css/tssTree.css" rel="stylesheet">
+	<link href="../css/tss.common.css" rel="stylesheet">
+	<link href="../css/tss.menu.css" rel="stylesheet">
+	<link href="../css/tss.tree.css" rel="stylesheet">
 
-	<script src="../tssJS.js"></script>
-	<script src="../tssAjax.js"></script>
-	<script src="../ui/JMenu.js"></script>
-	<script src="../ui/tssTree.js"></script>
+	<script src="../src/tssJS.js"></script>
+	<script src="../src/tssJS.ajax.js"></script>
+	<script src="../src/tssJS.menu.js"></script>
+	<script src="../src/tssJS.tree.js"></script>
 
 <style type="text/css">
  
@@ -101,7 +101,8 @@ function initMenus() {
             alert("编辑树节点：" + $.T("tree").getActiveTreeNodeAttr("name"));
 
             activeNode.attrs["name"] = "天地玄黄";
-            activeNode.li.a.innerText = activeNode.li.a.title = "天地玄黄";
+            activeNode.li.a.title = "天地玄黄";
+            $(activeNode.li.a).html("天地玄黄");
         }
     }
     var item2 = {

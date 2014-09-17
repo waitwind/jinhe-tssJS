@@ -4,13 +4,11 @@
 	<meta charset="UTF-8" />
 	<title>tssJS test</title>
 
-	<script src="../tssJS.js"></script>
+	<script src="../src/tssJS.js"></script>
  
 	<style>
 
-		.cc {
-			width: 250px;
-		}
+		.cc { width: 250px; }
 	
 	</style>
 
@@ -80,8 +78,8 @@
  	}); 
  	$.assertEquals("9", array2[0].y, "$.grep() error.");
 
- 	$.assertEquals("_default_id_0", $.getUniqueID(), "$.getUniqueID() error.");
- 	$.assertEquals("_default_id_1", $.getUniqueID(), "$.getUniqueID() error.");
+ 	$.assertEquals("_0", $.getUniqueID(), "$.getUniqueID() error.");
+ 	$.assertEquals("_1", $.getUniqueID(), "$.getUniqueID() error.");
 
  	console.log((new Date()).format("yyyy-MM-dd"));
  
@@ -136,10 +134,6 @@
 
 		$.assertEquals(1, $.getNSElements(document.body, "Page", "WorkSpace").length);
 		$.assertEquals(1, $("WorkSpace\\:Page").size());
-
-		$.insertHtml("afterEnd", newElement, "<div>test insertHtml afterEnd</div>");
-		$.insertHtml("afterBegin", newElement, "<div>test insertHtml afterBegin 1</div>");
-		$.insertHtml("afterBegin", newElement, "<div>test insertHtml afterBegin 2</div>");
 
 		$.createScript("console.log('test createScript')");
 
@@ -215,7 +209,7 @@
 
 	var xmlNode4 = $.XML.appendCDATA("test", "1<>2");
 	$.assertEquals("<test><![CDATA[1<>2]]></test>",$.XML.toString(xmlNode4));
-	$.assertEquals("1<>2", $.XML.getCDATA(xmlNode4, "test"));
+	$.assertEquals("1<>2", $.XML.getText(xmlNode4));
 
 	var xmlNode5 = $.XML.toNode("<p></p>")
 	$.XML.setCDATA(xmlNode5, "test", "3<>4");
@@ -229,12 +223,6 @@
 	// } catch (e) {
 	// 	console.log($.XML.getParseError(xmlDom));
 	// }
-
-	// console.log(xml.selectNodes("/book/year")[0]);
-	// console.log(xmlNode.selectNodes("/book/year")[0]);
-
-	// console.log(xml.selectSingleNode("/book/author"));
-	// console.log(xmlNode.selectSingleNode("/book/author"));
 
 	</script>
 </head>

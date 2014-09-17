@@ -1,4 +1,3 @@
-
 ;(function ($, factory) {
 
     $.Balloon = factory();
@@ -32,53 +31,53 @@
  
         /* 生成气球型提示界面 */
         Balloon = function (content) {
-            this.object = $.createElement("div", _STYLE_BALLOON);
+            this.el = $.createElement("div", _STYLE_BALLOON);
 
             var html = "<table>";
             html += "   <tr><td></td></tr>";
             html += "   <tr><td class='content'><div>" + content + "</div></td></tr>";        
             html += "   <tr><td></td></tr>";
             html += "</table>";
-            this.object.innerHTML = html;
+            this.el.innerHTML = html;
 
-    		// 绑定事件，鼠标按下后气球消失
-    		$.Event.addEvent(document, "mousedown", dispose);
+            // 绑定事件，鼠标按下后气球消失
+            $.Event.addEvent(document, "mousedown", dispose);
         };
      
         /*
-         *	定位气球
-         *	参数：  number:x		坐标x
-                    number:y		坐标y
-    				number:delay	延时
-    				------------------------------------
-    				object:x		作为参考点的目标对象
-    				number:y		延时
+         *  定位气球
+         *  参数：  number:x       坐标x
+                    number:y        坐标y
+                    number:delay    延时
+                    ------------------------------------
+                    object:x        作为参考点的目标对象
+                    number:y        延时
          */
         Balloon.prototype.dockTo = function(x, y, delay) {
             if(typeof(x) == "object" && x.nodeType) {
                 var position = $.absPosition(x);
                 this.dockTo(position.left + x.offsetWidth/2, position.top - x.offsetHeight + 8, y);
             }
-    		else if(typeof(x) == "number") {
-    			var type = 1;
-    			if( (x + _SIZE_BALLOON_CONTENT_WIDTH) > (document.body.clientWidth + document.body.scrollLeft) ) {
-    				x -= _SIZE_BALLOON_CONTENT_WIDTH;
-    				type += 1;
-    			}
-    			if( (y - _SIZE_BALLOON_CONTENT_HEIGHT - _SIZE_BALLOON_ARROW_HEIGHT) < document.body.scrollTop) {
-    				type += 2;
-    			}
-    			else {
-    				y -= _SIZE_BALLOON_CONTENT_HEIGHT + _SIZE_BALLOON_ARROW_HEIGHT;            
-    			}
+            else if(typeof(x) == "number") {
+                var type = 1;
+                if( (x + _SIZE_BALLOON_CONTENT_WIDTH) > (document.body.clientWidth + document.body.scrollLeft) ) {
+                    x -= _SIZE_BALLOON_CONTENT_WIDTH;
+                    type += 1;
+                }
+                if( (y - _SIZE_BALLOON_CONTENT_HEIGHT - _SIZE_BALLOON_ARROW_HEIGHT) < document.body.scrollTop) {
+                    type += 2;
+                }
+                else {
+                    y -= _SIZE_BALLOON_CONTENT_HEIGHT + _SIZE_BALLOON_ARROW_HEIGHT;            
+                }
 
-                $(this.object).css("zIndex", NEXT_ZINDEX++).css("left", x + "px").css("top", y + "px");
+                $(this.el).css("zIndex", NEXT_ZINDEX++).css("left", x + "px").css("top", y + "px");
 
                 /* 添加气球箭头  */
                 var arrow = $.createElement("div", "arrow_" + type);
                 $(arrow).css("width", "30px").css("height", "15px") ;
 
-                var td = $("tr", this.object)[ (type <= 2) ? 2 : 0].childNodes[0];
+                var td = $("tr", this.el)[ (type <= 2) ? 2 : 0].childNodes[0];
                 td.appendChild(arrow);
                 if(type == 1 || type == 3) {
                     td.insertBefore(arrow, td.firstChild);
@@ -90,7 +89,7 @@
                 clearTimeout(timeout);
                 timeout = setTimeout( dispose, delay || 3000);
 
-    			document.body.appendChild(this.object);
+                document.body.appendChild(this.el);
             }
         };
     

@@ -1,0 +1,14 @@
+Form\:Box { width:100%; display:block; font-size:12px; } 
+Form\:Box .tssForm table { width: 100%; border-width:0px 0px 0px 0px;}
+Form\:Box .tssForm td { padding:2px 2px; border-width:0px; }
+Form\:Box input, Form\:Box textarea { color:#535458; font-size:12px; border:1px solid #ABAAAF; background-color:#ECEFF8; }
+Form\:Box input { height:18px; }
+Form\:Box textarea { word-break:break-all; }
+Form\:Box select{  font-size:12px; height:18px; }
+Form\:Box .radio{ border:0px;  background-color:transparent; }
+Form\:Box .button { background-color:#E4EBF3; border-style:outset;}
+Form\:Box .field_disabled{ border:1px dotted #ABAAAF; background-color:transparent; }
+Form\:Box .hidden{ display:none; }
+Form\:Box input.function { padding-right:18px; }
+Form\:Box .functionBt { display:inline-block;width:20px;height:18px;position:relative;top:4px;left:-21px;background-image:url(../images/icon_function.gif);}
+Form\:Box .notnull { color:red; margin-left:3px; margin-right:5px; }

@@ -1,4 +1,3 @@
-
 ;(function ($, factory) {
 
     $.Calendar = factory($.moment);
@@ -244,9 +243,9 @@
             if (!$.hasClass(target, 'is-disabled')) {
                 if ($.hasClass(target, 'pika-button') && !$.hasClass(target, 'is-empty')) {
                     self.setDate(new Date(self._y, self._m, parseInt(target.innerHTML, 10)));
-	                    window.setTimeout(function() {
-	                        self.hide();
-	                    }, 100);
+                        window.setTimeout(function() {
+                            self.hide();
+                        }, 100);
                     return;
                 }
                 else if ($.hasClass(target, 'pika-prev')) {
@@ -340,7 +339,7 @@
         $.Event.addEvent(self.el, 'change', self._onChange);
 
         if (opts.field) {
-			document.body.appendChild(self.el);
+            document.body.appendChild(self.el);
             $.Event.addEvent(opts.field, 'change', self._onInputChange);
 
             if (!opts.defaultDate) {
@@ -416,7 +415,7 @@
         },
 
         toString: function(format) {
-        	format = format || this._o.format;
+            format = format || this._o.format;
             return !isDate(this._d) ? '' : this._d.format(format);
         },
 
@@ -542,12 +541,12 @@
 
         adjustPosition: function() {
             var field = this._o.trigger, pEl = field,
-	            width = this.el.offsetWidth, 
-	            height = this.el.offsetHeight,
-	            viewportWidth  = window.innerWidth || document.documentElement.clientWidth,
-	            viewportHeight = window.innerHeight || document.documentElement.clientHeight,
-	            scrollTop = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop,
-	            left, top, clientRect;
+                width = this.el.offsetWidth, 
+                height = this.el.offsetHeight,
+                viewportWidth  = window.innerWidth || document.documentElement.clientWidth,
+                viewportHeight = window.innerHeight || document.documentElement.clientHeight,
+                scrollTop = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop,
+                left, top, clientRect;
 
             if (typeof field.getBoundingClientRect === 'function') {
                 clientRect = field.getBoundingClientRect();

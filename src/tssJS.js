@@ -1,5 +1,9 @@
 (function(window, undefined) {
 
+    if( window.attachEvent ) {
+        alert("您当前的IE浏览器版本过低，为能有更好的展示效果，建议升级到IE11，或换最新版Chrome、FireFox。");
+    } 
+    
     var _tssJS = (function() {
 
         // 构建tssJS对象
@@ -182,9 +186,6 @@
 
             // 获取对象的类型
             type: function(obj) {
-                // 通过核心API创建一个对象，不需要new关键字
-                // 普通函数不行
-                // 调用Object.prototype.toString方法，生成 "[object Xxx]"格式的字符串
                 // class2type[ "[object " + name + "]" ] = name.toLowerCase();
                 return obj == null ? String(obj) : class2type[toString.call(obj)] || "object";
             },
@@ -212,7 +213,7 @@
                     return null;
                 }
 
-                // Make sure leading/trailing whitespace is removed (IE can't handle it)
+                // Make sure leading/trailing whitespace is removed 
                 data = tssJS.trim(data);
 
                 // 原生JSON API。反序列化是JSON.stringify(object)
@@ -256,7 +257,7 @@
                     if(tssJS.isFunction(callback)) {
                         returnVal = callback(param);
                     }
-                    else {
+                    else if(callback) {
                         var rightKH = callback.indexOf(")");
                         if(rightKH < 0 && param) {
                             callback = callback + "('" + param + "')";
@@ -322,8 +323,7 @@
                 var ret = [],
                 retVal;
 
-                for (var i = 0,
-                length = elems.length; i < length; i++) {
+                for (var i = 0, length = elems.length; i < length; i++) {
                     retVal = !!callback(elems[i], i);
                     if (retVal) {
                         ret.push(elems[i]);
@@ -429,8 +429,12 @@
 
     window.tssJS = window.$ = _tssJS;
 
-    window.$1 = window.$$ = function(id) {
-        return $("#" + id)[0];
+    window.$1 = function(id) {
+        return $("#" + id.replace(/\./gi, "\\."))[0];
+    }
+
+    window.$$ = function(id) {
+        return document.getElementById(id);
     }
 
 })(window);
@@ -515,6 +519,13 @@
             return this;
         },
 
+        title: function(str) {
+            for (var i = 0; i < this.length; i++) {
+                this[i].title = str;
+            }
+            return this;
+        },
+
         // 设置鼠标移入移出方法
         hover: function(over, out) {
             for (var i = 0; i < this.length; i++) {
@@ -538,9 +549,16 @@
         },
 
         //设置显示
-        show: function() {
+        show: function(block) {
             for (var i = 0; i < this.length; i++) {
-                this[i].style.display = 'block';
+                this[i].style.display = block ? 'block' : '';
+            }
+            return this;
+        },
+
+        focus: function() {
+            if ( this.length > 0 ) {
+                this[0].focus();
             }
             return this;
         },
@@ -555,12 +573,16 @@
 
         // 设置物体居中
         center: function(width, height) {
-            var top  = ($.getInner().height - (width || 100) ) / 2;
-            var left = ($.getInner().width - (height || 100) ) / 2;
+            var left = ($.getInner().width - (width || 100) ) / 2;
+            var top  = ($.getInner().height - (height || 100) ) / 2;
+            return this.position(left, top);
+        },
+
+        position: function(left, top) {
             for (var i = 0; i < this.length; i++) {
                 this[i].style.position = "absolute";
-                this[i].style.top  = top + 'px';
                 this[i].style.left = left + 'px';
+                this[i].style.top  = top + 'px';
             }
             return this;
         },
@@ -671,38 +693,6 @@
             }
         },
 
-        /*
-         * where：插入位置。包括afterBegin,afterEnd。
-         * el：用于参照插入位置的html元素对象
-         * html：要插入的html代码
-         */
-        insertHtml: function(where, el, html) {
-            where = where.toLowerCase();
-            if(el.insertAdjacentHTML) {
-                el.insertAdjacentHTML(where, html);
-                return;
-            }
-
-            var range = el.ownerDocument.createRange();
-            var frag;
-            switch(where){
-                 case "afterbegin":
-                    if(el.firstChild){
-                        range.setStartBefore(el.firstChild);
-                        frag = range.createContextualFragment(html);
-                        el.insertBefore(frag, el.firstChild); 
-                     } else {
-                        el.innerHTML = html;
-                     }
-                    break;
-                case "afterend":
-                    range.setStartAfter(el);
-                    frag = range.createContextualFragment(html);
-                    el.parentNode.insertBefore(frag, el.nextSibling);
-                    break;
-            }
-        },
-
         /* 动态创建脚本 */
         createScript: function(script) {
             var head = document.head || document.getElementsByTagName('head')[0];
@@ -719,14 +709,8 @@
                 opacity = 100;
             }
 
-            if(window.DOMParser) {
-                if(obj.style) {
-                    obj.style.opacity = opacity / 100;
-                }
-            }
-            else {
-                obj.style.filter = "alpha(opacity=" + opacity + ")";
-            }
+            obj.style.opacity = opacity / 100;
+            obj.style.filter = "alpha(opacity=" + opacity + ")";
         },
 
         waitingLayerCount: 0,
@@ -893,17 +877,18 @@
             },
 
             /* 取消事件 */
-            cancel: function(event) { 
-                if (event.preventDefault) {
-                    event.preventDefault();
+            cancel: function(ev) { 
+                ev = ev || window.event;
+                if (ev.preventDefault) {
+                    ev.preventDefault();
                 } else {
-                    event.returnValue = false;
+                    ev.returnValue = false;
                 }
             },
 
             // 获得事件触发对象
-            getSrcElement: function(eventObj) {
-                return eventObj.target || eventObj.srcElement;
+            getSrcElement: function(ev) {
+                return ev.target || ev.srcElement;
             },
 
             /* 使事件始终捕捉对象。设置事件捕获范围。 */
@@ -927,12 +912,12 @@
             },
 
             /* 阻止事件向上冒泡 */
-            cancelBubble: function(eventObj) {
-                if( eventObj.stopPropagation ) {
-                    eventObj.stopPropagation();
+            cancelBubble: function(ev) {
+                if( ev.stopPropagation ) {
+                    ev.stopPropagation();
                 }
                 else {
-                    eventObj.cancelBubble = true;
+                    ev.cancelBubble = true;
                 }
             },
 
@@ -944,16 +929,16 @@
     $.extend({
 
         EventFirer: function(obj, eventName) {
-            this.fire = function (event) {
+            this.fire = function (ev) {
                 var func = obj[eventName];
                 if( func ) {
                     var funcType = typeof(func);
                     if("string" == funcType) {
-                        return eval(func);
+                        return eval(func + "(ev)");
                     }
                     else if ("function" == funcType) {
-                        if(event) event._source = obj;
-                        return func(event);
+                        if(ev) ev._source = obj;
+                        return func(ev);
                     }
                 }
             }
@@ -1006,7 +991,7 @@
             },
 
             getText: function(node) {
-                return node.text || node.textContent || ""; // chrome 用 textContent
+                return node ? (node.text || node.textContent || "").trim() : ""; // chrome 用 textContent
             },
 
             setText: function(node, textValue) {
@@ -1029,8 +1014,9 @@
             },
 
             createCDATA: function(data) {
+                data = String(data).convertCDATA();
                 if(window.DOMParser) {
-                    return $.XML.toNode("<root><![CDATA[" + data + "]]></root>").firstChild;
+                    return $.parseXML("<root><![CDATA[" + data + "]]></root>").documentElement.firstChild;
                 }
                 else {
                     return $.XML.EMPTY_XML_DOM.createCDATASection(data);
@@ -1045,10 +1031,10 @@
             },
 
             getCDATA: function(pnode, name) {
-                var node = pnode.getElementsByTagName(name)[0];
-                node = node || pnode;
+                var nodes = pnode.getElementsByTagName(name);
+                if(nodes.length == 0) return null;
 
-                var cdataValue = $.XML.getText(node);
+                var cdataValue = $.XML.getText(nodes[0]);
                 return cdataValue.revertCDATA();
             },
 
@@ -1060,7 +1046,7 @@
                     pnode.appendChild(cdateNode);
                 }
                 else {
-                    oldNode.firstChild.removeNode();
+                    $.removeNode(oldNode.firstChild);
                     oldNode.appendChild(cdateNode);
                 }
             },

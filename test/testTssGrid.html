@@ -4,14 +4,14 @@
 	<meta charset="UTF-8"/>
 	<title>Grid test</title>
 
-	<link href="../css/tss.css" rel="stylesheet">
-	<link href="../css/JMenu.css" rel="stylesheet">
-	<link href="../css/tssGrid.css" rel="stylesheet">
+	<link href="../css/tss.common.css" rel="stylesheet">
+	<link href="../css/tss.menu.css" rel="stylesheet">
+	<link href="../css/tss.grid.css" rel="stylesheet">
 
-	<script src="../tssJS.js"></script>
-	<script src="../tssAjax.js"></script>
-	<script src="../ui/JMenu.js"></script>
-	<script src="../ui/tssGrid.js"></script>
+	<script src="../src/tssJS.js"></script>
+	<script src="../src/tssJS.ajax.js"></script>
+	<script src="../src/tssJS.menu.js"></script>
+	<script src="../src/tssJS.grid.js"></script>
 
 <style type="text/css">
  
@@ -33,13 +33,13 @@
 				var gridPage = this.getNodeValue("PageInfo");
 				createGridToolBar(gridPage);			
 
-				grid.onScrollToBottom = function () {
+				grid.el.onScrollToBottom = function () {
 					grid.load(gridData, true);
 				}
-				grid.onRightClickRow = function () {
+				grid.el.onRightClickRow = function () {
 					grid.element.contextmenu.show(event.clientX, event.clientY);						
 				}
-				grid.onDblClickRow = function () {
+				grid.el.onDblClickRow = function () {
 					alert($.G("grid").getColumnValue("id"));				
 				}
 			},

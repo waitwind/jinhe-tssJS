@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <title>SweetAlert</title>
+
+  <!-- This is what you need -->
+  <script src="sweet-alert.js"></script>
+  <link rel="stylesheet" href="sweet-alert.css">
+  <!--.......................-->
+
+  <style type="text/css">
+  	 
+body {
+  background-color: #f2f4f6;
+  font-family: 'Open Sans', sans-serif;
+  text-align: center;
+}
+
+a {
+  text-decoration: none;
+}
+
+.center-container {
+  max-width: 700px;
+  margin: 70px auto;
+}
+
+pre {
+  background-color: #49483e;
+  color: #f8f8f2;
+  padding: 10px;
+  border-radius: 5px;
+  white-space: pre-line;
+  text-align: left;
+  font-size: 14px;
+  max-width: 600px;
+
+  .str {
+    color: #e6db74;
+  }
+  .func {
+    color: #66d9ef;
+  }
+  .val {
+    color: #a381ff;
+  }
+  .tag {
+    color: #e92772;
+  }
+  .attr {
+    color: #a6e22d;
+  }
+}
+
+ul.examples {
+  list-style-type: none;
+  width: 700px;
+  margin: 0 auto;
+  text-align: left;
+  padding-left: 0;
+  @media all and (max-width: 758px) {
+    width: auto;
+  }
+
+  li {
+    padding-left: 0;
+  }
+
+  .ui, pre {
+    display: inline-block;
+    vertical-align: top;
+
+    @media all and (max-width: 758px) {
+      display: block;
+      max-width: none;
+      margin: 0 auto;
+    }
+  }
+  .ui {
+    width: 300px;
+    text-align: center;
+
+    button {
+      margin-top: 12px;
+    }
+
+    p {
+      text-align: center;
+      margin-bottom: 0;
+    }
+  }
+
+  pre {
+    max-width: 370px;
+    margin-top: 67px;
+
+    @media all and (max-width: 758px) {
+      margin-top: 16px !important;
+      margin-bottom: 60px;
+    }
+  }
+  .warning pre {
+    margin-top: 93px;
+  }
+}
+
+  </style>
+
+</head>
+
+<body>
+
+<ul class="examples">
+
+	<li class="message">
+		<div class="ui">
+			<p>A basic message</p>
+			<button>Try me!</button>
+		</div>
+		<pre>swal(<span class="str">"Here's a message!"</span>)</pre>
+	</li>
+
+	<li class="title-text">
+		<div class="ui">
+			<p>A title with a text under</p>
+			<button>Try me!</button>
+		</div>
+		<pre>swal(<span class="str">"Here's a message!"</span>, <span class="str">"It's pretty, isn't it?"</span>)</pre>
+	</li>
+
+	<li class="success">
+		<div class="ui">
+			<p>A success message!</p>
+			<button>Try me!</button>
+		</div>
+		<pre>swal(<span class="str">"Good job!"</span>, <span class="str">"You clicked the button!"</span>, <span class="str">"success"</span>)</pre>
+	</li>
+
+	<li class="warning confirm">
+		<div class="ui">
+			<p>A warning message, with a function attached to the "Confirm"-button...</p>
+			<button>Try me!</button>
+		</div>
+		<pre>swal({
+&nbsp;&nbsp;title: <span class="str">"Are you sure?"</span>,
+&nbsp;&nbsp;text: <span class="str">"Your will not be able to recover this imaginary file!"</span>,
+&nbsp;&nbsp;type: <span class="str">"warning"</span>,
+&nbsp;&nbsp;showCancelButton: <span class="val">true</span>,
+&nbsp;&nbsp;confirmButtonColor: <span class="str">"#DD6B55"</span>,
+&nbsp;&nbsp;confirmButtonText: <span class="str">"Yes, delete it!"</span>,
+&nbsp;&nbsp;closeOnConfirm: <span class="val">false</span>
+},
+<span class="func"><i>function</i></span>(){
+&nbsp;&nbsp;<span class="func">swal</span>(<span class="str">"Deleted!"</span>, <span class="str">"Your imaginary file has been deleted."</span>, <span class="str">"success"</span>);
+});</pre>
+	</li>
+
+	<li class="warning cancel">
+		<div class="ui">
+			<p>... and by passing a parameter, you can execute something else for "Cancel".</p>
+			<button>Try me!</button>
+		</div>
+		<pre>swal({
+&nbsp;&nbsp;title: <span class="str">"Are you sure?"</span>,
+&nbsp;&nbsp;text: <span class="str">"Your will not be able to recover this imaginary file!"</span>,
+&nbsp;&nbsp;type: <span class="str">"warning"</span>,
+&nbsp;&nbsp;showCancelButton: <span class="val">true</span>,
+&nbsp;&nbsp;confirmButtonColor: <span class="str">"#DD6B55"</span>,
+&nbsp;&nbsp;confirmButtonText: <span class="str">"Yes, delete it!"</span>,
+&nbsp;&nbsp;cancelButtonText: <span class="str">"No, cancel plx!"</span>,
+&nbsp;&nbsp;closeOnConfirm: <span class="val">false</span>,
+&nbsp;&nbsp;closeOnCancel: <span class="val">false</span>
+},
+<span class="func"><i>function</i></span>(isConfirm){
+&nbsp;&nbsp;<span class="tag">if</span> (isConfirm) {
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="func">swal</span>(<span class="str">"Deleted!"</span>, <span class="str">"Your imaginary file has been deleted."</span>, <span class="str">"success"</span>);
+&nbsp;&nbsp;} <span class="tag">else</span> {
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="func">swal</span>(<span class="str">"Cancelled"</span>, <span class="str">"Your imaginary file is safe :)"</span>, <span class="str">"error"</span>);
+&nbsp;&nbsp;}
+});</pre>
+	</li>
+
+	<li class="custom-icon">
+		<div class="ui">
+			<p>A message with a custom icon</p>
+			<button>Try me!</button>
+		</div>
+		<pre>swal({
+&nbsp;&nbsp;title: <span class="str">"Sweet!"</span>,
+&nbsp;&nbsp;text: <span class="str">"Here's a custom image."</span>,
+&nbsp;&nbsp;imageUrl: <span class="str">"test.jpg"</span>
+});</pre>
+	</li>
+
+</ul>
+
+
+<footer>
+	<span class="te-logo">TE</span> • 2014
+</footer>
+
+
+<script>
+
+ 
+document.querySelector('ul.examples li.message button').onclick = function(){
+	swal("Here's a message!");
+};
+
+document.querySelector('ul.examples li.title-text button').onclick = function(){
+	swal("Here's a message!", "It's pretty, isn't it?")
+};
+
+document.querySelector('ul.examples li.success button').onclick = function(){
+	swal("Good job!", "You clicked the button!", "success");
+};
+
+document.querySelector('ul.examples li.warning.confirm button').onclick = function(){
+	swal({
+		title: "Are you sure?",
+		text: "You will not be able to recover this imaginary file!",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: '#DD6B55',
+		confirmButtonText: 'Yes, delete it!',
+		closeOnConfirm: false,
+		//closeOnCancel: false
+	},
+	function(){
+		swal("Deleted!", "Your imaginary file has been deleted!", "success");
+	});
+};
+
+document.querySelector('ul.examples li.warning.cancel button').onclick = function(){
+	swal({
+		title: "Are you sure?",
+		text: "You will not be able to recover this imaginary file!",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: '#DD6B55',
+		confirmButtonText: 'Yes, delete it!',
+		cancelButtonText: "No, cancel plx!",
+		closeOnConfirm: false,
+		closeOnCancel: false
+	},
+	function(isConfirm){
+    if (isConfirm){
+      swal("Deleted!", "Your imaginary file has been deleted!", "success");
+    } else {
+      swal("Cancelled", "Your imaginary file is safe :)", "error");
+    }
+	});
+};
+
+document.querySelector('ul.examples li.custom-icon button').onclick = function(){
+	swal({
+		title: "Sweet!",
+		text: "Here's a custom image.",
+		imageUrl: 'test.jpg'
+	});
+};
+
+</script>
+
+
+
+</body>
+
+</html>

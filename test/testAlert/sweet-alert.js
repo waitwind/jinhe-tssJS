@@ -7,11 +7,6 @@
       overlayClass = '.sweet-overlay',
       alertTypes   = ['error', 'warning', 'info', 'success'];
 
-
-  /*
-   * Manipulate DOM
-   */
-
   var getModal = function() {
       return document.querySelector(modalClass);
     },
@@ -119,8 +114,6 @@
       tick();
     },
     fireClick = function(node) {
-      // Taken from http://www.nonobtrusive.com/2011/11/29/programatically-fire-crossbrowser-click-event-with-javascript/
-      // Then fixed for today's Chrome browser.
       if (MouseEvent) {
         // Up-to-date approach
         var mevt = new MouseEvent('click', {
@@ -156,35 +149,10 @@
       previousWindowKeyDown,
       lastFocusedButton;
 
-  /*
-   * Add modal + overlay to DOM
-   */
-
-  function initialize() {
-    var sweetHTML = '<div class="sweet-overlay" tabIndex="-1"></div><div class="sweet-alert" tabIndex="-1"><div class="icon error"><span class="x-mark"><span class="line left"></span><span class="line right"></span></span></div><div class="icon warning"> <span class="body"></span> <span class="dot"></span> </div> <div class="icon info"></div> <div class="icon success"> <span class="line tip"></span> <span class="line long"></span> <div class="placeholder"></div> <div class="fix"></div> </div> <div class="icon custom"></div> <h2>Title</h2><p>Text</p><button class="cancel" tabIndex="2">Cancel</button><button class="confirm" tabIndex="1">OK</button></div>',
-        sweetWrap = document.createElement('div');
-
-    sweetWrap.innerHTML = sweetHTML;
-
-    // For readability: check sweet-alert.html
-    document.body.appendChild(sweetWrap);
-
-    // For development use only!
-    /*jQuery.ajax({
-        url: '../lib/sweet-alert.html', // Change path depending on file location
-        dataType: 'html'
-      })
-      .done(function(html) {
-        jQuery('body').append(html);
-      });*/
-  }
-
-
 
   /*
    * Global sweetAlert function
    */
-
   window.sweetAlert = window.swal = function() {
 
     // Default parameters
@@ -332,7 +300,6 @@
       $buttons[i].onmouseover = onButtonEvent;
       $buttons[i].onmouseout  = onButtonEvent;
       $buttons[i].onmousedown = onButtonEvent;
-      //$buttons[i].onmouseup   = onButtonEvent;
       $buttons[i].onfocus     = onButtonEvent;
     }
 
@@ -468,7 +435,6 @@
   /*
    * Set type, text and actions on modal
    */
-
   function setParameters(params) {
     var modal = getModal();
 
@@ -586,7 +552,6 @@
   /*
    * Set hover, active and focus-states for buttons (source: http://www.sitepoint.com/javascript-generate-lighter-darker-color)
    */
-
   function colorLuminance(hex, lum) {
     // Validate hex string
     hex = String(hex).replace(/[^0-9a-f]/gi, '');
@@ -616,7 +581,6 @@
     var rgbColor = hexToRgb(bgColor);
     $button.style.boxShadow = '0 0 2px rgba(' + rgbColor +', 0.8), inset 0 0 0 1px rgba(0, 0, 0, 0.05)';
   }
-
 
 
   /*
@@ -686,28 +650,28 @@
   }
 
 
+  /*
+   * Add modal + overlay to DOM
+   */
+  function initialize() {
+    var sweetHTML = '<div class="sweet-overlay" tabIndex="-1"></div><div class="sweet-alert" tabIndex="-1"><div class="icon error"><span class="x-mark"><span class="line left"></span><span class="line right"></span></span></div><div class="icon warning"> <span class="body"></span> <span class="dot"></span> </div> <div class="icon info"></div> <div class="icon success"> <span class="line tip"></span> <span class="line long"></span> <div class="placeholder"></div> <div class="fix"></div> </div> <div class="icon custom"></div> <h2>Title</h2><p>Text</p><button class="cancel" tabIndex="2">Cancel</button><button class="confirm" tabIndex="1">OK</button></div>',
+        sweetWrap = document.createElement('div');
+
+    sweetWrap.innerHTML = sweetHTML;
+    document.body.appendChild(sweetWrap);
+  }
 
   /*
    * If library is injected after page has loaded
    */
-
   (function () {
 	  if (document.readyState === "complete" || document.readyState === "interactive") {
 		  initialize();
 	  } else {
-		  if (document.addEventListener) {
-			  document.addEventListener('DOMContentLoaded', function factorial() {
-				  document.removeEventListener('DOMContentLoaded', arguments.callee, false);
-				  initialize();
-			  }, false);
-		  } else if (document.attachEvent) {
-			  document.attachEvent('onreadystatechange', function() {
-				  if (document.readyState === 'complete') {
-					  document.detachEvent('onreadystatechange', arguments.callee);
-					  initialize();
-				  }
-			  });
-		  }
+	    document.addEventListener('DOMContentLoaded', function factorial() {
+        document.removeEventListener('DOMContentLoaded', arguments.callee, false);
+        initialize();
+      }, false);
 	  }
   })();
 

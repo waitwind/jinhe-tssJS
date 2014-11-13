@@ -201,7 +201,7 @@
 			border-radius: 5px;
 			line-height: 30px;
 		}
-		.quick-press .save, .quick-press .delete {
+		.quick-press button[type='button'] {
 			font-family: 'icomoon';
 			width: 37px;
 			background-color: rgb(246,246,240);
@@ -210,13 +210,13 @@
 			float: left;
 			margin-right: 5px;
 		}
-		.quick-press .save:hover, .quick-press .delete:hover {
+		.quick-press button[type='button']:hover {
 			background-color: rgb(232,232,232);
 		}
  
 		.quick-press .submit {
 			float: right;
-			width: 70px;
+			width: 60px;
 			border: 1px solid rgb(238,85,64);
 			color: #fff;
 			font-size: 16px;
@@ -249,11 +249,11 @@
 			<a href="#"></a>
 		</div>
 		<ul>
-			<li><a href="#dashboard" id="targeted">概览</a></li>
+			<li><a href="#dashboard">概览</a></li>
 			<li><a href="#project">项目配置</a></li>
 			<li><a href="#flow">流程配置</a></li>
 			<li><a href="#process">工序配置</a></li>
-			<li><a href="#step">操作步骤</a></li>
+			<li><a href="#step" id="targeted">操作步骤</a></li>
 			<li><a href="#remark">配置说明</a></li>
 		</ul>
 	</div>
@@ -261,10 +261,10 @@
 		<ul class="topbar clearfix">
 			<li><a href="#">q</a></li>
 			<li><a href="#">s</a></li>
-			<li><a href="#">p</a></li>
-			<li><a href="#">o</a></li>
+			<li><a href="#">c</a></li>
+			<li><a href="#">e</a></li>
 			<li><a href="#">f</a></li>
-			<li><a href="#">n</a></li>			
+			<li><a href="#">j</a></li>			
 		</ul>
 		<div class="mainContent clearfix">
 			<div id="dashboard">
@@ -302,21 +302,27 @@
 			      <tr>
 			        <th width="80">操作步骤代码</th>
 			        <th width="100">操作步骤名称</th>
-			        <th width="100">总时间（秒）</th>
 			        <th width="100">作业基准</th>
 			        <th width="100">基本时间（秒）</th>
 			        <th width="100">宽泛</th>
+			        <th width="100">总时间（秒）</th>
 			      </tr>
 			      <tr>
-			        <td contenteditable="true">仓库</td>
-			        <td contenteditable="true">String</td>
-			        <td contenteditable="true">no</td>
-			        <td contenteditable="true"></td>
-			        <td contenteditable="true">300</td>
+			        <td contenteditable="true">1</td>
+			        <td contenteditable="true">走到目的库位</td>
+			        <td contenteditable="true">250</td>
+			        <td contenteditable="true">
+			        	<select>
+			        		<option value="1">1111111</option>
+			        		<option value="2" selected>2222222</option>
+			        	</select>
+			        </td>
+			        <td contenteditable="true">10%</td>
 			        <td contenteditable="true">300</td>
 			      </tr>
 			    </table>
 			    <div class="quick-press">
+			    	<button type="button" class="add">q</button>
 					<button type="button" class="save">l</button>
 					<button type="button" class="delete">m</button>
 					<button type="submit" class="submit" name="submit">保存</button>

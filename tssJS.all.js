@@ -519,6 +519,13 @@
             return this;
         },
 
+        appendChild: function(el) {
+            if ( this.length > 0 ) {
+                this[0].appendChild(el);
+            }
+            return this;
+        },
+
         title: function(str) {
             for (var i = 0; i < this.length; i++) {
                 this[i].title = str;
@@ -1278,7 +1285,7 @@
     _HTTP_RESPONSE_STATUS_REMOTE_OK = 200,  // 远程OK
 
     /* HTTP超时(1分钟) */
-    _HTTP_TIMEOUT = 1*60*1000,
+    _HTTP_TIMEOUT = 3*60*1000,
 
  
     /*
@@ -4269,6 +4276,7 @@
     $.initGridToolBar = function(pageBar, pageInfo, callback) {
         pageBar.init = function() {
             this.innerHTML = ""; // 清空内容
+            this.callback = callback;
 
             var totalpages = pageBar.getTotalPages();
             var curPage = pageBar.getCurrentPage();
@@ -4333,7 +4341,11 @@
         }
         
         pageBar.gotoPage = function(page) {
-            callback(page); // 转到指定页
+            if( this.callback ) {
+                this.callback(page); // 转到指定页
+                $1("GridPageList").value = page;
+                pageInfo.setAttribute("currentpage", page);
+            }
         }
         
         pageBar.init();
@@ -4502,8 +4514,28 @@
             });
         };
 
+        // 借助于stack. [{id:1, name:node1, children:[ {id:3, name:node3, children:[......]} ], xx:xx}, {id:2......}]
         var loadJson = function(data) {
+            var stack = [];
+            var parents = {};
 
+            data.each(function(i, nodeAttrs) {
+                stack.push(nodeAttrs);
+            });
+
+            while(stack.length > 0) {
+                current = stack.pop();
+
+                var treeNode = new TreeNode(current, current.parent); 
+                if(current.parent == null) {
+                    tThis.rootList.push(treeNode);
+                }
+
+                current.children.each(function(i, child) {
+                    child.parent = treeNode;
+                    stack.push(child);
+                });
+            }
         };
 
         // 树控件上禁用默认右键和选中文本（默认双击会选中节点文本）

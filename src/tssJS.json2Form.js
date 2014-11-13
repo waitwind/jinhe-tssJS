@@ -2,11 +2,11 @@
 
 	var 
 
-		// item的类型允许为[id, code, name] or [pk, id, text] or {id:'xx', code:'yy', name:'zz'}
+		// item的类型允许为[id, code, name] or [pk, id, text]
 		createOption = function(item) {
 			var option = new Option();
-			option.value = item.pk   || item.id   || item[0];
-			option.text  = item.text || item.name || item[2];
+			option.value = item.id   || item.pk   || item[0];
+			option.text  = item.name || item.text || item[2];
 			return option;
 		},
 
@@ -14,7 +14,7 @@
 		this.name  = info.name;
 		this.label = info.label;
 		this.type  = info.type || "string";
-		this.nullable = (info.nullable == null ? true : info.nullable);
+		this.nullable = (info.nullable == null ? "true" : info.nullable);
 		this.checkReg = info.checkReg;
 		this.options = info.options;
 		this.jsonUrl = info.jsonUrl;
@@ -87,6 +87,11 @@
 							result.each(function(i, value){
 								sEl.options[sEl.options.length] = createOption(value);
 							});
+							
+							if( fThis.nullable == "false" && sEl.options.length > 0) {
+								sEl.options[sEl.options.length - 1].selected = true;
+								sEl.onchange();
+							}
 						}				
 					}
 				});

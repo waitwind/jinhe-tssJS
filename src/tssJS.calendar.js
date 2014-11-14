@@ -669,4 +669,3 @@
     };
 
     return JCalendar;
-});

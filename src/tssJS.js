@@ -519,6 +519,13 @@
             return this;
         },
 
+        appendChild: function(el) {
+            if ( this.length > 0 ) {
+                this[0].appendChild(el);
+            }
+            return this;
+        },
+
         title: function(str) {
             for (var i = 0; i < this.length; i++) {
                 this[i].title = str;

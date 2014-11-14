@@ -1,9 +1,9 @@
 ;(function($){
     /*
      *  大数据显示进度
-     *  参数： string:url         同步进度请求地址
-               xmlNode:data                    
-               string:cancelUrl   取消进度请求地址
+     *  参数： string:url                    同步进度请求地址
+            xmlNode:data                    
+            string:cancelUrl                取消进度请求地址
      */
     var Progress = function(url, data, cancelUrl) {
         this.progressUrl = url;

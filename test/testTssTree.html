@@ -34,6 +34,16 @@ URL_NODE_DELETE = "data/_success.xml?";
 var treeData;
 
 function init() {
+
+	$.ajax({
+		url: "data/tree.json?",
+		type: "json",
+		ondata: function() {
+			treeData = this.getResponseJSON();
+			console.log(treeData);
+			var tree3 = $.T("tree3", treeData);	
+		}
+	});
  
 	$.ajax({
 		url: URL_SOURCE_TREE,
@@ -176,15 +186,19 @@ window.onload = init;
 
 	<table id="t1" border="1">
 	 	<tr>
-			<td width="400"> - 普通树</td>
-			<td width="400"> - 多选树</td>
+			<td width="300"> - 普通树</td>
+			<td width="300"> - 多选树</td>
+			<td width="300"> - Json树</td>
 		</tr>
-		<tr height="350">
+		<tr height="380">
 			<td>
 				<Tree:Box id="tree" treeType="single" moveable="true"></Tree:Box>
 			</td>
 			<td>
 				<Tree:Box id="tree2" treeType="multi" selectSelf="false"></Tree:Box>
+			</td>
+			<td>
+				<Tree:Box id="tree3" treeType="single" moveable="true"></Tree:Box>
 			</td>
 		</tr>
 		<tr>
@@ -197,6 +211,8 @@ window.onload = init;
 			<td>-
 				<input type="button" value="获取选中节点" onclick="alert($.T('tree2').getCheckedIds(false));"/>
 				<input type="button" value="设为自选中" onclick="$.T('tree2').checkSelf = true;"/>
+			</td>
+			<td>
 			</td>
 		</tr>
 	</table>

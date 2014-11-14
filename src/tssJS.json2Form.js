@@ -88,6 +88,7 @@
 								sEl.options[sEl.options.length] = createOption(value);
 							});
 							
+							// 如果下拉列表要求非空，则默认选中最后一个选项
 							if( fThis.nullable == "false" && sEl.options.length > 0) {
 								sEl.options[sEl.options.length - 1].selected = true;
 								sEl.onchange();

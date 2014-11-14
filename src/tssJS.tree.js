@@ -1,3 +1,4 @@
+
 ;(function($, factory) {
 
     $.Tree = factory($);
@@ -85,8 +86,29 @@
             });
         };
 
+        // 借助于stack. [{id:1, name:node1, children:[ {id:3, name:node3, children:[......]} ], xx:xx}, {id:2......}]
         var loadJson = function(data) {
+            var stack = [];
+            var parents = {};
 
+            data.each(function(i, nodeAttrs) {
+                stack.push(nodeAttrs);
+            });
+
+            var current;
+            while(stack.length > 0) {
+                current = stack.pop();
+
+                var treeNode = new TreeNode(current, current.parent); 
+                if(current.parent == null) {
+                    tThis.rootList.push(treeNode);
+                }
+
+                (current.children || []).each(function(i, child) {
+                    child.parent = treeNode;
+                    stack.push(child);
+                });
+            }
         };
 
         // 树控件上禁用默认右键和选中文本（默认双击会选中节点文本）

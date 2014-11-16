@@ -87,12 +87,13 @@
         };
 
         // 借助于stack. [{id:1, name:node1, children:[ {id:3, name:node3, children:[......]} ], xx:xx}, {id:2......}]
+        // array.unshift(x), 先进先出；array.push(x), 后进先出
         var loadJson = function(data) {
             var stack = [];
             var parents = {};
 
             data.each(function(i, nodeAttrs) {
-                stack.push(nodeAttrs);
+                stack.unshift(nodeAttrs);
             });
 
             var current;
@@ -106,7 +107,7 @@
 
                 (current.children || []).each(function(i, child) {
                     child.parent = treeNode;
-                    stack.push(child);
+                    stack.unshift(child);
                 });
             }
         };

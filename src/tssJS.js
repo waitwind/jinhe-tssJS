@@ -350,6 +350,19 @@
                 return (new Date()).getTime();
             },
 
+            // 对数据进行简单加密
+            encode: function(info, key) {
+                if( info == null || typeof(info) != 'string') return "";
+
+                var result = [], _byte;
+                for(var i=0, length = info.length; i < length; i++) {
+                    _byte = info.charCodeAt(i) ^ (key || 100) % 127;
+                    result.push( String.fromCharCode(_byte) );
+                }
+
+                return result.join("");
+            },
+
             isIE: mc(/.net/),
             isChrome: mc(/\bchrome\b/),
             isWebKit: mc(/webkit/),

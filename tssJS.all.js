@@ -350,6 +350,19 @@
                 return (new Date()).getTime();
             },
 
+            // 对数据进行简单加密
+            encode: function(info, key) {
+                if( info == null || typeof(info) != 'string') return "";
+
+                var result = [], _byte;
+                for(var i=0, length = info.length; i < length; i++) {
+                    _byte = info.charCodeAt(i) ^ (key || 100) % 127;
+                    result.push( String.fromCharCode(_byte) );
+                }
+
+                return result.join("");
+            },
+
             isIE: mc(/.net/),
             isChrome: mc(/\bchrome\b/),
             isWebKit: mc(/webkit/),
@@ -1770,7 +1783,9 @@
                         loginNameObj.focus();
                     },
                     onresult: function(){
-                        loginNameObj.identifier = this.getNodeValue("ClassName");
+                        loginNameObj.identifier = this.getNodeValue("identifier");
+                        loginNameObj.randomKey  = this.getNodeValue("randomKey");
+                        
                         passwordObj.focus();
                     }
                 });
@@ -1789,6 +1804,8 @@
             
             var doLogin = function() {
                 var identifier = loginNameObj.identifier;
+                var randomKey  = loginNameObj.randomKey;
+
                 var loginName  = loginNameObj.value;
                 var password   = passwordObj.value;
                 
@@ -1807,8 +1824,8 @@
                     return;
                 } 
 
-                request.setHeader("loginName", loginName);
-                request.setHeader("password",  password);
+                request.setHeader("loginName", $.encode(loginName, randomKey));
+                request.setHeader("password",  $.encode(password, randomKey));
                 request.setHeader("identifier", identifier);
                 request.send();
                 $(reloginBox).hide();
@@ -4515,14 +4532,16 @@
         };
 
         // 借助于stack. [{id:1, name:node1, children:[ {id:3, name:node3, children:[......]} ], xx:xx}, {id:2......}]
+        // array.unshift(x), 先进先出；array.push(x), 后进先出
         var loadJson = function(data) {
             var stack = [];
             var parents = {};
 
             data.each(function(i, nodeAttrs) {
-                stack.push(nodeAttrs);
+                stack.unshift(nodeAttrs);
             });
 
+            var current;
             while(stack.length > 0) {
                 current = stack.pop();
 
@@ -4531,9 +4550,9 @@
                     tThis.rootList.push(treeNode);
                 }
 
-                current.children.each(function(i, child) {
+                (current.children || []).each(function(i, child) {
                     child.parent = treeNode;
-                    stack.push(child);
+                    stack.unshift(child);
                 });
             }
         };
@@ -5076,6 +5095,7 @@
 
     return Tree;
 });
+
 
 
 ;(function ($, factory) {

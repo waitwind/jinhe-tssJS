@@ -8,6 +8,7 @@
 			height: 300px;
 			border: 1px solid black;
 			position: relative;
+			right: -800px;
 		}
 		#div2 {
 			width: 150px;
@@ -15,14 +16,41 @@
 			border: 1px solid blue;
 			position: absolute;
 			top: 5px;
-			left: 10px;
+			right: 10px;
 		}
+ 
 	</style>
+
+	<script type="text/javascript">
+
+function simpleEncode(info, key) {
+	var result = [], _byte;
+	for(var i=0, length = info.length; i < length; i++) {
+		_byte = info.charCodeAt(i) ^ key % 127;
+		result.push( String.fromCharCode(_byte) );
+	}
+
+	return result.join("");
+}
+
+var key = 31;
+var test = simpleEncode('Jon.King!#$%&', key);
+console.log(test);
+console.log(simpleEncode(test, key));
+
+console.log('!'.charCodeAt(0) ^ key ^ key);
+
+	</script>
 
 </head>
 <body>
 	<div id="div1">
 		<div id="div2"></div>
 	</div>
+ 
 </body>
 </html>
+
+
+<html >
+

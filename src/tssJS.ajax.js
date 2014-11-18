@@ -551,7 +551,9 @@
                         loginNameObj.focus();
                     },
                     onresult: function(){
-                        loginNameObj.identifier = this.getNodeValue("ClassName");
+                        loginNameObj.identifier = this.getNodeValue("identifier");
+                        loginNameObj.randomKey  = this.getNodeValue("randomKey");
+                        
                         passwordObj.focus();
                     }
                 });
@@ -570,6 +572,8 @@
             
             var doLogin = function() {
                 var identifier = loginNameObj.identifier;
+                var randomKey  = loginNameObj.randomKey;
+
                 var loginName  = loginNameObj.value;
                 var password   = passwordObj.value;
                 
@@ -588,8 +592,8 @@
                     return;
                 } 
 
-                request.setHeader("loginName", loginName);
-                request.setHeader("password",  password);
+                request.setHeader("loginName", $.encode(loginName, randomKey));
+                request.setHeader("password",  $.encode(password, randomKey));
                 request.setHeader("identifier", identifier);
                 request.send();
                 $(reloginBox).hide();

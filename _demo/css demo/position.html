@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style type="text/css">
+		#div1 {
+			width: 300px;
+			height: 300px;
+			border: 1px solid black;
+			position: relative;
+			right: -800px;
+		}
+		#div2 {
+			width: 150px;
+			height: 150px;
+			border: 1px solid blue;
+			position: absolute;
+			top: 5px;
+			right: 10px;
+		}
+		*{margin:0;padding:0;font-size: 12px;}
+	</style>
+
+</head>
+<body>
+	<div id="div1">
+		<div id="div2"></div>
+	</div>
+
+	<div style="position:absolute;height:400px;width:400px;background:yellow;left:180px;top:80px;">
+		<div style="height:100px;width:100px;background:grey;"></div>
+		<div style="position:absolute;height:100px;width:100px;background:red;left:100px;top:100px;">absolute:脱离文档流，不占文档空间。根据父块的border进行的定位,不受父块padding影响，但受margin影响</div>
+		<div style="position:relative;height:100px;width:100px;background:blue;left:100px;top:100px;">relative:相对于该div在文档流中位置偏移</div>
+		<div style="height:100px;width:100px;background:orange;">after relative：可以发现上一个div定位偏移后，但继续占着它原来的文档空间</div>
+		<div style="position:fixed;height:100px;width:200px;background:black;left:20px;top:20px;color:white">fixed：固定定位，脱离文档流，能够根据top、right、left、bottom属性进行定位，其根据body为原点进行偏移定位的，也就是说它不会根据滚动条的滚动而进行偏移</div>
+	</div>
+	<div style="position:static;height:140px;width:140px;background:green;left:220px;top:220px;">static</div>
+</body>
+</html>
+
+
+<html >
+

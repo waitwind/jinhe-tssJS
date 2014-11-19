@@ -354,11 +354,21 @@
             encode: function(info, key) {
                 if( info == null || typeof(info) != 'string') return "";
 
-                var result = [], _byte;
+                var result = [];
                 for(var i=0, length = info.length; i < length; i++) {
-                    _byte = info.charCodeAt(i) ^ (key || 100) % 127;
-                    result.push( String.fromCharCode(_byte) );
+                    result.push( info.charCodeAt(i) ^ (key || 100) % 127 );
                 }
+
+                return result.join("X");
+            },
+
+            decode: function(info, key) {
+                if( info == null || typeof(info) != 'string') return "";
+
+                var result = [];
+                info.split("X").each(function(){
+                    result.push( String.fromCharCode(this ^ (key || 100) % 127) );
+                });
 
                 return result.join("");
             },
@@ -1758,6 +1768,11 @@
                 $("#bt_cancel").click(function() {
                     reloginBox.style.display = "none";
                 });
+
+                var defaultUserName = $.Cookie.getValue("iUserName");
+                if( defaultUserName ) {
+                    $1("loginName").value = defaultUserName;
+                }
             }
 
             $(reloginBox).show(); // 显示登录框
@@ -1777,7 +1792,6 @@
                 
                 $.ajax({
                     url: "/" + CONTEXTPATH + "getLoginInfo.in",
-                    headers:{"appCode": FROMEWORK_CODE || 'TSS'},
                     params: {"loginName": value},
                     onexcption: function() {
                         loginNameObj.focus();

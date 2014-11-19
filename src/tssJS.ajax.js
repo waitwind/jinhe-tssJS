@@ -526,12 +526,18 @@
                 $("#bt_cancel").click(function() {
                     reloginBox.style.display = "none";
                 });
+
+                var defaultUserName = $.Cookie.getValue("iUserName");
+                if( defaultUserName ) {
+                    $1("loginName").value = defaultUserName;
+                }
             }
 
             $(reloginBox).show(); // 显示登录框
 
             var loginNameObj = $("#loginName")[0];
             var passwordObj  = $("#password")[0];
+
             loginNameObj.focus();
             passwordObj.value = ""; // 清空上次输入的密码，以防泄密
             
@@ -545,7 +551,6 @@
                 
                 $.ajax({
                     url: "/" + CONTEXTPATH + "getLoginInfo.in",
-                    headers:{"appCode": FROMEWORK_CODE || 'TSS'},
                     params: {"loginName": value},
                     onexcption: function() {
                         loginNameObj.focus();

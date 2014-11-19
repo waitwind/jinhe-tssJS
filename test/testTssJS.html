@@ -83,14 +83,14 @@
 
  	console.log((new Date()).format("yyyy-MM-dd"));
 
- 	var key = 31;
+ 	var key = 502;
  	var info = 'Jon.King!#$%&';
 	var test = $.encode(info, key);
 	console.log(test);
-	$.assertEquals(info, $.encode(test, key));
+	$.assertEquals(info, $.decode(test, key));
 
 	for(var key = 1; key < 127; key++) {
-		$.assertEquals(info, $.encode($.encode(info, key), key));
+		$.assertEquals(info, $.decode($.encode(info, key), key));
  	}
  
  	// test Element

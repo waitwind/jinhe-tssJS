@@ -33,7 +33,7 @@ function simpleEncode(info, key) {
 	return result.join("");
 }
 
-var key = 31;
+var key = 502;
 var test = simpleEncode('Jon.King!#$%&', key);
 console.log(test);
 console.log(simpleEncode(test, key));

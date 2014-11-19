@@ -354,11 +354,21 @@
             encode: function(info, key) {
                 if( info == null || typeof(info) != 'string') return "";
 
-                var result = [], _byte;
+                var result = [];
                 for(var i=0, length = info.length; i < length; i++) {
-                    _byte = info.charCodeAt(i) ^ (key || 100) % 127;
-                    result.push( String.fromCharCode(_byte) );
+                    result.push( info.charCodeAt(i) ^ (key || 100) % 127 );
                 }
+
+                return result.join("X");
+            },
+
+            decode: function(info, key) {
+                if( info == null || typeof(info) != 'string') return "";
+
+                var result = [];
+                info.split("X").each(function(){
+                    result.push( String.fromCharCode(this ^ (key || 100) % 127) );
+                });
 
                 return result.join("");
             },

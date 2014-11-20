@@ -1,6 +1,16 @@
-.live {
-  overflow: hidden;
-}
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>CSS3自定义美化UL OL列表DEMO演示</title>
+
+  <link rel="stylesheet" href="../../lib/normalize.css">
+
+  <style type="text/css">
+
 .live > li {
   list-style: none;
   position: relative;
@@ -35,25 +45,6 @@
   -webkit-transition: .1s;
           transition: .1s;
 }
-.live.type2 > li::before {
-  content: '';
-  width: 10px;
-  height: 10px;
-  background: #FFF;
-  border-radius: 3px;
-  line-height: 0;
-  top: .27em;
-  left: 5px;
-}
-.live.type2 > li:hover::before {
-  -webkit-transform: none;
-      -ms-transform: none;
-          transform: none;
-  border-radius: 5px;
-  width: 25px;
-  left: -10px;
-  background: #BA5353;
-}
 
 .live.numbers {
   counter-reset: xxx 0;
@@ -79,16 +70,6 @@
           transition: .12s;
 }
 
-@font-face {
-  font-family: 'Roboto Condensed';
-  font-style: normal;
-  font-weight: 400;
-  src: local("Roboto Condensed Regular"), local("RobotoCondensed-Regular"), url(http://themes.googleusercontent.com/static/fonts/robotocondensed/v7/Zd2E9abXLFGSr9G3YK2MsFzqCfRpIA3W6ypxnPISCPA.woff) format("woff");
-}
-html {
-  height: 100%;
-}
-
 body {
   height: 100%;
   font: 1.33em 'Roboto Condensed', arial;
@@ -96,17 +77,6 @@ body {
   text-align: center;
   background-image: -webkit-radial-gradient(circle, #3c3b52 0%, #252233 80%);
   background-image: radial-gradient(circle, #3c3b52 0%, #252233 80%);
-}
-
-h1 {
-  margin: .5em 0 0;
-  padding: 0;
-  text-shadow: 0 4px rgba(0, 0, 0, 0.2);
-}
-
-* {
-  -moz-box-sizing: padding-box;
-       box-sizing: padding-box;
 }
 
 ol, ul {
@@ -121,3 +91,28 @@ ol, ul {
   margin: 2%;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
 }
+  </style>
+
+</head>
+
+<body>
+
+<ol class="live numbers">
+  <li>I have never seen anything like this</li>
+  <li>This is most certainly cool, and it can also work on long texts inside the list-item elements, which spans over multiple lines</li>
+  <li>Un-ordered lists are fun to play with.</li>
+  <li>Firefox sure does animate this effect nicely.</li>
+  <li>This is so simple</li>
+</ol>
+
+<ul class="live">
+  <li>I have never seen anything like this</li>
+  <li>This is most certainly cool, and it can also work on long texts inside the list-item elements, which spans over multiple lines</li>
+  <li>Un-ordered lists are fun to play with</li>
+  <li>Firefox sure does animate this effect nicely</li>
+  <li>This is so simple</li>
+</ul>
+
+</body>
+
+</html>

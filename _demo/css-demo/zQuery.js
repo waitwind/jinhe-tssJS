@@ -1,14 +1,3 @@
-function getbyclassname(tagname, classname) {
-    var result = [];
-    var els = document.getElementsByTagName(tagname);
-    for (var i = 0; i < els.length; i++) {
-        if (classname == els[i].className) {
-        	result.push(els[i]);
-        }
-    }
-    return result;
-}
-
 function win(attr) {
     switch (attr) {
     case 'height':

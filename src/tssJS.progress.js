@@ -48,29 +48,34 @@
         show: function() {
             var pThis = this;
 
-            var graph = $1("progressBar");
+            var graph = $(".progressBar")[0];
             if(graph == null) {
                 graph = $.createElement("div", "progressBar");
-                $(graph).center(500, 50).css("width", "500px").css("color", "#fff").css("fontSize", "16px");
+                $(graph).center(500, 50).css("width", "600px").css("color", "#fff").css("fontSize", "16px").css("fontWeight", "bold");
 
                 var bar = $.createElement("div", "bar");
-                $(bar).css("display", "block").css("backgroundColor", "green").css("border", "1px solid #F8B3D0")
-                    .css("height", "25px").css("textAlign", "center").css("padding", "3px 0 0 0");     
+                $(bar).css("backgroundColor", "#e0f6c8").css("border", "1px solid #F8B3D0") ;  
+
+                var passBar = $.createElement("div", "passBar");
+                $(passBar).css("backgroundColor", "#009966").html("1212").css("textAlign", "center");    
+                
+                graph.appendChild(bar);
+                bar.appendChild(passBar);  
 
                 var info = $.createElement("span", "info");
-                $(info).html("剩余时间:<span'>1</span>秒").css("padding", "0 0 0 100px");
+                $(info).html("剩余时间: <span>1</span>秒").css("padding", "5px 0 0 120px").css("color", "grey").css("fontSize", "14px");
 
                 var cancel = $.createElement("span");
-                $(cancel).html("<a href='#'>取 消</a>").css("width", "50px").css("padding", "0 0 0 100px")
+                $(cancel).html("<a href='#'>取 消</a>").css("padding", "5px 0 0 80px").css("fontSize", "14px")
                     .click(function() { pThis.stop(); });
 
-                graph.appendChild(bar);
                 graph.appendChild(info);
                 graph.appendChild(cancel);
                 document.body.appendChild(graph);
             }
 
-            $(".bar", graph).css("width", this.percent + "%").html(this.percent + "%"); 
+            // this.percent = Math.round(Math.random() * 100); // just for test
+            $(".passBar", graph).css("width", this.percent + "%").html(this.percent + "%"); 
             $(".info span", graph).html(this.estimateTime); 
         },
 

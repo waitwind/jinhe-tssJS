@@ -34,6 +34,7 @@
 				break;
 			case "date":
 				this.mode = "date";
+				this.width = "200px";
 				var defaultValue = this.defaultValue;
 				if( defaultValue && (/today[\s]*-/gi).test(defaultValue) ) {
 					var deltaDays = parseInt(defaultValue.split("-")[1]);

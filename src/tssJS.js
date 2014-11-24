@@ -207,7 +207,7 @@
                 throw msg;
             },
 
-            // parseJSON把一个字符串变成JSON对象。
+            // parseJSON把一个字符串变成JSON对象。(注：JSON.parse要求数据必须用双引号，eval转换时则不分单、双引号)
             parseJSON: function(data) {
                 if (typeof data !== "string" || !data) {
                     return null;
@@ -218,7 +218,11 @@
 
                 // 原生JSON API。反序列化是JSON.stringify(object)
                 if (window.JSON && window.JSON.parse) {
-                    return window.JSON.parse(data);
+                    try {
+                        return window.JSON.parse(data);
+                    } catch(e) {
+                        return window.eval(data);
+                    }
                 }
 
                 // ... 大致地检查一下字符串合法性

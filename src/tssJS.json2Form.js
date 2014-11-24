@@ -121,7 +121,7 @@
 	}
 
 	$.json2Form = function(formId, jsonTemplate, buttonBox) {
-		var infos = jsonTemplate ? eval(jsonTemplate) : [];
+		var infos = jsonTemplate ? $.parseJSON(jsonTemplate) : [];
 
 		var columns = [];
 		var layouts = [];

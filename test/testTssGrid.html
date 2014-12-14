@@ -26,6 +26,7 @@
 
 		$.ajax({
 			url : "data/grid.xml",
+			method : "GET",
 			onresult : function() {
 				var gridData = this.getNodeValue("SourceList");
 				var grid = $.G("grid", gridData);       

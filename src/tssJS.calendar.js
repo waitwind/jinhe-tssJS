@@ -79,6 +79,9 @@
         // the default output format for `.toString()` and `field` value
         format: 'YYYY-MM-DD',
 
+        // hh:mi:ss
+        careTime: false,
+
         // the initial date to view when first opened
         defaultDate: null,
 
@@ -225,6 +228,18 @@
 
     renderTable = function(opts, data) {
         return '<table class="pika-table">' + renderHead(opts) + renderBody(data) + '</table>';
+    },
+
+    renderTime = function(opts, time) {
+        var html = [];
+        html.push('<div>');
+        html.push('时：<input type="range" min="0" max="23" value="0" step="1" onchange="$(\"#range1\").html(this.value)" /><span id="range1">0</span><br/>');
+        html.push('分：<input type="range" min="0" max="59" value="0" step="1" onchange="$(\"#range2\").html(this.value)" /><span id="range2">0</span><br/>');
+        html.push('秒：<input type="range" min="0" max="59" value="0" step="1" onchange="$(\"#range3\").html(this.value)" /><span id="range3">0</span><br/>');
+        html.push('<button type="button" class="" onclick=";">当前时间</button>');
+        html.push('<button type="button" class="" onclick=";">确定</button>');
+        html.push('</div>');
+        return html.join("\n");
     },
 
 
@@ -523,6 +538,9 @@
             }
 
             this.el.innerHTML = renderTitle(this) + this.render(this._y, this._m);
+            if(opts.careTime) {
+                this.el.innerHTML += renderTime(opts);
+            }
 
             this.adjustPosition();
             if(opts.field.type !== 'hidden') {

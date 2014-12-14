@@ -6,6 +6,23 @@
 
     <link href="../css/tss.calendar.css" rel="stylesheet">
 
+    <style type="text/css">
+    	pre,code {
+    		width: 500px;
+		    text-align: left;
+		    white-space: pre;
+		    word-spacing: normal;
+		    color: #f8f8f2;
+		    background: #1e2328;
+		    border-radius: 5px;
+		    overflow: auto;
+		    padding: 1em;
+		    margin: 1em 0;
+		    font-size: .9em;
+		    float: right;
+		}
+    </style>
+
     <script src="../src/tssJS.js"></script>
 	<script src="../src/tssJS.calendar.js"></script>
 
@@ -19,6 +36,7 @@
 	        maxDate: new Date('2020-12-31'),
 	        yearRange: [2000,2020],
 	        format: 'yyyy-MM-dd',
+	        careTime: true,
 	        // onOpen: function() {alert(this._y);},
 	        // onClose: function() {alert("close");}
 	    });
@@ -31,9 +49,21 @@
 
 <body>
 
-	<div id='div1'>
-		<input id="d1" style="width:200px"> </input>
-	</div>
+<div id='div1'>
+	<input id="d1" style="width:200px;display:inline;"> </input>
+	<pre>
+var pd = new $.Calendar( {
+        field: $1("d1"),
+        firstDay: 1,
+        minDate: new Date('2000-01-01'),
+        maxDate: new Date('2020-12-31'),
+        yearRange: [2000,2020],
+        format: 'yyyy-MM-dd',
+    });
+
+    pd.show();
+	</pre>
+</div>
 
 </body>
 </html>

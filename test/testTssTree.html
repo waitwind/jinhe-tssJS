@@ -37,6 +37,7 @@ function init() {
 
 	$.ajax({
 		url: "data/tree.json?",
+		method : "GET",
 		type: "json",
 		ondata: function() {
 			treeData = this.getResponseJSON();
@@ -47,6 +48,7 @@ function init() {
  
 	$.ajax({
 		url: URL_SOURCE_TREE,
+		method : "GET",
 		onresult: function() {
 			treeData = this.getNodeValue("ParamTree");
 			var tree1 = $.T("tree", treeData);	

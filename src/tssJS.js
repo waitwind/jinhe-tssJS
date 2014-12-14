@@ -21,9 +21,6 @@
         // The deferred used on DOM ready
         readyList = [],
 
-        // Check if a string has a non-whitespace character in it
-        rnotwhite = /\S/,
-
         // Used for trimming whitespace
         trimLeft = /^\s+/,
         trimRight = /\s+$/,
@@ -33,9 +30,7 @@
 
         toString = Object.prototype.toString,
         trim = String.prototype.trim,
-        push    = Array.prototype.push,
-        slice   = Array.prototype.slice,     
-        indexOf = Array.prototype.indexOf,
+        push = Array.prototype.push,    
 
         ua = navigator.userAgent.toLowerCase(),
         mc = function(e) {

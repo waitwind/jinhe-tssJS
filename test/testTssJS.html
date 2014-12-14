@@ -95,6 +95,11 @@
  
  	// test Element
 
+ 	$(function(name) {
+ 		var tssJSObj = $("#div1");
+ 		$.assertEquals(1, tssJSObj.size());
+ 	});
+
  	$().ready(function(name) {
  		$.assertEquals("tssJS1.0.0", name + this.tssjs, "$().ready(fn) method error.");
  		

@@ -18,6 +18,7 @@
 
 	 	$.ajax({
 	 		url: url,
+	 		method : "GET",
 	 		onresult: function() {
 	 			var data = this.getNodeValue("ProgressInfo");
 	 			var progress = new $.Progress(url, data, 'data/_success.xml?');

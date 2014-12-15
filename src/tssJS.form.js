@@ -191,7 +191,7 @@
                         else if(mode == "string" && nodeName == 'textarea') {
                             htmls.push("<textarea " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + ">" + (value ? value : "") + "</textarea>");
                         }
-                        else if(mode == "string" || mode == "number" || mode == "function" || mode == "date") {
+                        else if(mode == "string" || mode == "number" || mode == "function" || mode == "date" || mode == "datetime") {
                             htmls.push("<input " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + _value + "></input>");
                         }
                     }
@@ -298,6 +298,9 @@
                     case "date":
                     case "function":
                         fieldObj = new FunctionField(fieldName, this);
+                        break;
+                    case "datetime":
+                        fieldObj = new FunctionField(fieldName, this, true);
                         break;
                     case "hidden":
                         fieldObj = new HiddenFiled(fieldName, this);
@@ -499,10 +502,10 @@
     };
 
     // 自定义方法输入值类型
-    var FunctionField = function(fieldName, form) {
+    var FunctionField = function(fieldName, form, isDatetime) {
         this.el = $$(fieldName);
         this.el._value = this.el.value; // 备份原值
-        this.isdate = (this.el.getAttribute("mode").toLowerCase() == "date");
+        this.isdate = (this.el.getAttribute("mode").toLowerCase() == "date") || isDatetime;
      
         if( !this.el.disabled ) {
             if(this.isdate) {
@@ -511,9 +514,10 @@
                         field: $1(this.el.id),
                         firstDay: 1,
                         minDate: new Date('2000-01-01'),
-                        maxDate: new Date('2020-12-31'),
-                        yearRange: [2000,2020],
-                        format: 'yyyy-MM-dd'
+                        maxDate: new Date('2030-12-31'),
+                        yearRange: [2000,2030],
+                        format: 'yyyy-MM-dd',
+                        careTime: isDatetime
                     });
                 }
             }

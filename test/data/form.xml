@@ -17,7 +17,7 @@
           <column name="sex2"      caption="性别" mode="string" editor="comboedit" editorvalue="0|1|2" editortext="男|女|其它" editable="false"/> 
           <column name="season"    caption="季节" mode="string" editor="comboedit" editorvalue="0|1|2|3|4|5|6" editortext="春天|夏天|秋天|寒冬腊月111111|寒冬腊月222222222|寒冬腊月3333333333333|寒冬腊月44444444444444444" multiple="multiple"/> 
 		      <column name="temp1"     caption="函数" mode="function" cmd="func1()" editable="true"  empty="false"/>
-          <column name="temp2"     caption="日期" mode="date"  empty="false"/>
+          <column name="temp2"     caption="日期" mode="datetime"  empty="false"/>
         </declare>
         <layout>
           <TR>

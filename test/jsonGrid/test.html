@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<HTML XMLNS:Grid>
+<head>
+	<meta charset="UTF-8"/>
+	<title>DataGrid test</title>
+
+	<link href="../../css/tss.common.css" rel="stylesheet">
+	<link href="../../css/tss.menu.css" rel="stylesheet">
+	<link href="../../css/tss.grid.css" rel="stylesheet">
+
+	<script src="../../src/tssJS.js"></script>
+	<script src="../../src/tssJS.ajax.js"></script>
+	<script src="../../src/tssJS.menu.js"></script>
+	<script src="tssJS.datagrid.js"></script>
+
+
+	<script type="text/javascript">
+	    window.onload = function() {
+
+		var cHtml = []; 
+        var labelList = []; 
+        labelList[0] = '一月';
+        labelList[1] = '二月';
+        labelList[2] = '三月';        
+        labelList[3] = '四月';
+        labelList[4] = '五月';
+        labelList[5] = '六月';
+        labelList[6] = '七月';
+        labelList[7] = '八月';
+        labelList[8] = '九月';
+        labelList[9] = '十月';
+        labelList[10] = '十一月';
+        labelList[11] = '十二月';
+        labelList[12] = '汇总';
+
+        for(var i=0; i < labelList.length; i++) {        	
+        	cHtml.push('<th field="' + labelList[i] + '" width="90" align="right" styler="rowStyler" formatter="formatter">' + labelList[i] + '</th>');
+        }
+		
+		$$("cityColumn").innerHTML = cHtml.join("\n");
+		show();
+	    } 
+
+	    function show() {
+	    	Ajax({
+	            url : 'finMonth.json',
+	            method : 'GET',
+	            type : "json",
+	            waiting : true,
+	            ondata : function() { 
+	                var rows = window.JSON.parse(this.getResponseText());
+	                var data = {};
+	                data.rows = rows;
+	                
+	                var rows = data.rows;
+	                var rank1 = [];
+	                var rank2 = [];
+	                var rank3 = [];
+	                var rank4 = [];
+	                for(var i = 0; i < rows.length; i++) {
+	                	var row = rows[i];
+	                	row.id = i + 1;
+
+	                	if(row.rank === "一级" ) {
+	                		rank1.push(row);	                		
+	                	}
+	                	else if(row.rank === "二级") {
+	                		row._parentId = rank1[rank1.length - 1].id;
+	                		rank2.push(row);	                		
+	                	}
+	                	else if(row.rank === "三级") {
+	                		row._parentId = rank2[rank2.length - 1].id;
+	                		rank3.push(row);	                		
+	                	}
+	                	else if(row.rank === "四级") {
+	                		row._parentId = rank3[rank3.length - 1].id;
+	                		rank4.push(row);	                		
+	                	}
+	                	else if(row.rank === "五级") {
+	                		row._parentId = rank4[rank4.length - 1].id;
+	                	}	                	
+	                }
+
+	                for (var i = 0; i < rows.length; i++) {
+	                	for (var j = i; j < rows.length; j++) {
+	                		if (rows[i].id == rows[j]._parentId) {rows[i].state = "closed";}; 
+	                	};	                	
+	                };
+
+
+	                $('#dg').treegrid({
+					    idField:'id',
+					    treeField:'name',
+					    rownumbers: true,
+					    showFooter: true,
+					    animate: true,					    
+					    data: data,
+					    singleSelect: true,
+					    idField: 'id',
+					    onClickRow: onClickRow
+					});
+	            }
+	        });
+	    }
+ 
+
+	    function formatter(value, row, index){
+	    	if (row.name.indexOf('率') == -1) {return formatMoney(value, 1);}
+	    	else{return Math.round(value*1000)/10 + '%'};			
+		}
+
+		function formatMoney(s, n) {   
+		   n = n > 0 && n <= 20 ? n : 2;   
+		   s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";   
+		   var l = s.split(".")[0].split("").reverse(),   
+		   r = s.split(".")[1];   
+		   t = "";   
+		   for(i = 0; i < l.length; i ++ ) {   
+		      t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");   
+		   }   
+		   return t.split("").reverse().join("") + "." + r;   
+		} 
+	
+	</script>
+</head>
+
+<body>
+ 
+
+</body>
+</html>

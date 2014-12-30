@@ -9,6 +9,26 @@
 	<link href="../../css/tss.menu.css" rel="stylesheet">
 	<link href="../../css/tss.grid.css" rel="stylesheet">
 
+	<style type="text/css">
+		.container {
+            border: #000000 1px solid;
+            height: 500px;
+            overflow-y: auto;
+            width: 1200px;
+        }
+		.datagrid { width:100%; height:100%; position:relative; padding-top:0px; display:inline-block;}
+		.datagrid table { width:100%; height:auto; table-layout:fixed; border:0px; margin:0px; border-collapse:collapse;}
+		.datagrid td { font-size:12px; text-align:center; border-style:solid; border-color:#FFFFFF #96969E #96969E #FFFFFF; border-width:1px;}
+		.datagrid thead tr { height: auto; position: relative; }
+		.datagrid thead td { background-color:#E4E6F5; height:25px; }
+
+		.datagrid tbody { background-color:#F7F8FD;	overflow-x: hidden; overflow-y: auto; }
+		.datagrid tbody tr { height:25px; }
+		.datagrid tbody td { overflow: hidden; text-overflow:ellipsis; white-space: nowrap; word-break:keep-all; }
+		.datagrid tbody td div { padding:2px; }
+
+	</style>
+
 	<script src="../../src/tssJS.js"></script>
 	<script src="../../src/tssJS.ajax.js"></script>
 	<script src="../../src/tssJS.menu.js"></script>
@@ -16,89 +36,39 @@
 
 
 	<script type="text/javascript">
-	    window.onload = function() {
-
-		var cHtml = []; 
-        var labelList = []; 
-        labelList[0] = '一月';
-        labelList[1] = '二月';
-        labelList[2] = '三月';        
-        labelList[3] = '四月';
-        labelList[4] = '五月';
-        labelList[5] = '六月';
-        labelList[6] = '七月';
-        labelList[7] = '八月';
-        labelList[8] = '九月';
-        labelList[9] = '十月';
-        labelList[10] = '十一月';
-        labelList[11] = '十二月';
-        labelList[12] = '汇总';
-
-        for(var i=0; i < labelList.length; i++) {        	
-        	cHtml.push('<th field="' + labelList[i] + '" width="90" align="right" styler="rowStyler" formatter="formatter">' + labelList[i] + '</th>');
-        }
-		
-		$$("cityColumn").innerHTML = cHtml.join("\n");
-		show();
-	    } 
+	    $().ready( function() {
+			show();
+	    } );
 
 	    function show() {
-	    	Ajax({
-	            url : 'finMonth.json',
+	    	$.ajax({
+	            url : 'grid.json',
 	            method : 'GET',
 	            type : "json",
 	            waiting : true,
 	            ondata : function() { 
-	                var rows = window.JSON.parse(this.getResponseText());
-	                var data = {};
-	                data.rows = rows;
-	                
-	                var rows = data.rows;
-	                var rank1 = [];
-	                var rank2 = [];
-	                var rank3 = [];
-	                var rank4 = [];
-	                for(var i = 0; i < rows.length; i++) {
-	                	var row = rows[i];
-	                	row.id = i + 1;
-
-	                	if(row.rank === "一级" ) {
-	                		rank1.push(row);	                		
-	                	}
-	                	else if(row.rank === "二级") {
-	                		row._parentId = rank1[rank1.length - 1].id;
-	                		rank2.push(row);	                		
-	                	}
-	                	else if(row.rank === "三级") {
-	                		row._parentId = rank2[rank2.length - 1].id;
-	                		rank3.push(row);	                		
-	                	}
-	                	else if(row.rank === "四级") {
-	                		row._parentId = rank3[rank3.length - 1].id;
-	                		rank4.push(row);	                		
-	                	}
-	                	else if(row.rank === "五级") {
-	                		row._parentId = rank4[rank4.length - 1].id;
-	                	}	                	
-	                }
-
-	                for (var i = 0; i < rows.length; i++) {
-	                	for (var j = i; j < rows.length; j++) {
-	                		if (rows[i].id == rows[j]._parentId) {rows[i].state = "closed";}; 
-	                	};	                	
-	                };
+	                var data = this.getResponseJSON();
+	                 
 
 
-	                $('#dg').treegrid({
-					    idField:'id',
-					    treeField:'name',
-					    rownumbers: true,
-					    showFooter: true,
-					    animate: true,					    
-					    data: data,
-					    singleSelect: true,
-					    idField: 'id',
-					    onClickRow: onClickRow
+	                $('#dg').datagrid({
+	                	columns:[
+	                				{"name": "name", "label": "名称", "width": "180"},
+	                				{"name": "一月", "editable" : "true"},
+	                				{"name": "二月"},
+	                				{"name": "三月"},
+	                				{"name": "四月"},
+	                				{"name": "五月"},
+	                				{"name": "六月"},
+	                				{"name": "七月"},
+	                				{"name": "八月"},
+	                				{"name": "九月"},
+	                				{"name": "十月"},
+	                				{"name": "十一月"},
+	                				{"name": "十二月"},
+	                				{"name": "汇总"}
+	                			],				    
+					    data: data 
 					});
 	            }
 	        });
@@ -127,6 +97,9 @@
 
 <body>
  
+ 	<div class="container">
+		<table id="dg"></table>
+	</div>
 
 </body>
 </html>

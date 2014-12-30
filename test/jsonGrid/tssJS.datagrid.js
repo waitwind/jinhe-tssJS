@@ -2,29 +2,21 @@
 
     $.DataGrid = factory();
 
+    var DataGridCache = {};
+
     $.fn.extend({
     	datagrid: function(info) {
     		var el = this[0];
     		var id = el.id;
-	        var grid = GridCache[id];
+	        var grid = DataGridCache[id];
 	        if( grid == null || info.data ) {
 	            grid = new $.DataGrid(el, info);
-	            GridCache[id] = grid;  
+	            // DataGridCache[id] = grid;  
 	        }
 	        
 	        return grid;
 	    }
     });
-
-    $.DG = function(id, info) {
-        var grid = GridCache[id];
-        if( grid == null || info.data ) {
-            grid = new $.DataGrid($1(id), info);
-            GridCache[id] = grid;  
-        }
-        
-        return grid;
-    }
 
 })(tssJS, function() {
 
@@ -32,12 +24,13 @@
 
     var Column = function(info) {
 		this.name  = info.name;
-		this.label = info.label;
+		this.label = info.label|| info.name;
 		this.type  = info.type || "string";
 		this.width = (info.width || "120px").trim();
 		this.align = info.align || "center"
 		this.formatter = info.formatter;
 		this.styler = info.styler;
+		this.editable = info.editable || "false";
 
 		if( /^\d*$/.test(this.width) ) {
 			this.width += "px";
@@ -78,7 +71,7 @@
 
 		var _columns = {};
         (info.columns || []).each(function(index, column) {
-            _columns[column.name] = column;
+            _columns[column.name] = new Column(column);
         });
         this.columns = _columns;
 
@@ -95,11 +88,13 @@
         		waiting: true,
         		ondata: function() {
         			oThis.data = this.getResponseJSON();
+        			oThis.toHTML();
         		}
         	});
         }
         else {
         	this.data = info.data;
+        	this.toHTML();
         }
 
         
@@ -111,7 +106,7 @@
 
     		thead.push('<thead><tr>');
     		$.each(this.columns, function(name, column) {
-                var width   = column.getAttribute("width");
+                var width   = column.width;
                 var style = (width ? ' style="width:' + width + '"': '');
                 thead.push('<td name="' + column.name + '" ' + style + '>' + column.label + '</td>');
             });
@@ -119,23 +114,14 @@
 
             var oThis = this;
             tbody.push('<tbody>');
-            $.each(this.dataRows, function(i, row) {
-                var index = startNum + i + 1;
+            $.each(oThis.data, function(i, row) {
+                var index = i + 1;
                 tbody.push('<tr _index="' + index + '">');
 
-                if(oThis.hasHeader) {
-                    tbody.push('<td></td>');
-                }
-                if(oThis.needSequence) {
-                    tbody.push('<td></td>');
-                }
-
-                var columnsMap = oThis.columnsMap;
-                for(var name in columnsMap) {
-                    var value  = row.getAttribute(name) || "";
-                    var _class = columnsMap[name].getAttribute("display")  == "none" ? ' class="hidden"' : '';
-                    tbody.push('<td name="' + name + '" value="' + value + '" ' + _class + '>' + value + '</td>');
-                }
+                $.each(oThis.columns, function(name, column) {
+                    var value  = row[name] || "";
+                    tbody.push('<td name="' + name + '" ><div contenteditable="' + column.editable + '">' + value + '</div></td>');
+                });
 
                 tbody.push("</tr>");
             });
@@ -145,7 +131,8 @@
             htmls.push(thead.join(""));
             htmls.push(tbody.join(""));
             htmls.push("</table>");
-            return htmls.join("");
+
+            $(this.el).html( htmls.join("") ).addClass("datagrid");
     	}
     }
 

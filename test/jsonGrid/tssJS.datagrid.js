@@ -11,11 +11,25 @@
 	        var grid = DataGridCache[id];
 	        if( grid == null || info.data ) {
 	            grid = new $.DataGrid(el, info);
-	            // DataGridCache[id] = grid;  
+	            DataGridCache[id] = grid;  
 	        }
 	        
 	        return grid;
 	    }
+    });
+
+    $.extend({
+        formatMoney: function(s, n) {   
+            n = n > 0 && n <= 20 ? n : 2;   
+            s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";   
+            var l = s.split(".")[0].split("").reverse(),   
+            r = s.split(".")[1];   
+            t = "";   
+            for(i = 0; i < l.length; i ++ ) {   
+                t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");   
+            }   
+            return t.split("").reverse().join("") + "." + r;   
+        }
     });
 
 })(tssJS, function() {
@@ -27,7 +41,7 @@
 		this.label = info.label|| info.name;
 		this.type  = info.type || "string";
 		this.width = (info.width || "120px").trim();
-		this.align = info.align || "center"
+		this.align = info.align;
 		this.formatter = info.formatter;
 		this.styler = info.styler;
 		this.editable = info.editable || "false";
@@ -48,10 +62,6 @@
        	 	}
 		}
 		
-    };
-
-    Column.prototype = {
- 
     };
 
     var DataGrid = function(el, info) {
@@ -88,19 +98,27 @@
         		waiting: true,
         		ondata: function() {
         			oThis.data = this.getResponseJSON();
-        			oThis.toHTML();
+        			oThis.createGrid();
         		}
         	});
         }
         else {
         	this.data = info.data;
-        	this.toHTML();
+        	this.createGrid();
         }
-
-        
     };
 
     DataGrid.prototype = {
+        createGrid: function() {
+            this.toHTML();
+
+            // 渲染样式 styler rowStyler
+            this.appendStyle();
+
+            // 添加事件、动作
+            this.addEvent();
+        },
+
     	toHTML: function() {
     		var htmls = [], thead = [], tbody = [];
 
@@ -120,7 +138,7 @@
 
                 $.each(oThis.columns, function(name, column) {
                     var value  = row[name] || "";
-                    tbody.push('<td name="' + name + '" ><div contenteditable="' + column.editable + '">' + value + '</div></td>');
+                    tbody.push('<td><div name="' + name + '" value="' + value + '" contenteditable="' + column.editable + '" ' + '>' + value + '</div></td>');
                 });
 
                 tbody.push("</tr>");
@@ -133,7 +151,70 @@
             htmls.push("</table>");
 
             $(this.el).html( htmls.join("") ).addClass("datagrid");
-    	}
+    	},
+
+        appendStyle: function() {
+            var oThis = this;
+            $("tbody>tr", this.el).each(function(i, row){
+                var rowValues = oThis.data[i];
+                if( $.isFunction(oThis.rowStyler) ) {
+                    oThis.rowStyler(i, row, rowValues);
+                }
+
+                $(row).hover(
+                    function() { 
+                        $(row).addClass("highlight"); 
+                    }, 
+                    function() { 
+                        $(row).removeClass("highlight");
+                    } 
+                );
+
+                $("td>div", row).each(function(j, cellDiv){
+                    var name = cellDiv.getAttribute("name");
+                    var column = oThis.columns[name];
+                    if( $.isFunction(column.styler) ) {
+                        var value = cellDiv.getAttribute("value");
+                        column.styler(value, cellDiv);
+                    }
+
+                    if(column.align) {
+                        $(cellDiv).css("textAlign", column.align);
+                    }
+
+                    var value = cellDiv.getAttribute("value");
+                    if( $.isFunction(column.formatter) ) {
+                        $(cellDiv).html( column.formatter(value, rowValues) );
+                    }
+                });
+            });
+        },
+
+        addEvent: function() {
+            var oThis = this;
+            $("tbody>tr", this.el).each(function(i, row){
+ 
+                $("td>div", row).each(function(j, cellDiv){
+                    var name = cellDiv.getAttribute("name");
+                    var column = oThis.columns[name];
+
+                    var value = $(cellDiv).html();
+                    var originalValye = cellDiv.getAttribute("value");
+                    if(cellDiv.getAttribute("contenteditable") === "true") {
+                        $(cellDiv).click(function(){
+                            $(cellDiv).html(originalValye);
+                        });
+                        
+                        // $(cellDiv).focus(function(){
+                        //     value = $(cellDiv).html(); 
+                        //     if( $.isFunction(column.formatter) ) {
+                        //         $(cellDiv).html( column.formatter(value, rowValues) );
+                        //     }
+                        // });
+                    }
+                });
+            });
+        }
     }
 
     return DataGrid;

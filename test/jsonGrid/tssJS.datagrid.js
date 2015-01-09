@@ -29,6 +29,11 @@
                 t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");   
             }   
             return t.split("").reverse().join("") + "." + r;   
+        },
+
+        numberValidator: function(value) {
+            var re = /^-?[0-9]+.?[0-9]*$/;
+            return re.test(value);
         }
     });
 
@@ -49,19 +54,17 @@
 		if( /^\d*$/.test(this.width) ) {
 			this.width += "px";
 		}
-
-		if(this.align == null) {
-			switch(this.type) {
-            case "number":
-                this.align = "right";
-                break;
-            case "string":
-            default:
-                this.align = "center";
-                 break;
-       	 	}
-		}
-		
+ 
+		switch(this.type) {
+        case "number":
+            this.align = this.align || "right";
+            this.validator = this.validator || $.numberValidator;
+            break;
+        case "string":
+        default:
+            this.align = this.align || "center";
+             break;
+   	 	}		
     };
 
     var DataGrid = function(el, info) {
@@ -85,7 +88,9 @@
         });
         this.columns = _columns;
 
+        // 样式 和 事件
         this.rowStyler = info.rowStyler;
+        this.afterEditCell = info.afterEditCell;
 
         this.url = info.url;
         this.queryParams = info.queryParams;
@@ -103,7 +108,7 @@
         	});
         }
         else {
-        	this.data = info.data;
+        	this.data = this.el.data = info.data;
         	this.createGrid();
         }
     };
@@ -138,7 +143,7 @@
 
                 $.each(oThis.columns, function(name, column) {
                     var value  = row[name] || "";
-                    tbody.push('<td><div name="' + name + '" value="' + value + '" contenteditable="' + column.editable + '" ' + '>' + value + '</div></td>');
+                    tbody.push('<td><div name="' + name + '" contenteditable="' + column.editable + '" ' + '>' + value + '</div></td>');
                 });
 
                 tbody.push("</tr>");
@@ -156,35 +161,32 @@
         appendStyle: function() {
             var oThis = this;
             $("tbody>tr", this.el).each(function(i, row){
-                var rowValues = oThis.data[i];
+                row.data = oThis.data[i];
                 if( $.isFunction(oThis.rowStyler) ) {
-                    oThis.rowStyler(i, row, rowValues);
+                    oThis.rowStyler(i, row);
                 }
 
                 $(row).hover(
-                    function() { 
-                        $(row).addClass("highlight"); 
-                    }, 
-                    function() { 
-                        $(row).removeClass("highlight");
-                    } 
+                    function() { $(row).addClass("highlight"); }, 
+                    function() { $(row).removeClass("highlight"); } 
                 );
 
                 $("td>div", row).each(function(j, cellDiv){
-                    var name = cellDiv.getAttribute("name");
+                    var $cell= $(cellDiv);
+                    var name = $cell.attr("name");
+
                     var column = oThis.columns[name];
                     if( $.isFunction(column.styler) ) {
-                        var value = cellDiv.getAttribute("value");
-                        column.styler(value, cellDiv);
+                        column.styler(row.data[name], cellDiv);
                     }
 
                     if(column.align) {
-                        $(cellDiv).css("textAlign", column.align);
+                        $cell.css("textAlign", column.align);
                     }
 
-                    var value = cellDiv.getAttribute("value");
                     if( $.isFunction(column.formatter) ) {
-                        $(cellDiv).html( column.formatter(value, rowValues) );
+                        var value = $cell.html();
+                        $cell.html( column.formatter(value, row) );
                     }
                 });
             });
@@ -193,27 +195,49 @@
         addEvent: function() {
             var oThis = this;
             $("tbody>tr", this.el).each(function(i, row){
- 
                 $("td>div", row).each(function(j, cellDiv){
-                    var name = cellDiv.getAttribute("name");
+                    var $cell = $(cellDiv);
+                    var name = $cell.attr("name");
                     var column = oThis.columns[name];
 
-                    var value = $(cellDiv).html();
-                    var originalValye = cellDiv.getAttribute("value");
-                    if(cellDiv.getAttribute("contenteditable") === "true") {
-                        $(cellDiv).click(function(){
-                            $(cellDiv).html(originalValye);
-                        });
-                        
-                        // $(cellDiv).focus(function(){
-                        //     value = $(cellDiv).html(); 
-                        //     if( $.isFunction(column.formatter) ) {
-                        //         $(cellDiv).html( column.formatter(value, rowValues) );
-                        //     }
-                        // });
+                    if($cell.attr("contenteditable") === "true") {
+                        $cell.click(function(){
+                            var originalVal = row.data[name];
+                            $cell.html(originalVal);
+
+                            $cell[0].blurHandler = $cell[0].blurHandler || function() {
+                                var value = $cell.html(); 
+                                
+                                // 如果不合格式，则置会修改前的值
+                                if( $.isFunction(column.validator) && !column.validator(value, row) ) {
+                                    (new $.Balloon("新输入的值【" + value + "】不符合格式要求")).dockTo($cell[0]);
+                                    $cell.html( column.formatter(originalVal, row) );
+                                    return;
+                                }
+
+                                row.data[name] = value;
+                                if( $.isFunction(column.formatter) ) {
+                                    $cell.html( column.formatter(value, row) );
+                                }
+
+                                if( $.isFunction(oThis.afterEditCell) ) {
+                                    oThis.afterEditCell(value, cellDiv, row);
+                                }
+                            };
+  
+                            $cell.blur($cell[0].blurHandler);
+                        });                        
                     }
                 });
             });
+        },
+
+        appendRow: function(rowData) {
+
+        },
+
+        deleteRow: function(rowIndex) {
+
         }
     }
 

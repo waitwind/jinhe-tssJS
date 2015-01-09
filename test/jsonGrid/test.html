@@ -7,6 +7,7 @@
 
 	<link href="../../css/tss.common.css" rel="stylesheet">
 	<link href="../../css/tss.menu.css" rel="stylesheet">
+	<link href="../../css/tss.balloon.css" rel="stylesheet">
 	<link href="../../css/tss.grid.css" rel="stylesheet">
 
 	<style type="text/css">
@@ -34,6 +35,8 @@
 	<script src="../../src/tssJS.js"></script>
 	<script src="../../src/tssJS.ajax.js"></script>
 	<script src="../../src/tssJS.menu.js"></script>
+	<script src="../../src/tssJS.balloon.js"></script>
+
 	<script src="tssJS.datagrid.js"></script>
 
 
@@ -53,7 +56,7 @@
 
 	                $('#dg').datagrid({
 	                	columns:[
-            				{"name": "name", "label": "名称", "width": "180"},
+            				{"name": "name", "label": "名称", "width": "180", "align": "left"},
             				{"name": "一月", "type" : "number", "editable" : "true",  "formatter": formatter},
             				{"name": "二月", "type" : "number", "editable" : "true",  "formatter": formatter},
             				{"name": "三月", "type" : "number", "editable" : "true"},
@@ -74,30 +77,40 @@
 	            }
 	        });
 	    }
- 
+
+	    function afterEditCell(cell, row) {
+
+	    } 
 
 	    function formatter(value, row) {
 	    	if( $.isNullOrEmpty(value) ) return "";
 
-	    	if (row.name.indexOf('率') == -1) {
-	    		return $.formatMoney(value, 1);
+	    	if (row.data.name.indexOf('率') == -1) {
+	    		return $.formatMoney(value, 2);
 	    	}
 	    	else{
 	    		return Math.round(value*1000) / 10 + '%'
 	    	};			
 		}
 
-		function rowStyler(value, row, rowValues) {
-			if (rowValues.name.indexOf('利') >= 0){
-                $(row).css('backgroundColor', '#6293BB');
+		function rowStyler(value, row) {
+			if (row.data.name.indexOf('利') >= 0){
+                // $(row).css('backgroundColor', '#6293BB');
             }
+
+            if (row.data.rank === '一级') {
+	    		 $("td>div", row).attr("contenteditable", "false");
+	    		 $(row).css('backgroundColor', '#CCCCCC');
+	    	}
 		}
 
 		function styler(value, cell) {
-			if (value.indexOf('-') >= 0){
+			if (value && value < 0){
                 $(cell).css('backgroundColor', 'red');
             }
 		}
+
+ 
 	
 	</script>
 </head>

@@ -500,9 +500,9 @@
         // 添加Class
         addClass: function(className) {
             for (var i = 0; i < this.length; i++) {
-                var element = this[i];
-                if (!$.hasClass(element, className)) {
-                    element.className += ' ' + className;
+                var el = this[i];
+                if (!$.hasClass(el, className)) {
+                    el.className += ' ' + className;
                 }
             }
             return this;
@@ -512,9 +512,9 @@
         removeClass: function(className) {
             var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
             for (var i = 0; i < this.length; i++) {
-                var element = this[i];
-                if ($.hasClass(element, className)) {
-                    element.className = element.className.replace(reg, ' ').trim();
+                var el = this[i];
+                if ($.hasClass(el, className)) {
+                    el.className = el.className.replace(reg, ' ').trim();
                 }
             }
             return this;
@@ -532,11 +532,11 @@
         // 设置innerHTML
         html: function(str) {
             for (var i = 0; i < this.length; i++) {
-                var element = this[i];
+                var el = this[i];
                 if (arguments.length == 0) {
-                    return element.innerHTML;
+                    return el.innerHTML;
                 }
-                element.innerHTML = str;
+                el.innerHTML = str;
             }
             return this;
         },
@@ -555,21 +555,27 @@
             return this;
         },
 
+        // 触发点击事件
+        click: function(fn) {
+            for (var i = 0; i < this.length; i++) {
+                this[i].onclick = fn;
+            }
+            return this;
+        },
+
         // 设置鼠标移入移出方法
         hover: function(over, out) {
-            for (var i = 0; i < this.length; i++) {
-                $.Event.addEvent(this[i], 'mouseover', over);
-                $.Event.addEvent(this[i], 'mouseout', out);
-            }
+            this.addEvent('mouseover', over);
+            this.addEvent('mouseout', out);
             return this;
         },
 
         // 设置点击切换方法
         toggle: function() {
             for (var i = 0; i < this.length; i++) { 
-                (function(element, args) {
+                (function(el, args) {
                     var count = 0;
-                    $.Event.addEvent(element, 'click', function() {
+                    $.Event.addEvent(el, 'click', function() {
                         args[count++%args.length].call(this);
                     });
                 })(this[i], arguments);
@@ -588,6 +594,25 @@
         focus: function() {
             if ( this.length > 0 ) {
                 this[0].focus();
+            }
+            return this;
+        },
+
+        blur: function(fn) {
+            this.removeEvent('blur', fn).addEvent('blur', fn);
+            return this;
+        },
+
+        addEvent: function(eventName, fn, capture) {
+            for (var i = 0; i < this.length; i++) {
+                $.Event.addEvent(this[i], eventName, fn, capture);
+            }
+            return this;
+        },
+
+        removeEvent: function(eventName, fn, capture) {
+            for (var i = 0; i < this.length; i++) {
+                $.Event.removeEvent(this[i], eventName, fn, capture);
             }
             return this;
         },
@@ -616,18 +641,15 @@
             return this;
         },
 
-        // 触发点击事件
-        click: function(fn) {
+        attr: function(name, value) {
             for (var i = 0; i < this.length; i++) {
-                this[i].onclick = fn;
+                var el = this[i];
+                if (arguments.length == 1) {
+                    return el.getAttribute(name);
+                }
+                el.setAttribute(name, value);
             }
             return this;
-        },
-
-        focus: function() {
-            if(this.length > 0) {
-                this[0].focus();
-            }
         }
     });
 })(tssJS);
@@ -657,12 +679,12 @@
         },
 
         // 获取Style。注：computedStyle: style 和 runtimeStyle 的结合
-        getStyle: function(element, attr) {
+        getStyle: function(el, attr) {
             if (window.getComputedStyle) { // W3C
-                return window.getComputedStyle(element, null)[attr];
+                return window.getComputedStyle(el, null)[attr];
             } 
-            else if (element.currentStyle) { //IE
-                return element.currentStyle[attr];
+            else if (el.currentStyle) { //IE
+                return el.currentStyle[attr];
             }
             return null;
         },
@@ -690,27 +712,27 @@
         },
 
         createElement: function(tagName, className) {
-            var element = document.createElement(tagName);
+            var el = document.createElement(tagName);
             if (className) {
-                $(element).addClass(className)
+                $(el).addClass(className)
             }
-            return element;
+            return el;
         },
 
         // 创建带命名空间的对象
         createNSElement: function(tagName, ns) {
             var tempDiv = document.createElement("DIV");
             tempDiv.innerHTML = "<" + ns + ":" + tagName + "/>";
-            var element = tempDiv.firstChild.cloneNode(false);
-            element.uniqueID = $.getUniqueID();
+            var el = tempDiv.firstChild.cloneNode(false);
+            el.uniqueID = $.getUniqueID();
 
             $.removeNode(tempDiv);
 
-            return element;
+            return el;
         },
 
-        getNSElements: function(element, tagName, ns) {
-            return element.getElementsByTagName(ns + ":" + tagName);
+        getNSElements: function(el, tagName, ns) {
+            return el.getElementsByTagName(ns + ":" + tagName);
         },
 
         removeNode: function(node) {
@@ -897,12 +919,13 @@
 
             timeout: {},
 
-            addEvent: function(element, eventName, fn, capture) {
-                element.addEventListener(eventName, fn, !!capture);
+            // 同一事件多次添加，不会彼此覆盖，将会多次触发
+            addEvent: function(el, eventName, fn, capture) {
+                el.addEventListener(eventName, fn, !!capture);
             },
 
-            removeEvent: function(element, eventName, fn, capture) {
-                element.removeEventListener(eventName, fn, !!capture);
+            removeEvent: function(el, eventName, fn, capture) {
+                el.removeEventListener(eventName, fn, !!capture);
             },
 
             /* 取消事件 */

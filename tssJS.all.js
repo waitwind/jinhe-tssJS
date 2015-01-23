@@ -1857,9 +1857,9 @@
 
 ;(function ($, factory) {
 
-    $.Balloon = factory();
+    $.Balloon = factory($);
 
-})(tssJS, function () {
+})(tssJS, function ($) {
 
     'use strict';
 
@@ -1958,9 +1958,9 @@
 
 ;(function ($, factory) {
 
-    $.Menu = factory();
+    $.Menu = factory($);
 
-})(tssJS, function () {
+})(tssJS, function ($) {
 
     'use strict';
 
@@ -5180,9 +5180,9 @@
 
 ;(function ($, factory) {
 
-    $.WorkSpace = factory();
+    $.WorkSpace = factory($);
 
-})(tssJS, function () {
+})(tssJS, function ($) {
 
     'use strict';
 

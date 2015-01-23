@@ -2,9 +2,9 @@
 
 ;(function ($, factory) {
 
-    $.Menu = factory();
+    $.Menu = factory($);
 
-})(tssJS, function () {
+})(tssJS, function ($) {
 
     'use strict';
 

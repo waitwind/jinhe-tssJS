@@ -541,6 +541,17 @@
             return this;
         },
 
+        // 设置XML node text
+        text: function(value) {
+            for (var i = 0; i < this.length; i++) {
+                if (arguments.length == 0) {
+                    return $.XML.getText( this[i] );
+                }
+                $.XML.setText(this[i], value);  
+            }
+            return this;
+        },
+
         appendChild: function(el) {
             if ( this.length > 0 ) {
                 this[0].appendChild(el);

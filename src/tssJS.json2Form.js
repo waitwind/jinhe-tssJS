@@ -5,8 +5,8 @@
 		// item的类型允许为[id, code, name] or [pk, id, text]
 		createOption = function(item) {
 			var option = new Option();
-			option.value = item.id   || item.pk   || item[0];
-			option.text  = item.name || item.text || item[2];
+			option.value = item.id   || item.pk   || item[0] || '';
+			option.text  = item.name || item.text || item[2] || '';
 			return option;
 		},
 

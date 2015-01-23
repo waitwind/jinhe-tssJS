@@ -1,8 +1,8 @@
 ;(function ($, factory) {
 
-    $.Balloon = factory();
+    $.Balloon = factory($);
 
-})(tssJS, function () {
+})(tssJS, function ($) {
 
     'use strict';
 

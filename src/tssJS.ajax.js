@@ -262,7 +262,7 @@
          
             for(var name in this.params) {
                 var value = this.params[name];
-                if(value) {
+                if( !$.isNullOrEmpty(value) ) {
                     var paramNode = $.XML.createNode(_XML_NODE_REQUEST_PARAM);
                     paramNode.appendChild($.XML.appendCDATA(_XML_NODE_REQUEST_NAME, name));
                     paramNode.appendChild($.XML.appendCDATA(_XML_NODE_REQUEST_VALUE, value));

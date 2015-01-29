@@ -204,8 +204,8 @@
 
             // parseJSON把一个字符串变成JSON对象。(注：JSON.parse要求数据必须用双引号，eval转换时则不分单、双引号)
             parseJSON: function(data) {
-                if (typeof data !== "string" || !data) {
-                    return null;
+                if (typeof data !== "string") {
+                    return data;
                 }
 
                 // Make sure leading/trailing whitespace is removed 

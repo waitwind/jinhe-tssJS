@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>tssCalendar test</title>
+
+	<link href="../css/tss.common.css" rel="stylesheet">
+    <link href="../css/tss.calendar.css" rel="stylesheet">
+
+    <style type="text/css">
+    	pre,code {
+    		width: 500px;
+		    text-align: left;
+		    white-space: pre;
+		    word-spacing: normal;
+		    color: #f8f8f2;
+		    background: #1e2328;
+		    border-radius: 5px;
+		    overflow: auto;
+		    padding: 1em;
+		    margin: 1em 0;
+		    font-size: .9em;
+		    float: right;
+		}
+
+		#div1 { position: absolute; left: 30px; top: 30px; }
+		#div2 { position: absolute; left: 30px; top: 250px; }
+		#div1 pre, #div2 pre { margin-left:50px; }
+
+    </style>
+
+    <script src="../src/tssJS.js"></script>
+	<script src="../src/tssJS.calendar.js"></script>
+
+	<script type="text/javascript">
+
+	 window.onload = function() {
+		 
+        var pd3 = new $.Calendar( {
+	        field: document.getElementById("d3"),
+	        firstDay: 1,
+	        careTime: true
+	    });
+
+ 
+
+
+         
+	 }
+
+	</script>
+</head>
+
+<body>
+
+ 
+
+<div id='div2'>
+	 
+	<input id="d3" style="width:200px;display:inline;" value="2014-12-13 16:36:59"> </input>
+	 
+</div>
+
+</body>
+</html>

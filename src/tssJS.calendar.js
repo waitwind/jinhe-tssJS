@@ -1,8 +1,16 @@
 ;(function ($, factory) {
 
-    $.Calendar = factory($.moment);
+    $.Calendar = factory($);
 
-})(tssJS, function (moment) {
+    $.createCalendar = function(el, careTime) {
+        new $.Calendar( {
+            field: el,
+            format: 'yyyy-MM-dd',
+            careTime: careTime || false
+        });
+    }
+
+})(tssJS, function ($) {
     
     'use strict';
 
@@ -10,6 +18,11 @@
  
     isDate = function(obj) {
         return (/Date/).test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime());
+    },
+
+    string2Date = function(_s) {
+        var d = new Date(Date.parse(_s.replace(/-/g, "/"))); // Date.parse in IE only support yyyy/mm/dd
+        return d;
     },
 
     isLeapYear = function(year) {
@@ -310,7 +323,7 @@
         self._onInputChange = function(e) {
             if (e.firedBy === self) return;
  
-            var date = new Date(Date.parse(opts.field.value));
+            var date = string2Date(opts.field.value);
             self.setDate(isDate(date) ? date : null);
             if (!self._v) {
                 self.show();
@@ -370,7 +383,7 @@
             $.Event.addEvent(opts.field, 'change', self._onInputChange);
 
             if (!opts.defaultDate) {
-                opts.defaultDate = new Date(Date.parse(opts.field.value));
+                opts.defaultDate = string2Date(opts.field.value);
                 opts.setDefaultDate = true;
             }
         }
@@ -459,7 +472,7 @@
                 return this.draw();
             }
             if (typeof date === 'string') {
-                date = new Date(Date.parse(date));
+                date = string2Date(date);
             }
             if (!isDate(date)) {
                 return;
@@ -573,12 +586,14 @@
                     self._o.field.value = self._o.field.value.split(" ")[0] + " " + _time;
                     self._o.field.focus();
 
-                    var date = new Date(Date.parse(opts.field.value));
+                    var date = string2Date(opts.field.value);
                     self._hour = date.getHours();
                     self._minute = date.getMinutes();
                     self._second = date.getSeconds();
 
-                    self.hide();
+                    window.setTimeout(function() {
+                        self.hide();
+                    }, 50);
                 });
             }
 

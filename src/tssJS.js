@@ -1,4 +1,5 @@
-(function(window, undefined) {
+
+;(function(window, undefined) {
 
     if( window.attachEvent ) {
         alert("您当前的IE浏览器版本过低，为能有更好的展示效果，建议升级到IE11，或换最新版Chrome、FireFox。");

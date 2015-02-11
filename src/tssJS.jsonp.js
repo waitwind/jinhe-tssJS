@@ -1,3 +1,13 @@
+
+
+/* 
+ * 跨域调用支持 
+ * $.JSONP.getJSON(
+        "http://bl00618-l:8088/dms/display/json/GetAllVisitors", 
+        {'param1': 'hello jsonp!'}, 
+        function(result) { console.log(result.length); }
+   );
+ */
 ;(function($) {
 
     $.JSONP = {

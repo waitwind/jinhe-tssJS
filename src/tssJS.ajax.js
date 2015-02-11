@@ -1,4 +1,6 @@
-/*
+
+
+/*  AJAX相关封装
     $.ajax({
         url : url,
         method : "GET",

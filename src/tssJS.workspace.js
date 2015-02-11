@@ -1,3 +1,6 @@
+
+
+/* 布局组件 */
 ;(function ($, factory) {
 
     $.WorkSpace = factory($);

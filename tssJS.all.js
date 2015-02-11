@@ -1,4 +1,5 @@
-(function(window, undefined) {
+
+;(function(window, undefined) {
 
     if( window.attachEvent ) {
         alert("您当前的IE浏览器版本过低，为能有更好的展示效果，建议升级到IE11，或换最新版Chrome、FireFox。");
@@ -204,8 +205,8 @@
 
             // parseJSON把一个字符串变成JSON对象。(注：JSON.parse要求数据必须用双引号，eval转换时则不分单、双引号)
             parseJSON: function(data) {
-                if (typeof data !== "string" || !data) {
-                    return null;
+                if (typeof data !== "string") {
+                    return data;
                 }
 
                 // Make sure leading/trailing whitespace is removed 
@@ -500,9 +501,9 @@
         // 添加Class
         addClass: function(className) {
             for (var i = 0; i < this.length; i++) {
-                var element = this[i];
-                if (!$.hasClass(element, className)) {
-                    element.className += ' ' + className;
+                var el = this[i];
+                if (!$.hasClass(el, className)) {
+                    el.className += ' ' + className;
                 }
             }
             return this;
@@ -512,9 +513,9 @@
         removeClass: function(className) {
             var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
             for (var i = 0; i < this.length; i++) {
-                var element = this[i];
-                if ($.hasClass(element, className)) {
-                    element.className = element.className.replace(reg, ' ').trim();
+                var el = this[i];
+                if ($.hasClass(el, className)) {
+                    el.className = el.className.replace(reg, ' ').trim();
                 }
             }
             return this;
@@ -532,11 +533,22 @@
         // 设置innerHTML
         html: function(str) {
             for (var i = 0; i < this.length; i++) {
-                var element = this[i];
+                var el = this[i];
                 if (arguments.length == 0) {
-                    return element.innerHTML;
+                    return el.innerHTML;
                 }
-                element.innerHTML = str;
+                el.innerHTML = str;
+            }
+            return this;
+        },
+
+        // 设置XML node text
+        text: function(value) {
+            for (var i = 0; i < this.length; i++) {
+                if (arguments.length == 0) {
+                    return $.XML.getText( this[i] );
+                }
+                $.XML.setText(this[i], value);  
             }
             return this;
         },
@@ -555,21 +567,27 @@
             return this;
         },
 
+        // 触发点击事件
+        click: function(fn) {
+            for (var i = 0; i < this.length; i++) {
+                this[i].onclick = fn;
+            }
+            return this;
+        },
+
         // 设置鼠标移入移出方法
         hover: function(over, out) {
-            for (var i = 0; i < this.length; i++) {
-                $.Event.addEvent(this[i], 'mouseover', over);
-                $.Event.addEvent(this[i], 'mouseout', out);
-            }
+            this.addEvent('mouseover', over);
+            this.addEvent('mouseout', out);
             return this;
         },
 
         // 设置点击切换方法
         toggle: function() {
             for (var i = 0; i < this.length; i++) { 
-                (function(element, args) {
+                (function(el, args) {
                     var count = 0;
-                    $.Event.addEvent(element, 'click', function() {
+                    $.Event.addEvent(el, 'click', function() {
                         args[count++%args.length].call(this);
                     });
                 })(this[i], arguments);
@@ -588,6 +606,25 @@
         focus: function() {
             if ( this.length > 0 ) {
                 this[0].focus();
+            }
+            return this;
+        },
+
+        blur: function(fn) {
+            this.removeEvent('blur', fn).addEvent('blur', fn);
+            return this;
+        },
+
+        addEvent: function(eventName, fn, capture) {
+            for (var i = 0; i < this.length; i++) {
+                $.Event.addEvent(this[i], eventName, fn, capture);
+            }
+            return this;
+        },
+
+        removeEvent: function(eventName, fn, capture) {
+            for (var i = 0; i < this.length; i++) {
+                $.Event.removeEvent(this[i], eventName, fn, capture);
             }
             return this;
         },
@@ -616,18 +653,15 @@
             return this;
         },
 
-        // 触发点击事件
-        click: function(fn) {
+        attr: function(name, value) {
             for (var i = 0; i < this.length; i++) {
-                this[i].onclick = fn;
+                var el = this[i];
+                if (arguments.length == 1) {
+                    return el.getAttribute(name);
+                }
+                el.setAttribute(name, value);
             }
             return this;
-        },
-
-        focus: function() {
-            if(this.length > 0) {
-                this[0].focus();
-            }
         }
     });
 })(tssJS);
@@ -657,12 +691,12 @@
         },
 
         // 获取Style。注：computedStyle: style 和 runtimeStyle 的结合
-        getStyle: function(element, attr) {
+        getStyle: function(el, attr) {
             if (window.getComputedStyle) { // W3C
-                return window.getComputedStyle(element, null)[attr];
+                return window.getComputedStyle(el, null)[attr];
             } 
-            else if (element.currentStyle) { //IE
-                return element.currentStyle[attr];
+            else if (el.currentStyle) { //IE
+                return el.currentStyle[attr];
             }
             return null;
         },
@@ -690,27 +724,27 @@
         },
 
         createElement: function(tagName, className) {
-            var element = document.createElement(tagName);
+            var el = document.createElement(tagName);
             if (className) {
-                $(element).addClass(className)
+                $(el).addClass(className)
             }
-            return element;
+            return el;
         },
 
         // 创建带命名空间的对象
         createNSElement: function(tagName, ns) {
             var tempDiv = document.createElement("DIV");
             tempDiv.innerHTML = "<" + ns + ":" + tagName + "/>";
-            var element = tempDiv.firstChild.cloneNode(false);
-            element.uniqueID = $.getUniqueID();
+            var el = tempDiv.firstChild.cloneNode(false);
+            el.uniqueID = $.getUniqueID();
 
             $.removeNode(tempDiv);
 
-            return element;
+            return el;
         },
 
-        getNSElements: function(element, tagName, ns) {
-            return element.getElementsByTagName(ns + ":" + tagName);
+        getNSElements: function(el, tagName, ns) {
+            return el.getElementsByTagName(ns + ":" + tagName);
         },
 
         removeNode: function(node) {
@@ -897,12 +931,13 @@
 
             timeout: {},
 
-            addEvent: function(element, eventName, fn, capture) {
-                element.addEventListener(eventName, fn, !!capture);
+            // 同一事件多次添加，不会彼此覆盖，将会多次触发
+            addEvent: function(el, eventName, fn, capture) {
+                el.addEventListener(eventName, fn, !!capture);
             },
 
-            removeEvent: function(element, eventName, fn, capture) {
-                element.removeEventListener(eventName, fn, !!capture);
+            removeEvent: function(el, eventName, fn, capture) {
+                el.removeEventListener(eventName, fn, !!capture);
             },
 
             /* 取消事件 */
@@ -1107,9 +1142,7 @@
 
 })(tssJS);
 
-
-
-/*
+/*  AJAX相关封装
     $.ajax({
         url : url,
         method : "GET",
@@ -1373,7 +1406,7 @@
          
             for(var name in this.params) {
                 var value = this.params[name];
-                if(value) {
+                if( !$.isNullOrEmpty(value) ) {
                     var paramNode = $.XML.createNode(_XML_NODE_REQUEST_PARAM);
                     paramNode.appendChild($.XML.appendCDATA(_XML_NODE_REQUEST_NAME, name));
                     paramNode.appendChild($.XML.appendCDATA(_XML_NODE_REQUEST_VALUE, value));
@@ -1721,14 +1754,14 @@
     return HttpRequest;
 });
 
-
+/*
+ *  大数据显示进度
+ *  参数： string:url                    同步进度请求地址
+        xmlNode:data                    
+        string:cancelUrl                取消进度请求地址
+ */
 ;(function($){
-    /*
-     *  大数据显示进度
-     *  参数： string:url                    同步进度请求地址
-            xmlNode:data                    
-            string:cancelUrl                取消进度请求地址
-     */
+    
     var Progress = function(url, data, cancelUrl) {
         this.progressUrl = url;
         this.cancelUrl = cancelUrl;
@@ -1853,8 +1886,7 @@
 
 })(tssJS);
 
-
-
+/* 气泡提示 */
 ;(function ($, factory) {
 
     $.Balloon = factory($);
@@ -1953,9 +1985,7 @@
     return Balloon;
 });
 
-
 /* 右键菜单 */
-
 ;(function ($, factory) {
 
     $.Menu = factory($);
@@ -2357,13 +2387,20 @@
     return Menu;
 });
 
-
-
+/* 日期时间选择控件 */
 ;(function ($, factory) {
 
-    $.Calendar = factory($.moment);
+    $.Calendar = factory($);
 
-})(tssJS, function (moment) {
+    $.createCalendar = function(el, careTime) {
+        new $.Calendar( {
+            field: el,
+            format: 'yyyy-MM-dd',
+            careTime: careTime || false
+        });
+    }
+
+})(tssJS, function ($) {
     
     'use strict';
 
@@ -2371,6 +2408,11 @@
  
     isDate = function(obj) {
         return (/Date/).test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime());
+    },
+
+    string2Date = function(_s) {
+        var d = new Date(Date.parse(_s.replace(/-/g, "/"))); // Date.parse in IE only support yyyy/mm/dd
+        return d;
     },
 
     isLeapYear = function(year) {
@@ -2671,7 +2713,7 @@
         self._onInputChange = function(e) {
             if (e.firedBy === self) return;
  
-            var date = new Date(Date.parse(opts.field.value));
+            var date = string2Date(opts.field.value);
             self.setDate(isDate(date) ? date : null);
             if (!self._v) {
                 self.show();
@@ -2731,7 +2773,7 @@
             $.Event.addEvent(opts.field, 'change', self._onInputChange);
 
             if (!opts.defaultDate) {
-                opts.defaultDate = new Date(Date.parse(opts.field.value));
+                opts.defaultDate = string2Date(opts.field.value);
                 opts.setDefaultDate = true;
             }
         }
@@ -2820,7 +2862,7 @@
                 return this.draw();
             }
             if (typeof date === 'string') {
-                date = new Date(Date.parse(date));
+                date = string2Date(date);
             }
             if (!isDate(date)) {
                 return;
@@ -2934,12 +2976,14 @@
                     self._o.field.value = self._o.field.value.split(" ")[0] + " " + _time;
                     self._o.field.focus();
 
-                    var date = new Date(Date.parse(opts.field.value));
+                    var date = string2Date(opts.field.value);
                     self._hour = date.getHours();
                     self._minute = date.getMinutes();
                     self._second = date.getSeconds();
 
-                    self.hide();
+                    window.setTimeout(function() {
+                        self.hide();
+                    }, 50);
                 });
             }
 
@@ -3085,8 +3129,7 @@
     return JCalendar;
 });
 
-
-
+/* Form组件 */
 ;(function ($, factory) {
 
     $.Form = factory($);
@@ -3780,8 +3823,7 @@
     return Form;
 });
 
-
-
+/* Grid组件 */
 ;(function ($, factory) {
 
     $.Grid = factory($);
@@ -4518,8 +4560,7 @@
 
 })(tssJS);
 
-
-
+/* 树控件 */
 ;(function($, factory) {
 
     $.Tree = factory($);
@@ -5176,13 +5217,12 @@
     return Tree;
 });
 
-
-
+/* 布局组件 */
 ;(function ($, factory) {
 
     $.WorkSpace = factory($);
 
-})(tssJS, function ($) {
+})(tssJS, function($) {
 
     'use strict';
 

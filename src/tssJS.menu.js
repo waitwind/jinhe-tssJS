@@ -1,5 +1,6 @@
-/* 右键菜单 */
 
+
+/* 右键菜单 */
 ;(function ($, factory) {
 
     $.Menu = factory($);

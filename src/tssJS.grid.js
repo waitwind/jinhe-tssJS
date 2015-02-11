@@ -1,3 +1,6 @@
+
+
+/* Grid组件 */
 ;(function ($, factory) {
 
     $.Grid = factory($);

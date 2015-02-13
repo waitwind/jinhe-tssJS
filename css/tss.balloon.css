@@ -1,3 +1,4 @@
+
 .balloon { position:absolute; overflow:hidden; }
 .balloon .content { height:44px; width:204px; padding:3px; vertical-align:top;  background-image:url(../images/balloon/bg.gif);}
 .balloon .content div { font-size:12px; height:40px; overflow:hidden; word-break:break-all;}

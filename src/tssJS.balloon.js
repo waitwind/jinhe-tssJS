@@ -49,12 +49,12 @@
      
         /*
          *  定位气球
-         *  参数：  number:x       坐标x
-                    number:y        坐标y
-                    number:delay    延时
-                    ------------------------------------
-                    object:x        作为参考点的目标对象
-                    number:y        延时
+         *  参数：  number:x        坐标x
+                   number:y        坐标y
+                   number:delay    延时
+                   ------------------------------------
+                   object:x        作为参考点的目标对象
+                   number:y        延时
          */
         Balloon.prototype.dockTo = function(x, y, delay) {
             if(typeof(x) == "object" && x.nodeType) {

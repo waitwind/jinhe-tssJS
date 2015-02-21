@@ -314,9 +314,9 @@
                 this.fieldObjMap[fieldName] = fieldObj;
 
                 if(field.getAttribute('empty') == "false") {
-                    var notnullTag = $.createElement("span", "notnull");
-                    $(notnullTag).html("*");
-                    fieldEl.parentNode.appendChild(notnullTag);
+                    var requiredTag = $.createElement("span", "required");
+                    $(requiredTag).html("*");
+                    fieldEl.parentNode.appendChild(requiredTag);
                 }
             }
 

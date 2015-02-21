@@ -1,8 +1,9 @@
-
-.balloon { position:absolute; overflow:hidden; }
-.balloon .content { height:44px; width:204px; padding:3px; vertical-align:top;  background-image:url(../images/balloon/bg.gif);}
-.balloon .content div { font-size:12px; height:40px; overflow:hidden; word-break:break-all;}
-.balloon .arrow_1 { background-image:url(../images/balloon/01.gif); margin-top:-3px; }
-.balloon .arrow_2 { background-image:url(../images/balloon/02.gif);	margin-top:-3px; margin-left:-30px; }
-.balloon .arrow_3 { background-image:url(../images/balloon/03.gif); margin-top:1px; }
-.balloon .arrow_4 { background-image:url(../images/balloon/04.gif); margin-top:1px; margin-left:-30px; }
+.tssJS-bubble {  
+	position: absolute; background-color: #292929; color: white; border-radius: 10px;
+	display: table; /* 使垂直居中 */  
+}
+.tssJS-bubble p { display: table-cell; padding: 5px; text-align: center; word-break:break-all; }
+/* 箭头 */ 
+.tssJS-bubble:after { content: ''; width: 0; height: 0; border: 15px solid transparent; position: absolute; }
+.tssJS-bubble-arrow-top:after { border-bottom-color: #292929; bottom: 100%; left: 50%; margin-left: -15px; }
+.tssJS-bubble-arrow-bottom:after { border-top-color: #292929; top: 100%;    left: 50%; margin-left: -15px; } 

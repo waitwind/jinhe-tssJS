@@ -1,100 +1,69 @@
+;(function($, factory) {
 
+    $.Bubble = $.Balloon = factory($);
 
-/* 气泡提示 */
-;(function ($, factory) {
+    $.notice = function(targetEl, msg) {
+        var balloon = new $.Bubble(msg);
+        balloon.dockTo(targetEl);
+    }
 
-    $.Balloon = factory($);
+    $.fn.extend({
+        notice: function(msg, delay) {
+            if(this.length > 0) {
+                $.notice(this[0], msg);
+            }
+        }
+    })
 
-})(tssJS, function ($) {
-
+})(tssJS, function($){
     'use strict';
 
-    var
-        /* 样式名称 */
-        _STYLE_BALLOON = "balloon",
-     
-        /* 尺寸 */
-        _SIZE_BALLOON_ARROW_HEIGHT = 15,
-        _SIZE_BALLOON_CONTENT_WIDTH = 210,
-        _SIZE_BALLOON_CONTENT_HEIGHT = 44,
+    var _STYLE_BUBBLE = "tssJS-bubble",
+        _STYLE_ARROW_TOP = "tssJS-bubble-arrow-top",
+        _STYLE_ARROW_BOTTOM = "tssJS-bubble-arrow-bottom",      
+        NEXT_ZINDEX  = 1000,
+        BUBBLE_WIDTH = 200,
+        ARROW_HEIGHT = 15,
 
-        NEXT_ZINDEX = 1000,
+    timeout,
+    dispose = function() {
+        var buddles = $("." + _STYLE_BUBBLE);
+        buddles.each(function() {
+            $.removeNode(this);
+        });
+        
+        $(document).removeEvent("mousedown", dispose);
+    },
 
-        timeout, 
+    Bubble = function(content) {
+        this.el = $.createElement("div", _STYLE_BUBBLE);
+        $(this.el).html("<p>" + content + "</p>");
+        $(this.el).css("width", BUBBLE_WIDTH + "px");
 
-        /* 释放气球实例 */
-        dispose = function() {
-            var balloons = $("." + _STYLE_BALLOON);
-            balloons.each(function() {
-                $.removeNode(this);
-            });
-            
-            $.Event.removeEvent(document, "mousedown", dispose);
-        },
- 
-        /* 生成气球型提示界面 */
-        Balloon = function (content) {
-            this.el = $.createElement("div", _STYLE_BALLOON);
+        // 绑定事件，鼠标按下后气球消失
+        $(document).addEvent("mousedown", dispose);
+    };
 
-            var html = "<table>";
-            html += "   <tr><td></td></tr>";
-            html += "   <tr><td class='content'><div>" + content + "</div></td></tr>";        
-            html += "   <tr><td></td></tr>";
-            html += "</table>";
-            this.el.innerHTML = html;
+    Bubble.prototype.dockTo = function(targetEl, delay){
+        var position = $.absPosition(targetEl), 
+            x = position.left + targetEl.offsetWidth/2 - BUBBLE_WIDTH/2, 
+            y;
 
-            // 绑定事件，鼠标按下后气球消失
-            $.Event.addEvent(document, "mousedown", dispose);
-        };
-     
-        /*
-         *  定位气球
-         *  参数：  number:x        坐标x
-                   number:y        坐标y
-                   number:delay    延时
-                   ------------------------------------
-                   object:x        作为参考点的目标对象
-                   number:y        延时
-         */
-        Balloon.prototype.dockTo = function(x, y, delay) {
-            if(typeof(x) == "object" && x.nodeType) {
-                var position = $.absPosition(x);
-                this.dockTo(position.left + x.offsetWidth/2, position.top - x.offsetHeight + 8, y);
-            }
-            else if(typeof(x) == "number") {
-                var type = 1;
-                if( (x + _SIZE_BALLOON_CONTENT_WIDTH) > (document.body.clientWidth + document.body.scrollLeft) ) {
-                    x -= _SIZE_BALLOON_CONTENT_WIDTH;
-                    type += 1;
-                }
-                if( (y - _SIZE_BALLOON_CONTENT_HEIGHT - _SIZE_BALLOON_ARROW_HEIGHT) < document.body.scrollTop) {
-                    type += 2;
-                }
-                else {
-                    y -= _SIZE_BALLOON_CONTENT_HEIGHT + _SIZE_BALLOON_ARROW_HEIGHT;            
-                }
+        if( position.top + 50 >= document.body.clientHeight) {
+            y = position.top - targetEl.offsetHeight - ARROW_HEIGHT * 4 - this.el.offsetHeight; 
+            $(this.el).addClass(_STYLE_ARROW_BOTTOM);
+        }
+        else {
+            y = position.top + ARROW_HEIGHT;
+            $(this.el).addClass(_STYLE_ARROW_TOP);
+        } 
+        
+        $(this.el).css("zIndex", NEXT_ZINDEX++).css("left", x + "px").css("top", y + "px");
+        document.body.appendChild(this.el);
 
-                $(this.el).css("zIndex", NEXT_ZINDEX++).css("left", x + "px").css("top", y + "px");
+        clearTimeout(timeout);
+        timeout = setTimeout( dispose, delay || 3000 );
+    }
 
-                /* 添加气球箭头  */
-                var arrow = $.createElement("div", "arrow_" + type);
-                $(arrow).css("width", "30px").css("height", "15px") ;
-
-                var td = $("tr", this.el)[ (type <= 2) ? 2 : 0].childNodes[0];
-                td.appendChild(arrow);
-                if(type == 1 || type == 3) {
-                    td.insertBefore(arrow, td.firstChild);
-                } else {
-                    td.align = "right";
-                }
-
-                // 设置气球持续时间
-                clearTimeout(timeout);
-                timeout = setTimeout( dispose, delay || 3000);
-
-                document.body.appendChild(this.el);
-            }
-        };
-    
-    return Balloon;
+    return Bubble;
 });

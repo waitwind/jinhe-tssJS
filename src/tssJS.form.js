@@ -21,7 +21,15 @@
         }
         
         return form;
-    }
+    };
+
+    $.fn.extend({
+        form: function(data) {
+            if(this.length > 0) {
+                return $.F(this[0].id, data);
+            }
+        }
+    });
 
 })(tssJS, function ($) {
 
@@ -29,10 +37,8 @@
 
     var showErrorInfo = function(errorInfo, obj) {
         setTimeout(function() {
-            // 页面全局Balllon对象
             if( $.Balloon ) {
-                var balloon = new $.Balloon(errorInfo);
-                balloon.dockTo(obj);
+                $(obj).notice(errorInfo);
             }
         }, 100);
     },

@@ -30,7 +30,7 @@
 			saveUser(cacheID);
 		}
 
-		$.Ajax({ 
+		$.ajax({ 
 			url: URL_XFORM_DEMO, 
 			method : "GET",
 			onresult: function() {
@@ -38,7 +38,8 @@
 				$.cache.XmlDatas[cacheID] = dataXML;
 
 				var xfomrId = "userForm";
-				var userForm = $.F(xfomrId, dataXML);
+				// var userForm = $.F(xfomrId, dataXML);
+                var userForm = $("#" + xfomrId).form(dataXML);
 
 				// attachReminder(xfomrId, userForm); // 离开提醒
 

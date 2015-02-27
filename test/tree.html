@@ -35,6 +35,10 @@ var treeData;
 
 function init() {
 
+    if(window.parent != window.self) {
+        $("#tempUL").hide();
+    }
+
 	$.ajax({
 		url: "data/tree.json?",
 		method : "GET",
@@ -42,7 +46,7 @@ function init() {
 		ondata: function() {
 			treeData = this.getResponseJSON();
 			console.log(treeData);
-			var tree3 = $.T("tree3", treeData);	
+			var tree3 = $("#tree3").tree(treeData);	
 		}
 	});
  

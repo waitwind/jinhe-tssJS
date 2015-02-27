@@ -5,7 +5,7 @@
     $.notice = function(targetEl, msg) {
         var balloon = new $.Bubble(msg);
         balloon.dockTo(targetEl);
-    }
+    };
 
     $.fn.extend({
         notice: function(msg, delay) {
@@ -13,7 +13,7 @@
                 $.notice(this[0], msg);
             }
         }
-    })
+    });
 
 })(tssJS, function($){
     'use strict';

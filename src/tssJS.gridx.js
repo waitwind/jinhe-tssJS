@@ -210,7 +210,7 @@
                                 
                                 // 如果不合格式，则置会修改前的值
                                 if( $.isFunction(column.validator) && !column.validator(value, row) ) {
-                                    (new $.Balloon("新输入的值【" + value + "】不符合格式要求")).dockTo($cell[0]);
+                                    $cell.notice("新输入的值【" + value + "】不符合格式要求");
                                     $cell.html( column.formatter(originalVal, row) );
                                     return;
                                 }

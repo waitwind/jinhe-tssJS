@@ -6,12 +6,22 @@
     $.Calendar = factory($);
 
     $.createCalendar = function(el, careTime) {
-        new $.Calendar( {
-            field: el,
+        $(el).calendar({
             format: 'yyyy-MM-dd',
             careTime: careTime || false
         });
-    }
+    };
+
+    $.fn.extend({
+        calendar: function(inits) {
+            if(this.length > 0) {
+                inits = inits || {};
+                inits.field = this[0];
+
+                return new $.Calendar( inits );
+            }
+        }
+    });
 
 })(tssJS, function ($) {
     

@@ -17,7 +17,15 @@
         }
         
         return tree;
-    }
+    };
+
+    $.fn.extend({
+        tree: function(data) {
+            if(this.length > 0) {
+               return $.T(this[0].id, data);
+            }
+        }
+    });
 
 })(tssJS, function($) {
 

@@ -15,7 +15,15 @@
         }
         
         return grid;
-    }
+    };
+
+    $.fn.extend({
+        grid: function(data) {
+            if(this.length > 0) {
+                return $.G(this[0].id, data);
+            }
+        }
+    });
 
 })(tssJS, function ($) {
 

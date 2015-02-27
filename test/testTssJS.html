@@ -15,7 +15,7 @@
 	<script type="text/javascript">
 
 	 $(function() {
- 		$.assertEquals("1.0.0", this.tssjs, "$(fn) method error.");
+ 		$.assertEquals("1.1.0", this.tssjs, "$(fn) method error.");
 	 });
 
 
@@ -83,6 +83,7 @@
 
  	console.log((new Date()).format("yyyy-MM-dd"));
 
+ 	// test encode & decode
  	var key = 502;
  	var info = 'Jon.King!#$%&';
 	var test = $.encode(info, key);
@@ -101,7 +102,7 @@
  	});
 
  	$().ready(function(name) {
- 		$.assertEquals("tssJS1.0.0", name + this.tssjs, "$().ready(fn) method error.");
+ 		$.assertEquals("tssJS1.1.0", name + this.tssjs, "$().ready(fn) method error.");
  		
  		// test id selector
  		var tssJSObj = $("#div1");
@@ -133,8 +134,8 @@
 		$("a").click( function() { 
 				$("#d4").show()
 					.css("backgroundColor", "grey")
-					.css("height", "50px")
-					.center(200, 50); 
+					.css("height", "150px")
+					.center(); 
 				console.log( $.absPosition($("#d4")[0]) );
 			} 			
 		);
@@ -154,6 +155,9 @@
 
 		$.showWaitingLayer();
 		setTimeout($.hideWaitingLayer, 1000);
+
+		$.assertEquals("L1", $1("layout.id").value);
+		$.assertEquals("L1", $$("layout.id").value);
 
 	 }, "tssJS");
 
@@ -231,7 +235,7 @@
 	$.assertEquals("3<>4", $.XML.getCDATA(xmlNode5, "test"));
 
 	$.XML.removeCDATA(xmlNode5, "test");
-	$.assertEquals("",$.XML.getText(xmlNode5));
+	$.assertEquals("", $.XML.getText(xmlNode5));
 
 	// try {
 	// 	var xmlDom = $.parseXML("<test>1<>2</test>");
@@ -262,6 +266,8 @@
 		<input type='button' id='B4' value='B4' class='btClass'></input> 
 		<a href='#'>i'm a href, click me</a>
 	</div>
+
+	<input id="layout.id" value="L1"/>
 
 </body>
 </html>

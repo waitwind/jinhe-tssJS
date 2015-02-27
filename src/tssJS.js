@@ -5,14 +5,14 @@
         alert("您当前的IE浏览器版本过低，为能有更好的展示效果，建议升级到IE11，或换最新版Chrome、FireFox。");
     } 
     
-    var _tssJS = (function() {
+    window.tssJS = (function() {
 
         // 构建tssJS对象
         var tssJS = function(selector, parent) {
             return new tssJS.fn.init(selector, parent, rootTssJS);
         },
 
-        version = "1.0.0",
+        version = "1.1.0",
 
         // Map over the $ in case of overwrite
         _$ = window.$,
@@ -137,12 +137,13 @@
                     // If there are functions bound, to execute
                     if (fn) {
                         fn(args);
-                    } else {
-                        tssJS.each(readyList,
-                        function(i, name) {
-                            var _ = readyList[i];
-                            _.fn.call(_._this, _.args);
-                        });
+                    } 
+                    else {
+                        tssJS.each(readyList, function(i, name) {
+                                var _ = readyList[i];
+                                _.fn.call(_._this, _.args);
+                            }
+                        );
 
                         readyList = [];
                     }
@@ -170,10 +171,7 @@
             },
 
             // 是否数组
-            isArray: Array.isArray ||
-                function(obj) {
-                    return tssJS.type(obj) === "array";
-                },
+            isArray: Array.isArray || function(obj) { return tssJS.type(obj) === "array"; },
 
             // 简单的判断（判断setInterval属性）是否window对象
             isWindow: function(obj) {
@@ -251,7 +249,7 @@
                 }
             },
 
-            "execCommand": function(callback, param) {
+            execCommand: function(callback, param) {
                 var returnVal;
                 try {
                     if(tssJS.isFunction(callback)) {
@@ -265,8 +263,7 @@
                         returnVal = eval(callback);
                     }
                 } catch (e) {
-                    alert(e.message);
-                    console.log(e.stack);
+                    console.log(e.message + ", " + e.stack);
                     returnVal = false;
                 }
                 return returnVal;
@@ -294,7 +291,7 @@
                         }
                     }
                 }
-                // 没有参数args则调用，则调用call，上下文设置为当前遍历到的对象，参数设置为key/index和value
+                // 没有参数args，则调用call，上下文设置为当前遍历到的对象，参数设置为key or index 和 value
                 else {
                     if (isObj) {
                         for (name in object) {
@@ -319,14 +316,13 @@
                 function(text) { return text.toString().replace(trimLeft, "").replace(trimRight, ""); },
 
             // 过滤数组，返回新数组；callback返回true时保留
-            grep: function(elems, callback) {
-                var ret = [],
-                retVal;
+            grep: function(_array, callback) {
+                var ret = [], item;
 
-                for (var i = 0, length = elems.length; i < length; i++) {
-                    retVal = !!callback(elems[i], i);
-                    if (retVal) {
-                        ret.push(elems[i]);
+                for (var i = 0, length = _array.length; i < length; i++) {
+                    item = _array[i];
+                    if (!!callback(item, i)) {
+                        ret.push(item);
                     }
                 }
 
@@ -334,14 +330,14 @@
             },
 
             /* 缓存页面数据（xml、变量等） */
-            "cache": {
+            cache: {
                 "Variables": {},
                 "XmlDatas":  {}
             },
 
             /* 负责生成对象唯一编号（为了兼容FF） */
-            "uid": 0,
-            "getUniqueID": function(prefix) {
+            uid: 0,
+            getUniqueID: function(prefix) {
                 return (prefix || "_") + String($.uid ++ );
             },
 
@@ -382,9 +378,10 @@
 
         // Populate the class2type map
         tssJS.each("Boolean Number String Function Array Date RegExp Object".split(" "),
-        function(i, name) {
-            class2type["[object " + name + "]"] = name.toLowerCase();
-        });
+            function(i, name) {
+                class2type["[object " + name + "]"] = name.toLowerCase();
+            }
+        );
 
         var DOMContentLoaded = (function() {
             return function() {
@@ -419,12 +416,13 @@
     };
 
     Array.prototype.remove = function(item) {
-        for(var i=0, n=0; i < this.length; i++) {
+        var i=0, n=0;
+        for(; i < this.length; i++) {
             if(this[i] != item) {
                 this[n++] = this[i];
             }
         }
-        this.length -= 1;
+        this.length = n;
     };
 
     Date.prototype.format = function(format) {
@@ -450,7 +448,7 @@
         return format;
     };
 
-    window.tssJS = window.$ = _tssJS;
+    window.$ = window.tssJS;
 
     window.$1 = function(id) {
         return $("#" + id.replace(/\./gi, "\\."))[0];
@@ -502,7 +500,7 @@
         addClass: function(className) {
             for (var i = 0; i < this.length; i++) {
                 var el = this[i];
-                if (!$.hasClass(el, className)) {
+                if ( !$.hasClass(el, className) ) {
                     el.className += ' ' + className;
                 }
             }
@@ -514,7 +512,7 @@
             var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
             for (var i = 0; i < this.length; i++) {
                 var el = this[i];
-                if ($.hasClass(el, className)) {
+                if ( $.hasClass(el, className) ) {
                     el.className = el.className.replace(reg, ' ').trim();
                 }
             }
@@ -631,25 +629,24 @@
 
         //设置隐藏
         hide: function() {
-            for (var i = 0; i < this.length; i++) {
-                this[i].style.display = 'none';
-            }
+            this.css('display', 'none');
             return this;
         },
 
         // 设置物体居中
         center: function(width, height) {
-            var left = ($.getInner().width - (width || 100) ) / 2;
-            var top  = ($.getInner().height - (height || 100) ) / 2;
+            if (arguments.length == 0 && this.length > 0) {
+                width  = this[0].clientWidth;
+                height = this[0].clientHeight;
+            }
+
+            var left = ($.getInner().width - (width || 0) ) / 2;
+            var top  = ($.getInner().height - (height || 0) ) / 2;
             return this.position(left, top);
         },
 
         position: function(left, top) {
-            for (var i = 0; i < this.length; i++) {
-                this[i].style.position = "absolute";
-                this[i].style.left = left + 'px';
-                this[i].style.top  = top + 'px';
-            }
+            this.css('position', 'absolute').css('left', left + 'px').css('top', top + 'px');
             return this;
         },
 
@@ -987,10 +984,7 @@
 
             /** 模拟事件 */
             createEventObject: function() { return new Object(); }
-        }
-    });
-
-    $.extend({
+        },
 
         EventFirer: function(obj, eventName) {
             this.fire = function (ev) {
@@ -1007,7 +1001,6 @@
                 }
             }
         }
-
     });
 
 })(tssJS);
@@ -1036,7 +1029,7 @@
 
     $.extend({
 
-        XML : {
+        XML: {
             _NODE_TYPE_ELEMENT    : 1,
             _NODE_TYPE_ATTRIBUTE  : 2,
             _NODE_TYPE_TEXT       : 3,

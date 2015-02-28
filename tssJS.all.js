@@ -5,14 +5,14 @@
         alert("您当前的IE浏览器版本过低，为能有更好的展示效果，建议升级到IE11，或换最新版Chrome、FireFox。");
     } 
     
-    var _tssJS = (function() {
+    window.tssJS = (function() {
 
         // 构建tssJS对象
         var tssJS = function(selector, parent) {
             return new tssJS.fn.init(selector, parent, rootTssJS);
         },
 
-        version = "1.0.0",
+        version = "1.1.0",
 
         // Map over the $ in case of overwrite
         _$ = window.$,
@@ -137,12 +137,13 @@
                     // If there are functions bound, to execute
                     if (fn) {
                         fn(args);
-                    } else {
-                        tssJS.each(readyList,
-                        function(i, name) {
-                            var _ = readyList[i];
-                            _.fn.call(_._this, _.args);
-                        });
+                    } 
+                    else {
+                        tssJS.each(readyList, function(i, name) {
+                                var _ = readyList[i];
+                                _.fn.call(_._this, _.args);
+                            }
+                        );
 
                         readyList = [];
                     }
@@ -170,10 +171,7 @@
             },
 
             // 是否数组
-            isArray: Array.isArray ||
-                function(obj) {
-                    return tssJS.type(obj) === "array";
-                },
+            isArray: Array.isArray || function(obj) { return tssJS.type(obj) === "array"; },
 
             // 简单的判断（判断setInterval属性）是否window对象
             isWindow: function(obj) {
@@ -251,7 +249,7 @@
                 }
             },
 
-            "execCommand": function(callback, param) {
+            execCommand: function(callback, param) {
                 var returnVal;
                 try {
                     if(tssJS.isFunction(callback)) {
@@ -265,8 +263,7 @@
                         returnVal = eval(callback);
                     }
                 } catch (e) {
-                    alert(e.message);
-                    console.log(e.stack);
+                    console.log(e.message + ", " + e.stack);
                     returnVal = false;
                 }
                 return returnVal;
@@ -294,7 +291,7 @@
                         }
                     }
                 }
-                // 没有参数args则调用，则调用call，上下文设置为当前遍历到的对象，参数设置为key/index和value
+                // 没有参数args，则调用call，上下文设置为当前遍历到的对象，参数设置为key or index 和 value
                 else {
                     if (isObj) {
                         for (name in object) {
@@ -319,14 +316,13 @@
                 function(text) { return text.toString().replace(trimLeft, "").replace(trimRight, ""); },
 
             // 过滤数组，返回新数组；callback返回true时保留
-            grep: function(elems, callback) {
-                var ret = [],
-                retVal;
+            grep: function(_array, callback) {
+                var ret = [], item;
 
-                for (var i = 0, length = elems.length; i < length; i++) {
-                    retVal = !!callback(elems[i], i);
-                    if (retVal) {
-                        ret.push(elems[i]);
+                for (var i = 0, length = _array.length; i < length; i++) {
+                    item = _array[i];
+                    if (!!callback(item, i)) {
+                        ret.push(item);
                     }
                 }
 
@@ -334,14 +330,14 @@
             },
 
             /* 缓存页面数据（xml、变量等） */
-            "cache": {
+            cache: {
                 "Variables": {},
                 "XmlDatas":  {}
             },
 
             /* 负责生成对象唯一编号（为了兼容FF） */
-            "uid": 0,
-            "getUniqueID": function(prefix) {
+            uid: 0,
+            getUniqueID: function(prefix) {
                 return (prefix || "_") + String($.uid ++ );
             },
 
@@ -382,9 +378,10 @@
 
         // Populate the class2type map
         tssJS.each("Boolean Number String Function Array Date RegExp Object".split(" "),
-        function(i, name) {
-            class2type["[object " + name + "]"] = name.toLowerCase();
-        });
+            function(i, name) {
+                class2type["[object " + name + "]"] = name.toLowerCase();
+            }
+        );
 
         var DOMContentLoaded = (function() {
             return function() {
@@ -419,12 +416,13 @@
     };
 
     Array.prototype.remove = function(item) {
-        for(var i=0, n=0; i < this.length; i++) {
+        var i=0, n=0;
+        for(; i < this.length; i++) {
             if(this[i] != item) {
                 this[n++] = this[i];
             }
         }
-        this.length -= 1;
+        this.length = n;
     };
 
     Date.prototype.format = function(format) {
@@ -450,7 +448,7 @@
         return format;
     };
 
-    window.tssJS = window.$ = _tssJS;
+    window.$ = window.tssJS;
 
     window.$1 = function(id) {
         return $("#" + id.replace(/\./gi, "\\."))[0];
@@ -502,7 +500,7 @@
         addClass: function(className) {
             for (var i = 0; i < this.length; i++) {
                 var el = this[i];
-                if (!$.hasClass(el, className)) {
+                if ( !$.hasClass(el, className) ) {
                     el.className += ' ' + className;
                 }
             }
@@ -514,7 +512,7 @@
             var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
             for (var i = 0; i < this.length; i++) {
                 var el = this[i];
-                if ($.hasClass(el, className)) {
+                if ( $.hasClass(el, className) ) {
                     el.className = el.className.replace(reg, ' ').trim();
                 }
             }
@@ -631,25 +629,24 @@
 
         //设置隐藏
         hide: function() {
-            for (var i = 0; i < this.length; i++) {
-                this[i].style.display = 'none';
-            }
+            this.css('display', 'none');
             return this;
         },
 
         // 设置物体居中
         center: function(width, height) {
-            var left = ($.getInner().width - (width || 100) ) / 2;
-            var top  = ($.getInner().height - (height || 100) ) / 2;
+            if (arguments.length == 0 && this.length > 0) {
+                width  = this[0].clientWidth;
+                height = this[0].clientHeight;
+            }
+
+            var left = ($.getInner().width - (width || 0) ) / 2;
+            var top  = ($.getInner().height - (height || 0) ) / 2;
             return this.position(left, top);
         },
 
         position: function(left, top) {
-            for (var i = 0; i < this.length; i++) {
-                this[i].style.position = "absolute";
-                this[i].style.left = left + 'px';
-                this[i].style.top  = top + 'px';
-            }
+            this.css('position', 'absolute').css('left', left + 'px').css('top', top + 'px');
             return this;
         },
 
@@ -787,7 +784,7 @@
 
                 $(waitingDiv).css("width", "100%").css("height", "100%")
                              .css("position", "absolute").css("left", "0px").css("top", "0px")
-                             .css("cursor", "wait").css("zIndex", "10000").css("background", "black");
+                             .css("cursor", "wait").css("zIndex", "998").css("background", "black");
                 $.setOpacity(waitingDiv, 33);
             }
             else {
@@ -987,10 +984,7 @@
 
             /** 模拟事件 */
             createEventObject: function() { return new Object(); }
-        }
-    });
-
-    $.extend({
+        },
 
         EventFirer: function(obj, eventName) {
             this.fire = function (ev) {
@@ -1007,7 +1001,6 @@
                 }
             }
         }
-
     });
 
 })(tssJS);
@@ -1036,7 +1029,7 @@
 
     $.extend({
 
-        XML : {
+        XML: {
             _NODE_TYPE_ELEMENT    : 1,
             _NODE_TYPE_ATTRIBUTE  : 2,
             _NODE_TYPE_TEXT       : 3,
@@ -1178,8 +1171,8 @@
         request.onresult = arg.onresult || request.onresult;
         request.onsuccess = arg.onsuccess || request.onsuccess;
         request.onexception = arg.onexception || function(errorMsg) {
-                // alert(errorMsg.description); // 遇到异常却看不到任何信息，可尝试放开这里的注释
-            };
+            // alert(errorMsg.description); // 遇到异常却看不到任何信息，可尝试放开这里的注释
+        };
 
         request.send();
     };
@@ -1884,105 +1877,74 @@
 
     $.Progress = Progress;
 
-})(tssJS);
+})(tssJS);;(function($, factory) {
 
-/* 气泡提示 */
-;(function ($, factory) {
+    $.Bubble = $.Balloon = factory($);
 
-    $.Balloon = factory($);
+    $.notice = function(targetEl, msg) {
+        var balloon = new $.Bubble(msg);
+        balloon.dockTo(targetEl);
+    };
 
-})(tssJS, function ($) {
+    $.fn.extend({
+        notice: function(msg, delay) {
+            if(this.length > 0) {
+                $.notice(this[0], msg);
+            }
+        }
+    });
 
+})(tssJS, function($){
     'use strict';
 
-    var
-        /* 样式名称 */
-        _STYLE_BALLOON = "balloon",
-     
-        /* 尺寸 */
-        _SIZE_BALLOON_ARROW_HEIGHT = 15,
-        _SIZE_BALLOON_CONTENT_WIDTH = 210,
-        _SIZE_BALLOON_CONTENT_HEIGHT = 44,
+    var _STYLE_BUBBLE = "tssJS-bubble",
+        _STYLE_ARROW_TOP = "tssJS-bubble-arrow-top",
+        _STYLE_ARROW_BOTTOM = "tssJS-bubble-arrow-bottom",      
+        NEXT_ZINDEX  = 1000,
+        BUBBLE_WIDTH = 200,
+        ARROW_HEIGHT = 15,
 
-        NEXT_ZINDEX = 1000,
+    timeout,
+    dispose = function() {
+        var buddles = $("." + _STYLE_BUBBLE);
+        buddles.each(function() {
+            $.removeNode(this);
+        });
+        
+        $(document).removeEvent("mousedown", dispose);
+    },
 
-        timeout, 
+    Bubble = function(content) {
+        this.el = $.createElement("div", _STYLE_BUBBLE);
+        $(this.el).html("<p>" + content + "</p>");
+        $(this.el).css("width", BUBBLE_WIDTH + "px");
 
-        /* 释放气球实例 */
-        dispose = function() {
-            var balloons = $("." + _STYLE_BALLOON);
-            balloons.each(function() {
-                $.removeNode(this);
-            });
-            
-            $.Event.removeEvent(document, "mousedown", dispose);
-        },
- 
-        /* 生成气球型提示界面 */
-        Balloon = function (content) {
-            this.el = $.createElement("div", _STYLE_BALLOON);
+        // 绑定事件，鼠标按下后气球消失
+        $(document).addEvent("mousedown", dispose);
+    };
 
-            var html = "<table>";
-            html += "   <tr><td></td></tr>";
-            html += "   <tr><td class='content'><div>" + content + "</div></td></tr>";        
-            html += "   <tr><td></td></tr>";
-            html += "</table>";
-            this.el.innerHTML = html;
+    Bubble.prototype.dockTo = function(targetEl, delay){
+        var position = $.absPosition(targetEl), 
+            x = position.left + targetEl.offsetWidth/2 - BUBBLE_WIDTH/2, 
+            y;
 
-            // 绑定事件，鼠标按下后气球消失
-            $.Event.addEvent(document, "mousedown", dispose);
-        };
-     
-        /*
-         *  定位气球
-         *  参数：  number:x       坐标x
-                    number:y        坐标y
-                    number:delay    延时
-                    ------------------------------------
-                    object:x        作为参考点的目标对象
-                    number:y        延时
-         */
-        Balloon.prototype.dockTo = function(x, y, delay) {
-            if(typeof(x) == "object" && x.nodeType) {
-                var position = $.absPosition(x);
-                this.dockTo(position.left + x.offsetWidth/2, position.top - x.offsetHeight + 8, y);
-            }
-            else if(typeof(x) == "number") {
-                var type = 1;
-                if( (x + _SIZE_BALLOON_CONTENT_WIDTH) > (document.body.clientWidth + document.body.scrollLeft) ) {
-                    x -= _SIZE_BALLOON_CONTENT_WIDTH;
-                    type += 1;
-                }
-                if( (y - _SIZE_BALLOON_CONTENT_HEIGHT - _SIZE_BALLOON_ARROW_HEIGHT) < document.body.scrollTop) {
-                    type += 2;
-                }
-                else {
-                    y -= _SIZE_BALLOON_CONTENT_HEIGHT + _SIZE_BALLOON_ARROW_HEIGHT;            
-                }
+        if( position.top + 50 >= document.body.clientHeight) {
+            y = position.top - targetEl.offsetHeight - ARROW_HEIGHT * 4 - this.el.offsetHeight; 
+            $(this.el).addClass(_STYLE_ARROW_BOTTOM);
+        }
+        else {
+            y = position.top + ARROW_HEIGHT;
+            $(this.el).addClass(_STYLE_ARROW_TOP);
+        } 
+        
+        $(this.el).css("zIndex", NEXT_ZINDEX++).css("left", x + "px").css("top", y + "px");
+        document.body.appendChild(this.el);
 
-                $(this.el).css("zIndex", NEXT_ZINDEX++).css("left", x + "px").css("top", y + "px");
+        clearTimeout(timeout);
+        timeout = setTimeout( dispose, delay || 3000 );
+    }
 
-                /* 添加气球箭头  */
-                var arrow = $.createElement("div", "arrow_" + type);
-                $(arrow).css("width", "30px").css("height", "15px") ;
-
-                var td = $("tr", this.el)[ (type <= 2) ? 2 : 0].childNodes[0];
-                td.appendChild(arrow);
-                if(type == 1 || type == 3) {
-                    td.insertBefore(arrow, td.firstChild);
-                } else {
-                    td.align = "right";
-                }
-
-                // 设置气球持续时间
-                clearTimeout(timeout);
-                timeout = setTimeout( dispose, delay || 3000);
-
-                document.body.appendChild(this.el);
-            }
-        };
-    
-    return Balloon;
+    return Bubble;
 });
 
 /* 右键菜单 */
@@ -2393,12 +2355,22 @@
     $.Calendar = factory($);
 
     $.createCalendar = function(el, careTime) {
-        new $.Calendar( {
-            field: el,
+        $(el).calendar({
             format: 'yyyy-MM-dd',
             careTime: careTime || false
         });
-    }
+    };
+
+    $.fn.extend({
+        calendar: function(inits) {
+            if(this.length > 0) {
+                inits = inits || {};
+                inits.field = this[0];
+
+                return new $.Calendar( inits );
+            }
+        }
+    });
 
 })(tssJS, function ($) {
     
@@ -3150,7 +3122,15 @@
         }
         
         return form;
-    }
+    };
+
+    $.fn.extend({
+        form: function(data) {
+            if(this.length > 0) {
+                return $.F(this[0].id, data);
+            }
+        }
+    });
 
 })(tssJS, function ($) {
 
@@ -3158,10 +3138,8 @@
 
     var showErrorInfo = function(errorInfo, obj) {
         setTimeout(function() {
-            // 页面全局Balllon对象
             if( $.Balloon ) {
-                var balloon = new $.Balloon(errorInfo);
-                balloon.dockTo(obj);
+                $(obj).notice(errorInfo);
             }
         }, 100);
     },
@@ -3443,9 +3421,9 @@
                 this.fieldObjMap[fieldName] = fieldObj;
 
                 if(field.getAttribute('empty') == "false") {
-                    var notnullTag = $.createElement("span", "notnull");
-                    $(notnullTag).html("*");
-                    fieldEl.parentNode.appendChild(notnullTag);
+                    var requiredTag = $.createElement("span", "required");
+                    $(requiredTag).html("*");
+                    fieldEl.parentNode.appendChild(requiredTag);
                 }
             }
 
@@ -3838,7 +3816,15 @@
         }
         
         return grid;
-    }
+    };
+
+    $.fn.extend({
+        grid: function(data) {
+            if(this.length > 0) {
+                return $.G(this[0].id, data);
+            }
+        }
+    });
 
 })(tssJS, function ($) {
 
@@ -4577,7 +4563,15 @@
         }
         
         return tree;
-    }
+    };
+
+    $.fn.extend({
+        tree: function(data) {
+            if(this.length > 0) {
+               return $.T(this[0].id, data);
+            }
+        }
+    });
 
 })(tssJS, function($) {
 

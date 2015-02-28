@@ -774,6 +774,7 @@
         },
 
         waitingLayerCount: 0,
+        waitingLayerZIndex: 998,
 
         showWaitingLayer: function () {
             var waitingObj = $("#_waiting");
@@ -784,7 +785,7 @@
 
                 $(waitingDiv).css("width", "100%").css("height", "100%")
                              .css("position", "absolute").css("left", "0px").css("top", "0px")
-                             .css("cursor", "wait").css("zIndex", "10000").css("background", "black");
+                             .css("cursor", "wait").css("zIndex", "998").css("background", "black");
                 $.setOpacity(waitingDiv, 33);
             }
             else {

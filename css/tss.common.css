@@ -9,7 +9,7 @@ ul,ol{list-style:none;}
 a{text-decoration:none;}
 a:hover{text-decoration:underline;cursor:pointer;}
 table{border-collapse:collapse;border-spacing:0;}
-hr { height:4px; border:none; border-top: 1px dashed #555555; }
+hr { height:1px; border:none; border-top: 1px dashed #555555; }
 
 /* 发光输入框 start */
 input[type=text], textarea {

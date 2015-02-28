@@ -9,7 +9,7 @@ ul,ol{list-style:none;}
 a{text-decoration:none;}
 a:hover{text-decoration:underline;cursor:pointer;}
 table{border-collapse:collapse;border-spacing:0;}
-hr { height:4px; border:none; border-top: 1px dashed #555555; }
+hr { height:1px; border:none; border-top: 1px dashed #555555; }
 
 /* 发光输入框 start */
 input[type=text], textarea {
@@ -24,14 +24,15 @@ input[type=text]:focus, textarea:focus {
   box-shadow: 0 0 5px rgba(81, 203, 238, 1);
   border: 1px solid rgba(81, 203, 238, 1);
 }
-/* 发光输入框 end */
-.balloon { position:absolute; overflow:hidden; }
-.balloon .content { height:44px; width:204px; padding:3px; vertical-align:top;  background-image:url(../images/balloon/bg.gif);}
-.balloon .content div { font-size:12px; height:40px; overflow:hidden; word-break:break-all;}
-.balloon .arrow_1 { background-image:url(../images/balloon/01.gif); margin-top:-3px; }
-.balloon .arrow_2 { background-image:url(../images/balloon/02.gif);	margin-top:-3px; margin-left:-30px; }
-.balloon .arrow_3 { background-image:url(../images/balloon/03.gif); margin-top:1px; }
-.balloon .arrow_4 { background-image:url(../images/balloon/04.gif); margin-top:1px; margin-left:-30px; }
+/* 发光输入框 end */.tssJS-bubble {  
+	position: absolute; background-color: #292929; color: white; border-radius: 10px;
+	display: table; /* 使垂直居中 */  
+}
+.tssJS-bubble p { display: table-cell; padding: 5px; text-align: center; word-break:break-all; }
+/* 箭头 */ 
+.tssJS-bubble:after { content: ''; width: 0; height: 0; border: 15px solid transparent; position: absolute; }
+.tssJS-bubble-arrow-top:after { border-bottom-color: #292929; bottom: 100%; left: 50%; margin-left: -15px; }
+.tssJS-bubble-arrow-bottom:after { border-top-color: #292929; top: 100%;    left: 50%; margin-left: -15px; } 
 .menu { position:absolute; width:135px; padding:1px; border:1px solid #666666; background: #F9F8F7 url(../images/menu_bg.gif) repeat-y;}
 .menu div { padding:5px 0px 0px 30px; font-size:12px; line-height:12px; width:104px; height:22px; overflow:hidden; position:relative; }
 .menu div.separator { padding:0px; width:103px; height:1px; overflow:hidden; background-color:#A6A6A6; margin:1px 0px 1px 30px; }
@@ -79,38 +80,37 @@ input[type=text]:focus, textarea:focus {
 .timeAera { font-size: 12px; font-weight: bold; margin: 10px 5px; line-height: 20px; vertical-align: top;}
 .timeAera input[type=range] { width: 120px;  margin-right: 5px; }
 .timeAera button { width: 50px; float:right; margin-right:70px; background-color:#FF9933; border:1px solid #dedede; letter-spacing:3px; }
-Form\:Box { width:100%; display:block; font-size:12px; } 
-Form\:Box .tssForm table { width:100%; border-width:0px 0px 0px 0px;}
-Form\:Box .tssForm td { padding:3px 2px; border-width:0px; }
-Form\:Box input, Form\:Box textarea { color:#535458; font-size:12px; border:1px solid #ABAAAF; background-color:#ECEFF8; }
-Form\:Box input { height:18px; }
-Form\:Box textarea { word-break:break-all; }
-Form\:Box select{  font-size:12px; height:18px; }
-Form\:Box .radio{ border:0px;  background-color:transparent; }
-Form\:Box .button { background-color:#E4EBF3; border-style:outset;}
-Form\:Box .field_disabled{ border:1px dotted #ABAAAF; background-color:transparent; }
-Form\:Box .hidden{ display:none; }
-Form\:Box input.function { padding-right:18px; }
-Form\:Box .functionBt { display:inline-block;width:20px;height:18px;position:relative;top:4px;left:-21px;background-image:url(../images/icon_function.gif);}
-Form\:Box .notnull { color:red; margin-left:3px; margin-right:5px; }
-Grid\:Box { width:100%; height:100%; overflow:auto; position:relative; padding-top:0px; display:inline-block;}
-Grid\:Box div { position:relative; left:0px; top:0px; }
-Grid\:Box table { width:100%; height:auto; table-layout:fixed; border:0px; margin:0px; border-collapse:collapse;}
-Grid\:Box td { font-size:12px; text-align:center; border-style:solid; border-color:#FFFFFF #96969E #96969E #FFFFFF; border-width:1px;}
-Grid\:Box thead td { background-color:#E4E6F5; height:25px; width:50px;}
-Grid\:Box tbody td { overflow:hidden; text-overflow:ellipsis; white-space: nowrap; word-break:keep-all; }
-Grid\:Box tbody { background-color:#F7F8FD;	}
-Grid\:Box tbody tr { height:25px; }
-Grid\:Box .highlightCol { background-color:#FFFFCC; }
-Grid\:Box .highlightRow td { background-color:#FEF7A9; }
-Grid\:Box .rolloverRow { background-color:#FEF7A9; }
-Grid\:Box .hidden { display:none; }
-Grid\:Box .asc  { background: #FFFFCC url(../images/direction_up.gif) no-repeat right 5px; } 
-Grid\:Box .desc { background: #FFFFCC url(../images/direction_down.gif) no-repeat right 5px; } 
-Grid\:Box .sorting { background: #F0EFE5; }
+.tssForm { width:100%; display:block; font-size:12px; } 
+.tssForm table { width:100%; border-width: 0; }
+.tssForm td { padding:3px 2px; border-width: 0; }
+.tssForm input, .tssForm textarea { color:#535458; font-size:12px; border:1px solid #ABAAAF; background-color:#ECEFF8; }
+.tssForm input { height:18px; }
+.tssForm textarea { word-break:break-all; }
+.tssForm select {  font-size:12px; height:18px; }
+.tssForm .button { background-color:#E4EBF3; border-style:outset; }
+.tssForm .field_disabled { border:1px dotted #ABAAAF; background-color:transparent; }
+.tssForm .hidden { display:none; }
+.tssForm input.function { padding-right:18px; }
+.tssForm .functionBt { display:inline-block; width:20px; height:18px; position:relative; top:4px; left:-21px; background-image:url(../images/icon_function.gif); }
+.tssForm .required { color:red; margin-left:3px; margin-right:5px; }
+Grid { width:100%; height:100%; overflow:auto; position:relative; padding-top:0px; display:inline-block; }
+Grid div { position:relative; left:0px; top:0px; }
+Grid table { width:100%; height:auto; table-layout:fixed; border:0px; margin:0px; border-collapse:collapse; }
+Grid td { font-size:12px; text-align:center; border-style:solid; border-color:#FFFFFF #96969E #96969E #FFFFFF; border-width:1px; }
+Grid thead td { background-color:#E4E6F5; height:25px; width:50px; }
+Grid tbody td { overflow:hidden; text-overflow:ellipsis; white-space: nowrap; word-break:keep-all; }
+Grid tbody { background-color:#F7F8FD;	}
+Grid tbody tr { height:25px; }
+Grid .highlightCol { background-color:#FFFFCC; }
+Grid .highlightRow td { background-color:#FEF7A9; }
+Grid .rolloverRow { background-color:#FEF7A9; }
+Grid .hidden { display:none; }
+Grid .asc  { background: #FFFFCC url(../images/direction_up.gif) no-repeat right 5px; } 
+Grid .desc { background: #FFFFCC url(../images/direction_down.gif) no-repeat right 5px; } 
+Grid .sorting { background: #F0EFE5; }
 /* grid列表标题栏 */
-#gridTitle { color:#0a1755; font-size:12px; font-weight:bold; height:21px; padding-left:8px; background-color:#BEC6EE; border-bottom:1px solid #96969E; position:relative;}
-#gridTitle .icon { display:inline-block; width:8px; height:8px; margin-right:5px; background-image: url(../images/minus.gif);}
+#gridTitle { color:#0a1755; font-size:12px; font-weight:bold; height:21px; padding-left:8px; background-color:#BEC6EE; border-bottom:1px solid #96969E; position:relative; }
+#gridTitle .icon { display:inline-block; width:8px; height:8px; margin-right:5px; background-image: url(../images/minus.gif); }
 #gridTitle .buttonBox { position: absolute; top: 0px; right:0px; }
 #gridTitle .button  { display:inline-block; width:16px; height:15px; background-repeat:no-repeat; background-position:center; cursor:hand; margin:2px; }
 #gridTitle .refresh { background-image: url(../images/icon_refresh.gif); }
@@ -119,30 +119,30 @@ Grid\:Box .sorting { background: #F0EFE5; }
 #gridTitle .next    { background-image: url(../images/next.gif); }
 #gridTitle .last    { background-image: url(../images/last.gif); }
 #gridTitle select { font-size:10px; font-family:Verdana; position:relative; top:-4px; right:1px; }
-Tree\:Box * { padding:0px; margin:0px; font-size:12px; font-family: Verdana, Arial, Helvetica, AppleGothic, sans-serif; }
-Tree\:Box { height: 100%; display:block; padding:5px; color:#333; overflow-y: scroll; }
-Tree\:Box li { list-style:none; line-height:18px; text-align:left; white-space:nowrap; }
-Tree\:Box li ul { padding-left:18px; }
-Tree\:Box li a { padding:1px 3px 0px 0px;cursor:pointer;height:17px;color:#333;text-decoration:none;display:inline-block;}
-Tree\:Box li>a:hover { text-decoration:underline; }
-Tree\:Box li>a.active { background-color: #FEF7A9; font-weight: bold; }
-Tree\:Box li>a.disable { color: grey; }
-Tree\:Box li span { width:16px; height:16px; margin-right:2px; display: inline-block; vertical-align:middle; cursor: pointer; }
-Tree\:Box .hidden { display: none; }
-Tree\:Box li>span.checkbox { width:13px; height:13px; margin-right:3px; background:url("../images/tree/checkbox.png") no-repeat;}
-Tree\:Box li>span.checkstate_0_0 {background-position:0px 0px;}
-Tree\:Box li>span.checkstate_1_0 {background-position:0px -36px;}
-Tree\:Box li>span.checkstate_2_0 {background-position:0px -24px;}
-Tree\:Box li>span.checkstate_0_1 {background-position:0px -72px;}
-Tree\:Box li>span.checkstate_1_1 {background-position:0px -48px;}
-Tree\:Box li>span.checkstate_2_1 {background-position:0px -48px;}
-Tree\:Box li>span.switch{width:18px; height:18px;}
-Tree\:Box li>span.node_open {background-image:url("../images/tree/minus.gif");}
-Tree\:Box li>span.node_close{background-image:url("../images/tree/plus.gif");}
-Tree\:Box li>span.node_leaf {background:none;cursor:default;}
-Tree\:Box li>div.selfIcon { width:16px; height:16px; margin-right:3px; vertical-align:middle; display: inline-block; }
-Tree\:Box li>div.folder { background-image:url("../images/tree/folder.gif"); }
-Tree\:Box li>div.leaf { width:0px; height:0px; background:none; }
+Tree * { padding:0px; margin:0px; font-size:12px; font-family: Verdana, Arial, Helvetica, AppleGothic, sans-serif; }
+Tree { height: 100%; display:block; padding:5px; color:#333; overflow-y: scroll; }
+Tree li { list-style:none; line-height:18px; text-align:left; white-space:nowrap; }
+Tree li ul { padding-left:18px; }
+Tree li a { padding:1px 3px 0px 0px;cursor:pointer;height:17px;color:#333;text-decoration:none;display:inline-block;}
+Tree li>a:hover { text-decoration:underline; }
+Tree li>a.active { background-color: #FEF7A9; font-weight: bold; }
+Tree li>a.disable { color: grey; }
+Tree li span { width:16px; height:16px; margin-right:2px; display: inline-block; vertical-align:middle; cursor: pointer; }
+Tree .hidden { display: none; }
+Tree li>span.checkbox { width:13px; height:13px; margin-right:3px; background:url("../images/tree/checkbox.png") no-repeat; }
+Tree li>span.checkstate_0_0 { background-position:0px 0px; }
+Tree li>span.checkstate_1_0 { background-position:0px -36px; }
+Tree li>span.checkstate_2_0 { background-position:0px -24px; }
+Tree li>span.checkstate_0_1 { background-position:0px -72px; }
+Tree li>span.checkstate_1_1 { background-position:0px -48px; }
+Tree li>span.checkstate_2_1 { background-position:0px -48px; }
+Tree li>span.switch { width:18px; height:18px; }
+Tree li>span.node_open { background-image:url("../images/tree/minus.gif"); }
+Tree li>span.node_close{ background-image:url("../images/tree/plus.gif"); }
+Tree li>span.node_leaf { background:none;cursor:default;}
+Tree li>div.selfIcon { width:16px; height:16px; margin-right:3px; vertical-align:middle; display: inline-block; }
+Tree li>div.folder { background-image:url("../images/tree/folder.gif"); }
+Tree li>div.leaf { width:0px; height:0px; background:none; }
 WorkSpace\:Box { width:100%; height:100%; overflow:hidden; font-size:12px; vertical-align:top; display:inline-block; }
 WorkSpace\:Tab { color:#575B67; width:100px; height:19px; cursor:pointer; position:relative; display:inline-block;background-image:url(../images/ws/bg_tab_inactive.gif); }
 WorkSpace\:Tab.active { color:#333333; font-weight:bold; background-image:url(../images/ws/bg_tab_active.gif); }

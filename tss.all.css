@@ -38,7 +38,7 @@ input[type=text]:focus, textarea:focus {
 .menu div.separator { padding:0px; width:103px; height:1px; overflow:hidden; background-color:#A6A6A6; margin:1px 0px 1px 30px; }
 .menu div img { position:absolute; width:16px; height:16px; left:2px; top:2px;}
 .menu div .hasChild { width:16px; height:16px; position:absolute; right:-25px; top:2px;
-  background:url(../images/icon_has_child.gif) no-repeat left top; }
+	background:url(../images/icon_has_child.gif) no-repeat left top; }
 .menu div.active { background-color:#B6BDD2; cursor: pointer;}
 .menu div.active img { left:1px; top:1px; }
 .menu div.active .hasChild { top:3px; }
@@ -81,12 +81,12 @@ input[type=text]:focus, textarea:focus {
 .timeAera input[type=range] { width: 120px;  margin-right: 5px; }
 .timeAera button { width: 50px; float:right; margin-right:70px; background-color:#FF9933; border:1px solid #dedede; letter-spacing:3px; }
 .tssForm { width:100%; display:block; font-size:12px; } 
-.tssForm table { width:100%; border-width: 0; }
+.tssForm table { width:100%; }
 .tssForm td { padding:3px 2px; border-width: 0; }
-.tssForm input, .tssForm textarea { color:#535458; font-size:12px; border:1px solid #ABAAAF; background-color:#ECEFF8; }
+.tssForm input:not([type='button']), .tssForm textarea, .tssForm select { border:1px solid #ABAAAF; background-color:#ECEFF8; padding-left:2px; }
 .tssForm input { height:18px; }
 .tssForm textarea { word-break:break-all; }
-.tssForm select {  font-size:12px; height:18px; }
+.tssForm select { height:18px; }
 .tssForm .button { background-color:#E4EBF3; border-style:outset; }
 .tssForm .field_disabled { border:1px dotted #ABAAAF; background-color:transparent; }
 .tssForm .hidden { display:none; }

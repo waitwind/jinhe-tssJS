@@ -19,6 +19,7 @@
 		this.type  = info.type || "string";
 		this.nullable = (info.nullable == null ? "true" : info.nullable);
 		this.checkReg = info.checkReg;
+		this.errorMsg = info.errorMsg;
 		this.options = info.options;
 		this.jsonUrl = info.jsonUrl;
 		this.multiple = (info.multiple == "true") || false;
@@ -60,7 +61,10 @@
 		createColumn: function() {
 			var column = "<column name='" +this.name+ "' caption='" +this.label+ "' mode='" +this.mode+ "' empty='" +this.nullable+ "' ";
 			if(this.checkReg) {
-				column += " inputReg='" +this.checkReg+ "' ";
+				column += " checkReg='" +this.checkReg+ "' ";
+			}
+			if(this.errorMsg) {
+				column += " errorMsg='" +this.errorMsg+ "' ";
 			}
 			if(this.multiple) {
 				column += " multiple='multiple' ";

@@ -35,10 +35,10 @@
 
     'use strict';
 
-    var showErrorInfo = function(errorInfo, obj) {
+    var showErrorInfo = function(errorMsg, obj) {
         setTimeout(function() {
             if( $.Balloon ) {
-                $(obj).notice(errorInfo);
+                $(obj).notice(errorMsg);
             }
         }, 100);
     },
@@ -48,21 +48,22 @@
     },
 
     validate = function() {
-        var empty     = this.el.getAttribute("empty");
-        var errorInfo = this.el.getAttribute("errorInfo");
-        var caption   = this.el.getAttribute("caption").replace(/\s/g, "");
-        var inputReg  = this.el.getAttribute("inputReg");
+        var empty    = this.el.getAttribute("empty");
+        var caption  = this.el.getAttribute("caption").replace(/\s/g, "");
+        var checkReg = this.el.getAttribute("checkReg") || this.el.getAttribute("inputReg");
         
+        var errorMsg;
         var value = this.el.value;
         if(value == "" && empty == "false") {
-            errorInfo = "[" + caption.replace(/\s/g, "") + "] 不允许为空。";
+            errorMsg = "[" + caption.replace(/\s/g, "") + "] 不允许为空。";
         }
-        if(inputReg && !eval(inputReg).test(value)) {
-            errorInfo = errorInfo || "[" + caption + "] 格式不正确，请更正.";
+        if(checkReg && !eval(checkReg).test(value)) {
+            errorMsg = this.el.getAttribute("errorMsg");
+            errorMsg = errorMsg || "[" + caption + "] 格式不正确，请更正.";
         }
 
-        if( errorInfo ) {
-            showErrorInfo(errorInfo, this.el);
+        if( errorMsg ) {
+            showErrorInfo(errorMsg, this.el);
 
             if( !!this.isInstance ) {
                 this.setFocus();
@@ -184,7 +185,7 @@
                             continue;
                         }
 
-                        var mode    = column.getAttribute("mode");
+                        var mode    = column.getAttribute("mode") || 'string';
                         var editor  = column.getAttribute("editor");
                         var caption = column.getAttribute("caption");
                         var value   = this.getFieldValue(binding);

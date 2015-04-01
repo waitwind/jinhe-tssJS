@@ -3395,15 +3395,6 @@
                 var fieldObj;
                 var fieldType = field.getAttribute("mode");
                 switch(fieldType) {
-                    case "string":
-                        var colEditor = field.getAttribute("editor");
-                        if(colEditor == "comboedit") {
-                            fieldObj = new ComboField(fieldName, this);
-                        }
-                        else {
-                            fieldObj = new StringField(fieldName, this);
-                        }
-                        break;
                     case "number":
                         fieldObj = new StringField(fieldName, this);
                         break;
@@ -3416,6 +3407,16 @@
                         break;
                     case "hidden":
                         fieldObj = new HiddenFiled(fieldName, this);
+                        break;
+                    case "string":
+                    default:
+                        var colEditor = field.getAttribute("editor");
+                        if(colEditor == "comboedit") {
+                            fieldObj = new ComboField(fieldName, this);
+                        }
+                        else {
+                            fieldObj = new StringField(fieldName, this);
+                        }
                         break;
                 }
 
@@ -4140,7 +4141,22 @@
 
             var mode  = column.getAttribute("mode") || "string";
             switch( mode ) {
+                case "number":  
+                case "date":
+                    cell.title = value;
+                    break;         
+                case "function":                          
+                    break;    
+                case "image":          
+                    cell.innerHTML = "<img src='" + value + "'/>";
+                    break;    
+                case "boolean":      
+                    var checked = (value =="true") ? "checked" : "";
+                    cell.innerHTML = "<form><input class='selectHandle' type='radio' " + checked + "/></form>";
+                    cell.querySelector("input").disabled = true;
+                    break;
                 case "string":
+                default:
                     var editor = column.getAttribute("editor");
                     var editortext = column.getAttribute("editortext");
                     var editorvalue = column.getAttribute("editorvalue");
@@ -4155,20 +4171,6 @@
                     }
                     
                     $(cell).html(value).title(value);                          
-                    break;
-                case "number":  
-                case "date":
-                    cell.title = value;
-                    break;         
-                case "function":                          
-                    break;    
-                case "image":          
-                    cell.innerHTML = "<img src='" + value + "'/>";
-                    break;    
-                case "boolean":      
-                    var checked = (value =="true") ? "checked" : "";
-                    cell.innerHTML = "<form><input class='selectHandle' type='radio' " + checked + "/></form>";
-                    cell.querySelector("input").disabled = true;
                     break;
             }                           
         },

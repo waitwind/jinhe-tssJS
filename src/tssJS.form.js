@@ -293,15 +293,6 @@
                 var fieldObj;
                 var fieldType = field.getAttribute("mode");
                 switch(fieldType) {
-                    case "string":
-                        var colEditor = field.getAttribute("editor");
-                        if(colEditor == "comboedit") {
-                            fieldObj = new ComboField(fieldName, this);
-                        }
-                        else {
-                            fieldObj = new StringField(fieldName, this);
-                        }
-                        break;
                     case "number":
                         fieldObj = new StringField(fieldName, this);
                         break;
@@ -314,6 +305,16 @@
                         break;
                     case "hidden":
                         fieldObj = new HiddenFiled(fieldName, this);
+                        break;
+                    case "string":
+                    default:
+                        var colEditor = field.getAttribute("editor");
+                        if(colEditor == "comboedit") {
+                            fieldObj = new ComboField(fieldName, this);
+                        }
+                        else {
+                            fieldObj = new StringField(fieldName, this);
+                        }
                         break;
                 }
 

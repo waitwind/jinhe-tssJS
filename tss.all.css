@@ -83,10 +83,11 @@ input[type=text]:focus, textarea:focus {
 .tssForm { width:100%; display:block; font-size:12px; } 
 .tssForm table { width:100%; }
 .tssForm td { padding:3px 2px; border-width: 0; }
-.tssForm input:not([type='button']), .tssForm textarea, .tssForm select { border:1px solid #ABAAAF; background-color:#ECEFF8; padding-left:2px; }
+.tssForm input, .tssForm textarea, .tssForm select { border:1px solid #ABAAAF; background-color:#ECEFF8; padding-left:2px; }
 .tssForm input { height:18px; }
 .tssForm textarea { word-break:break-all; }
 .tssForm select { height:18px; }
+.tssForm input[type='button'] { border: 0; }
 .tssForm .button { background-color:#E4EBF3; border-style:outset; }
 .tssForm .field_disabled { border:1px dotted #ABAAAF; background-color:transparent; }
 .tssForm .hidden { display:none; }
@@ -163,3 +164,34 @@ WorkSpace\:PhaseBox td { vertical-align:top; }
 WorkSpace\:Page { height:100%; padding:20px; margin-right:0px; overflow:hidden; background-color:#F7F8FD; border:1px solid #98989C; border-top:0px;}
 WorkSpace\:Page.tight { padding:0px; }
 WorkSpace\:PageStep { text-align:center; padding:0; width:100%; display:block;}
+.leftbar {
+    position:fixed; top:20%; 
+    z-index:100;
+    width:30px; height:200px;
+    background-color: lightgrey; 
+    border-right:2px solid yellow;
+    border-radius: 3px;
+    -webkit-transition: all .3s linear;
+    -moz-transition: all .3s linear;
+    -o-transition: all .3s linear;
+    transition: all .3s linear
+}
+.leftbar-open   { left:0; border-right:1px solid transparent; }
+.leftbar-hidden { left:-30px; }
+
+.leftbar .leftbar-menu { width:27px; height:110px; opacity:.5; padding: 90px 0 0 4px; border-radius: 3px; }
+.leftbar .leftbar-menu:hover { background-color: orange; opacity:1; cursor: pointer; }
+
+.leftbar .leftbar-menu span, 
+.leftbar .leftbar-menu span:before,
+.leftbar .leftbar-menu span:after {
+  position: absolute;
+  border-radius: 1px;
+  height: 5px;
+  width: 20px;
+  background: #000;
+  display: block;
+  content: '';
+}
+.leftbar .leftbar-menu span:before { top: -10px; }
+.leftbar .leftbar-menu span:after  { bottom: -10px; }

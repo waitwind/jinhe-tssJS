@@ -1,17 +1,21 @@
-.leftbar {
-    position:fixed; top:30%; z-index:100;
-    width:30px; height:200px;
-    background-color:rgba(255,255,255,0.30000000000000004); 
-}
-.leftbar:hover { left:0 }
-.leftbar:hover .leftbar-navigation { background:#fff }
-.leftbar .leftbar-navigation { position:absolute; left:0; top:0; width:30px; height:100%; border-right:1px solid #fff }
 
-.leftbar-open   { left:0 }
+.leftbar {
+    position:fixed; top:20%; 
+    z-index:100;
+    width:30px; height:200px;
+    background-color: lightgrey; 
+    border-right:2px solid yellow;
+    border-radius: 3px;
+    -webkit-transition: all .3s linear;
+    -moz-transition: all .3s linear;
+    -o-transition: all .3s linear;
+    transition: all .3s linear
+}
+.leftbar-open   { left:0; border-right:1px solid transparent; }
 .leftbar-hidden { left:-30px; }
 
-.leftbar .leftbar-menu { position:absolute; left:0; top:0; width:27px; height:110px; opacity:.5; padding: 90px 0 0 4px; }
-.leftbar .leftbar-menu:hover { background-color:rgba(60,63,65,0.19999999999999996); opacity:1 }
+.leftbar .leftbar-menu { width:27px; height:110px; opacity:.5; padding: 90px 0 0 4px; border-radius: 3px; }
+.leftbar .leftbar-menu:hover { background-color: orange; opacity:1; cursor: pointer; }
 
 .leftbar .leftbar-menu span, 
 .leftbar .leftbar-menu span:before,

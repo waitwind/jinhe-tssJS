@@ -1,0 +1,28 @@
+.leftbar {
+    position:fixed; top:30%; z-index:100;
+    width:30px; height:200px;
+    background-color:rgba(255,255,255,0.30000000000000004); 
+}
+.leftbar:hover { left:0 }
+.leftbar:hover .leftbar-navigation { background:#fff }
+.leftbar .leftbar-navigation { position:absolute; left:0; top:0; width:30px; height:100%; border-right:1px solid #fff }
+
+.leftbar-open   { left:0 }
+.leftbar-hidden { left:-30px; }
+
+.leftbar .leftbar-menu { position:absolute; left:0; top:0; width:27px; height:110px; opacity:.5; padding: 90px 0 0 4px; }
+.leftbar .leftbar-menu:hover { background-color:rgba(60,63,65,0.19999999999999996); opacity:1 }
+
+.leftbar .leftbar-menu span, 
+.leftbar .leftbar-menu span:before,
+.leftbar .leftbar-menu span:after {
+  position: absolute;
+  border-radius: 1px;
+  height: 5px;
+  width: 20px;
+  background: #000;
+  display: block;
+  content: '';
+}
+.leftbar .leftbar-menu span:before { top: -10px; }
+.leftbar .leftbar-menu span:after  { bottom: -10px; }

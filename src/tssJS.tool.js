@@ -5,7 +5,7 @@
  */
 ;(function($) {
  
-    $.leftbar = function(fn) {
+    $.leftbar = function(fn1, fn2) {
 
         var closeLeftbar = function() {
                 $(".leftbar").removeClass("leftbar-open").addClass("leftbar-hidden");
@@ -19,7 +19,7 @@
         this.init = function() {
             this.createInDomTree();
 
-            $(".leftbar-menu").click(fn);
+            $(".leftbar-menu").toggle(fn1, fn2);
             $(document).addEvent("mousemove", this.onMouseMove);
         };
 

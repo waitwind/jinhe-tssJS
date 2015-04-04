@@ -1,6 +1,6 @@
 
 .leftbar {
-    position:fixed; top:20%; 
+    position:fixed; bottom:20%; 
     z-index:100;
     width:30px; height:200px;
     background-color: lightgrey; 

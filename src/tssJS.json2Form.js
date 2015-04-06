@@ -120,11 +120,13 @@
 			return column + "/>";
 		},
 
-		createLayout: function() {			
+		createLayout: function() {	
+			var height = this.height||'18px';
+			var tag = (parseInt(height.replace('px', '')) > 18 && !this.options && !this.jsonUrl) ? 'textarea' : 'input';		
 			var layout = [];
 			layout[layout.length] = " <TR>";
 			layout[layout.length] = "    <TD width='88'><label binding='" + this.name + "'/></TD>";
-			layout[layout.length] = "    <TD><input binding='" + this.name + "' style='width:" + this.width + ";height:" + (this.height||'18px') + ";'/></TD>";
+			layout[layout.length] = "    <TD><" + tag + " binding='" + this.name + "' style='width:" + this.width + ";height:" + height + ";'/></TD>";
 			layout[layout.length] = " </TR>";
 
 			return layout.join("");
@@ -138,14 +140,14 @@
 		}
 	}
 
-	$.json2Form = function(formId, jsonTemplate, buttonBox) {
-		var infos = jsonTemplate ? $.parseJSON(jsonTemplate) : [];
+	$.json2Form = function(formId, defines, buttonBox) {
+		var infos = defines ? (typeof(defines) === "string" ? $.parseJSON(defines) : defines) : [];
 
 		var columns = [];
 		var layouts = [];
 		var datarow = [];
 		infos.each(function(i, info) {
-			info.name = info.name || "param" + (i+1);
+			info.name = info.name || info.code || "param" + (i+1);
 			var item = new Field(info);
 			columns.push(item.createColumn());
 			if(item.mode !== "hidden") {

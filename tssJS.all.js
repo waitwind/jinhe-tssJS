@@ -1596,7 +1596,7 @@
      *  对象名称：Message_Exception对象
      *  职责：负责处理异常信息
      *
-     *  注意：本对象除了展示异常信息（通过alert方法，window.alert=Alert，Alert在framework.js里做了重新定义）外，
+     *  注意：本对象除了展示异常信息外，
      *  还可以根据是否需要重新登录来再一次发送request请求，注意此处参数Message_Exception(param, request)，该
      *  request依然还是上一次发送返回异常信息的request，将登陆信息加入后（loginName/pwd等，通过_relogin.htm页面获得），
      *  再一次发送该request请求，从而通过AutoLoginFilter的验证，取回业务数据。  

@@ -7,3 +7,19 @@
 .tssJS-bubble:after { content: ''; width: 0; height: 0; border: 15px solid transparent; position: absolute; }
 .tssJS-bubble-arrow-top:after { border-bottom-color: #292929; bottom: 100%; left: 50%; margin-left: -15px; }
 .tssJS-bubble-arrow-bottom:after { border-top-color: #292929; top: 100%;    left: 50%; margin-left: -15px; } 
+
+#alert_box { z-index: 99999; width: 380px; min-width: 360px; border: solid 1px #99b1c4; font-size: 12px; color: #000; background-color: #fff; }
+#alert_box .title { padding-left: 8px; font-weight: bold; font-size: 13px; line-height: 1.9em; color: #fff; cursor: move;
+	background:url(../images/alert/title.gif) repeat-x 0px -2px; overflow:hidden; text-overflow:ellipsis;  }
+#alert_box .ok, #alert_box .cancel { width:58px; height:24px; margin-right:10px;
+	background:url(../images/alert/btn.gif) no-repeat; padding:0 4px; 
+	border:none; cursor:pointer; text-align:center;  }
+#alert_box .close { position:absolute; right:7px; top:4px; width:16px;height:16px; background:url(../images/alert/close.gif) no-repeat; cursor:pointer;}
+#alert_box .close:hover { background:url(../images/alert/close.gif) no-repeat -17px 0 ; }
+#alert_box .alert   { background: url(../images/alert/info.gif) no-repeat 20px 18px; }
+#alert_box .confirm { background: url(../images/alert/important.gif) no-repeat 20px 14px; }
+#alert_box .prompt  { background: url(../images/alert/help.gif) no-repeat 20px 14px; }
+#alert_box .btbox { text-align: right; border-top:1px solid #d7d7d7; margin: 1em 0em 0em 1em; padding-top:10px; }
+#alert_box .content { padding: 20px 12px 10px 12px; }
+#alert_box .message { max-height:150px; padding-left: 50px; padding-bottom: 10px; font-size:13px; overflow:hidden; text-overflow:ellipsis; word-break:break-all; }
+#alert_box .message  input { margin: .5em 0em; height: 20px; width: 250px; line-height: 20px; }

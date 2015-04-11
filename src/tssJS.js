@@ -529,24 +529,24 @@
         },
 
         // 设置innerHTML
-        html: function(str) {
+        html: function() {
             for (var i = 0; i < this.length; i++) {
                 var el = this[i];
                 if (arguments.length == 0) {
                     return el.innerHTML;
                 }
-                el.innerHTML = str;
+                el.innerHTML = arguments[0];
             }
             return this;
         },
 
         // 设置XML node text
-        text: function(value) {
+        text: function() {
             for (var i = 0; i < this.length; i++) {
                 if (arguments.length == 0) {
                     return $.XML.getText( this[i] );
                 }
-                $.XML.setText(this[i], value);  
+                $.XML.setText(this[i], arguments[0]);  
             }
             return this;
         },
@@ -554,6 +554,13 @@
         appendChild: function(el) {
             if ( this.length > 0 ) {
                 this[0].appendChild(el);
+            }
+            return this;
+        },
+
+        remove: function() {
+            for (var i = 0; i < this.length; i++) {
+                $.removeNode(this[i]);
             }
             return this;
         },
@@ -639,7 +646,6 @@
                 width  = this[0].clientWidth;
                 height = this[0].clientHeight;
             }
-
             var left = ($.getInner().width - (width || 0) ) / 2;
             var top  = ($.getInner().height - (height || 0) ) / 2;
             return this.position(left, top);
@@ -657,6 +663,17 @@
                     return el.getAttribute(name);
                 }
                 el.setAttribute(name, value);
+            }
+            return this;
+        },
+
+        value: function() {
+            if ( this.length > 0 ) {
+                var el = this[0];
+                if (arguments.length == 0) {
+                    return el.value;
+                }
+                el.value = arguments[0];
             }
             return this;
         }
@@ -720,10 +737,13 @@
             };
         },
 
-        createElement: function(tagName, className) {
+        createElement: function(tagName, className, id) {
             var el = document.createElement(tagName);
             if (className) {
                 $(el).addClass(className)
+            }
+            if(id) {
+                el.id = id;
             }
             return el;
         },
@@ -796,7 +816,7 @@
         },
 
         hideWaitingLayer: function() {
-            $.waitingLayerCount --;
+            $.waitingLayerCount && $.waitingLayerCount --;
 
             var waitingObj = $("#_waiting");
             if( waitingObj.length > 0 && $.waitingLayerCount <= 0 ) {

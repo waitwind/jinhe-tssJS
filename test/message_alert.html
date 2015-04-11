@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title> test </title>
+
+    <link rel="stylesheet" href="../css/tss.common.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="../css/tss.alert.css" type="text/css" media="screen" />
+
+    <script type="text/javascript" src="../src/tssJS.js"></script>
+    <script type="text/javascript" src="../src/tssJS.tool.js"></script>
+
+    <style type="text/css">
+        body {
+            background-color: white;
+        }
+    </style>
+
+
+</head>
+<body>
+
+    <div id="alert_box" class="moveable" style="position: fixed; z-index: 99999; top: 116px; left: 580px; width:300px;">
+        <h1 class="title" style="cursor: move;">提示</h1>
+        <span class="close"></span>
+        <div class="content alert">
+            <div class="message">欢迎来到helloweba.com</div>
+            <div class="btbox"><input type="button" value="确 定" class="ok"></div>
+        </div>
+
+ 
+        <h1 class="title" style="cursor: move;">输入框</h1>
+        <span class="close"></span>
+        <div class="content prompt">
+            <div class="message">请填写:<br>
+                <input type="text">
+            </div>
+            <div class="btbox">
+                <input type="button" value="确 定" class="ok"> &nbsp;
+                <input type="button" value="取 消" class="cancel">
+            </div>
+        </div>
+
+
+        <h1 class="title" style="cursor: move;">确认框</h1>
+        <span class="close"></span>
+        <div class="content confirm">
+            <div class="message">你确认此操作吗?</div>
+            <div class="btbox">
+                <input type="button" value="确 定" class="ok"> &nbsp;
+                <input type="button" value="取 消" class="cancel">
+            </div>
+        </div>
+
+
+        <h1 class="title" style="cursor: move;">标题</h1>
+        <span class="close"></span>
+        <div class="content msgBox">
+            <h3>这是一段测试用的文字</h3>
+            <p>我们关注业内发展动态，我们热爱WEB设计与开发，我们关注用户体验和网站的可用性，并遵循WEB标准，我们以推动规范设计为己任，我们致力于WEB前端技术在中国的应用，我们为用户提供优质高效的网站设计。<a href="http://www.helloweba.com">helloweba.com</a>
+            </p>
+            <p style="text-align:right"><a href="#" class="a_close">关闭</a></p>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+
+     //hiAlert("欢迎来到helloweba.com","提示");
+
+     //hiConfirm(content,title,callback);
+     //hiPrompt(content,defaultValue,title,callback); 
+
+    </script>  
+</body>
+</html>

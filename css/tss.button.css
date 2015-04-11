@@ -1,0 +1,30 @@
+.button {
+	display: inline-block;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	font: 16px/100% 'Microsoft yahei',Arial, Helvetica, sans-serif;
+	padding: .5em 2em .55em;
+	text-shadow: 0 1px 1px rgba(0,0,0,.3);
+	border-radius: .5em;
+}
+.button:hover { text-decoration: none; }
+.button:active { position: relative; top: 1px;}
+
+.bigrounded { -webkit-border-radius: 2em; -moz-border-radius: 2em; border-radius: 2em; }
+.medium { font-size: 12px; padding: .4em 1.5em .42em; }
+.small { font-size: 11px; padding: .2em 1em .275em;}
+
+.blue { color: #d9eef7; border: solid 1px #0076a3; background: #0095cd; }
+.blue:hover { background: #007ead; }
+.blue:active { color: #80bed6; }
+.green { color: #e8f0de; border: solid 1px #538312; background: #64991e; }
+.green:hover { background: #538018; }
+.green:active { color: #a9c08c; }
+.white { color: #606060; border: solid 1px #b7b7b7; background: #fff; }
+.white:hover { background: #ededed; }
+.white:active { color: #999; }
+.orange { color: #fef4e9; border: solid 1px #da7c0c; background: #f78d1d; }
+.orange:hover { background: #f47c20; }
+.orange:active { color: #fcd3a5; }

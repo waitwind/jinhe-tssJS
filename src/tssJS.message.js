@@ -1,3 +1,5 @@
+
+/* tip, 提示气泡 */
 ;(function($, factory) {
 
     $.Bubble = $.Balloon = factory($);
@@ -67,3 +69,10 @@
 
     return Bubble;
 });
+
+
+(function($) {
+    
+
+
+})(tssJS);

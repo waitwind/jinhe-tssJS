@@ -449,7 +449,7 @@
 
             // 3秒后自动自动隐藏成功提示信息
             setTimeout(function() {
-                $("#X-messageBox").css("display", "none");
+                $("#alert_box").hide();
             }, 3000);
         }
 

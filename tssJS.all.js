@@ -1605,7 +1605,7 @@
 
             // 3秒后自动自动隐藏成功提示信息
             setTimeout(function() {
-                $("#X-messageBox").css("display", "none");
+                $("#alert_box").hide();
             }, 3000);
         }
 
@@ -1967,32 +1967,34 @@
 
     var popupBox = function(title, callback) {
             var $box = $("#alert_box");
-            if($box.length == 0) {
-                var boxEl = $.createElement("div", "moveable", "alert_box");
-                document.body.appendChild(boxEl);
-
-                var html = [];
-                html.push('  <h1 class="title"></h1>');
-                html.push('  <span class="close"></span>');
-                html.push('  <div class="content">');
-                html.push('    <div class="message"></div>');
-                html.push('    <div class="btbox"><input type="button" value="确 定" class="ok"></div>');
-                html.push('  </div>');
-
-                $box = $(boxEl).html(html.join("\n")).show().drag();
-                $(".close", boxEl).click(closeBox);
-                $("h1", boxEl).html(title).addClass("text2");
-                $(".content .message", boxEl).addClass("text1");
-
-                $(boxEl).center(360, 300);   
-                callback && $.showWaitingLayer();
-
-                $.Event.addEvent(document, "keydown", function(ev) {
-                    if(27 == ev.keyCode) { // ESC 退出
-                       closeBox();
-                    }
-                });
+            if($box.length > 0) {
+                $box.remove();
             }
+
+            var boxEl = $.createElement("div", "moveable", "alert_box");
+            document.body.appendChild(boxEl);
+
+            var html = [];
+            html.push('  <h1 class="title"></h1>');
+            html.push('  <span class="close"></span>');
+            html.push('  <div class="content">');
+            html.push('    <div class="message"></div>');
+            html.push('    <div class="btbox"><input type="button" value="确 定" class="ok"></div>');
+            html.push('  </div>');
+
+            $box = $(boxEl).html(html.join("\n")).show().drag();
+            $(".close", boxEl).click(closeBox);
+            $("h1", boxEl).html(title).addClass("text2");
+            $(".content .message", boxEl).addClass("text1");
+
+            $(boxEl).center(360, 300);   
+            callback && $.showWaitingLayer();
+
+            $.Event.addEvent(document, "keydown", function(ev) {
+                if(27 == ev.keyCode) { // ESC 退出
+                   closeBox();
+                }
+            });
 
             return $box[0];
         },

@@ -5884,7 +5884,7 @@
         this.init = function() {
             this.createInDomTree();
 
-            $(".leftbar-menu").toggle(fn1, fn2);
+            $(".leftbar-menu").toggle(fn1, fn2 || fn1);
             $(document).addEvent("mousemove", this.onMouseMove);
         };
 

@@ -36,7 +36,7 @@
         request.onresult = arg.onresult || request.onresult;
         request.onsuccess = arg.onsuccess || request.onsuccess;
         request.onexception = arg.onexception || function(errorMsg) {
-            // alert(errorMsg.description); // 遇到异常却看不到任何信息，可尝试放开这里的注释
+            console.log(errorMsg.description); // 遇到异常却看不到任何信息，可尝试放开这里的注释
         };
 
         request.send();
@@ -70,6 +70,10 @@
     /* HTTP超时(1分钟) */
     _HTTP_TIMEOUT = 3*60*1000,
 
+    popupMessage = function (msg) {
+        ($.alert || alert)(msg);
+    },
+
  
     /*
      *  XMLHTTP请求对象，负责发起XMLHTTP请求并接收响应数据。例:
@@ -99,7 +103,7 @@
             this.xmlhttp = new XMLHttpRequest();
         } 
         else {
-            alert("您的浏览器版本过旧，不支持XMLHttpRequest，请先升级浏览器。");
+            popupMessage("您的浏览器版本过旧，不支持XMLHttpRequest，请先升级浏览器。");
         }
     };
 
@@ -439,13 +443,9 @@
     Message_Success = function(info, request) {
         request.ondata();
 
-        var str = [];
-        str[str.length] = "Success";
-        str[str.length] = "msg=\""  + info.msg  + "\"";
-
         if( info.type != "0" ) {
             
-            alert(info.msg, str.join("\r\n"));
+            popupMessage(info.msg);
 
             // 3秒后自动自动隐藏成功提示信息
             setTimeout(function() {
@@ -460,7 +460,7 @@
      *  对象名称：Message_Exception对象
      *  职责：负责处理异常信息
      *
-     *  注意：本对象除了展示异常信息（通过alert方法，window.alert=Alert，Alert在framework.js里做了重新定义）外，
+     *  注意：本对象除了展示异常信息外，
      *  还可以根据是否需要重新登录来再一次发送request请求，注意此处参数Message_Exception(param, request)，该
      *  request依然还是上一次发送返回异常信息的request，将登陆信息加入后（loginName/pwd等，通过_relogin.htm页面获得），
      *  再一次发送该request请求，从而通过AutoLoginFilter的验证，取回业务数据。  
@@ -480,7 +480,8 @@
         str[str.length] = "source=\"" + (info.source || "") + "\"";
 
         if( info.msg && info.type != "0" && info.relogin != "1") {
-            alert(info.msg, str.join("\r\n"));
+            popupMessage(info.msg);
+            console.log(str.join("\r\n"))
         }
 
         request.onexception(info);
@@ -496,15 +497,6 @@
             
             popupMessage(info.msg);
             relogin(request);
-        }
-
-        function popupMessage(msg) {
-            if(window._alert) {
-                _alert(msg);
-            }
-            else {
-                alert(msg);
-            }
         }
 
         function relogin(request) {

@@ -13,8 +13,7 @@
     <script type="text/javascript" src="../src/tssJS.message.js"></script>
 
     <style type="text/css">
-        body {
-            background-color: white;
+        .demo {
             padding: 30px;
         }
     </style>
@@ -56,11 +55,12 @@
     </div>
 -->
 
-<a href="#" class="button blue normal">test alert</a> 
-<a href="#" class="button blue bigrounded">test confirm</a> 
-<a href="#" class="button blue medium">test prompt</a> 
+    <div class="demo">
+        <a href="#" class="button blue normal">test alert</a> 
+        <a href="#" class="button blue bigrounded">test confirm</a> 
+        <a href="#" class="button blue medium">test prompt</a> 
+    </div>
 
-<button></button>
 
     <script type="text/javascript">
         function callback() {
@@ -72,8 +72,11 @@
         });
 
         $(".bigrounded").click(function(){
-            $.confirm("你确定要删除这个节点吗", "删除确认", function(result) {
-                $.alert("your select: " + result);
+            $.confirm("你确定要删除这个节点吗", "删除确认", function() {
+                $.alert("你选择了确认删除。");
+            },
+            function() {
+                $.alert("你选择了取消删除。");
             });
         });
 

@@ -5,9 +5,12 @@
 	<title>tssAjax test</title>
 
 	<link href="../css/tss.common.css" rel="stylesheet">
+	<link href="../css/tss.message.css" rel="stylesheet">
 
 	<script src="../src/tssJS.js"></script>
 	<script src="../src/tssJS.ajax.js"></script>
+	<script src="../src/tssJS.message.js"></script>
+	<script src="../src/tssJS.tool.js"></script>
 
 
 <SCRIPT LANGUAGE="JavaScript">
@@ -15,20 +18,22 @@
 
 	$().ready( function () {
 
-		// $.ajax({
-		// 	url : 'data/_success.xml',
-		// 	method : "GET"
-		// });
+		if(1) {
+			// $.ajax({
+			// 	url : 'data/_success.xml',
+			// 	method : "GET"
+			// });
 
-		// $.ajax({
-		// 	url : 'data/_error.xml',
-		// 	method : "GET"
-		// });
+			$.ajax({
+				url : 'data/_error.xml',
+				method : "GET"
+			});
 
-		// $.ajax({
-		// 	url : 'data/neverfind.xml',
-		// 	method : "GET"
-		// });
+			$.ajax({
+				url : 'data/neverfind.xml',
+				method : "GET"
+			});
+		}
 
 		$.ajax({
 			url : 'data/operation.xml',

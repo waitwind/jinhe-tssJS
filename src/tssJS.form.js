@@ -259,7 +259,7 @@
 
         load: function(dataXML) {
             if("object" != typeof(dataXML) || dataXML.nodeType != $.XML._NODE_TYPE_ELEMENT) {
-                return alert("传入的Form数据有问题，请检查。");
+                return $.alert("传入的Form数据有问题，请检查。");
             }
             
             this.template = new XMLTemplate(dataXML);   
@@ -446,7 +446,7 @@
         getFieldConfig: function(name, attrName) {
             var field = this.template.fieldsMap[name];
             if( field == null ) {
-                return alert("指定的字段[" + name + "]不存在");
+                return $.alert("指定的字段[" + name + "]不存在");
             }
             return field.getAttribute(attrName);
         },

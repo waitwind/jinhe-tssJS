@@ -73,7 +73,7 @@
 
 (function($) {
 
-    var popupBox = function() {
+    var popupBox = function(title, callback) {
             var $box = $("#alert_box");
             if($box.length == 0) {
                 var boxEl = $.createElement("div", "moveable", "alert_box");
@@ -89,6 +89,17 @@
 
                 $box = $(boxEl).html(html.join("\n")).show().drag();
                 $(".close", boxEl).click(closeBox);
+                $("h1", boxEl).html(title).addClass("text2");
+                $(".content .message", boxEl).addClass("text1");
+
+                $(boxEl).center(360, 300);   
+                callback && $.showWaitingLayer();
+
+                $.Event.addEvent(document, "keydown", function(ev) {
+                    if(27 == ev.keyCode) { // ESC 退出
+                       closeBox();
+                    }
+                });
             }
 
             return $box[0];
@@ -102,65 +113,68 @@
 
     // content：内容，title：对话框标题，callback：回调函数    
     $.alert = function(content, title, callback) {
-        var boxEl = popupBox();
-        $("h1", boxEl).html(title || '提示');
-        $(".content .message", boxEl).html(content);
+        var boxEl = popupBox(title || '提示', callback);
         $(".content", boxEl).addClass("alert");
+        $(".content .message", boxEl).html(content);
 
-        $(boxEl).center();
-
-        callback && $.showWaitingLayer();
-
-        $(".btbox .ok", boxEl).click(function() {
+        function ok() {
             closeBox();
             callback && callback();
+        }
+        $(".btbox .ok", boxEl).click(ok);
+        $.Event.addEvent(document, "keydown", function(ev) {
+            if(13 == ev.keyCode) { // Enter
+               setTimeout(ok, 10);
+            }
         });
     };
 
     // content：内容，title：对话框标题，callback：回调函数
-    $.confirm = function(content, title, callback){
-        var boxEl = popupBox();
-        $("h1", boxEl).html(title || '确认框');
-        $(".content .message", boxEl).html(content || '你确认此操作吗?');
+    $.confirm = function(content, title, callback, cancelCallback){
+        var boxEl = popupBox(title || '确认框', callback);
         $(".content", boxEl).addClass("confirm");
+        $(".content .message", boxEl).html(content || '你确认此操作吗?');
         $(".btbox", boxEl).html($(".btbox", boxEl).html() + '<input type="button" value="取 消" class="cancel">');
 
-        $(boxEl).center();
-
-        callback && $.showWaitingLayer();
-
-        $(".btbox .ok", boxEl).click(function() {
+        function ok(result) {
             closeBox();
-            callback && callback(true);
-        });
-        $(".btbox .cancel", boxEl).click(function() {
-            closeBox();
-            callback && callback(false);
+            if(result) {
+                callback && callback();
+            } else {
+                cancelCallback && cancelCallback();
+            }
+        }
+        $(".btbox .ok", boxEl).click(function() { ok(true); });
+        $(".btbox .cancel", boxEl).click(function() { ok(false); });
+        $.Event.addEvent(document, "keydown", function(ev) {
+            if(13 == ev.keyCode) { // Enter
+               setTimeout( function() { ok(true); }, 10);
+            }
         });
     };
 
     // content：内容，deinput：输入框的默认值，title：对话框标题，callback：回调函数
     $.prompt = function(content, title, callback, deinput){
-        var boxEl = popupBox();
-        $("h1", boxEl).html(title || '输入框');
+        var boxEl = popupBox(title || '输入框', callback);
+        $(".content", boxEl).addClass("prompt");
         $(".content .message", boxEl).html( (content || "请输入：") + ':<br><input type="text">' );
         $(".content .message input", boxEl).value(deinput || '');
-
-        $(".content", boxEl).addClass("prompt");
         $(".btbox", boxEl).html($(".btbox", boxEl).html() + '<input type="button" value="取 消" class="cancel">');       
 
-        $(boxEl).center();
-
-        callback && $.showWaitingLayer();
-
-        $(".btbox .ok", boxEl).click(function() {
+        function ok() {
             var value = $(".content .message input", boxEl).value();
-            if(!value) return;
 
             closeBox();
             callback && callback(value);
-        });
+        }
+        $(".btbox .ok", boxEl).click(ok);
         $(".btbox .cancel", boxEl).click(closeBox);
+
+        $.Event.addEvent(document, "keydown", function(ev) {
+            if(13 == ev.keyCode) { // Enter
+               setTimeout(ok, 10);
+            }
+        });
     };
 
 })(tssJS);

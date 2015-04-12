@@ -24,7 +24,7 @@
 
             var feedback = data.querySelector("feedback");
             if( feedback ) {
-                alert($.XML.getText(feedback));
+                $.alert($.XML.getText(feedback));
             }
         },
 

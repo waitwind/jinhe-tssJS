@@ -256,7 +256,7 @@
     Grid.prototype = {
         load: function(data, append) {
             if("object" != typeof(data) || data.nodeType != $.XML._NODE_TYPE_ELEMENT) {
-                alert("传入的Grid数据有问题。")  
+                $.alert("传入的Grid数据有问题。")  
             } 
 
             // 初始化变量

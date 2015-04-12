@@ -527,7 +527,7 @@
             var parent = to;
             while(parent) {
                 if(parent == from) {
-                    return alert("不能向自己的内部节点移动。"); // 不能移动到子节点里
+                    return $.alert("不能向自己的内部节点移动。"); // 不能移动到子节点里
                 }
                 parent = parent.parent;
             }
@@ -630,7 +630,7 @@
 
         this.search = function(searchStr) {
             if($.isNullOrEmpty(searchStr)) {
-                return alert("查询条件不能为空！");
+                return $.alert("查询条件不能为空！");
             }
 
             if(lastSearchStr == searchStr) {

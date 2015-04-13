@@ -38,7 +38,8 @@
 		this.mode = this.type.toLowerCase();
 		switch(this.mode) {
 			case "number":
-				this.checkReg = this.checkReg || "/^(-?\d+)(\.\d+)?$/"; // 浮点数
+				this.checkReg = this.checkReg || "^(-?\\d+)(\\.\\d+)?$"; // 浮点数
+				this.errorMsg = this.errorMsg || "请输入数字";
 				break;
 			case "string":
 			case "hidden":

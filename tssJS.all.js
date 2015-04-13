@@ -3287,7 +3287,7 @@
         if(value == "" && empty == "false") {
             errorMsg = "[" + caption.replace(/\s/g, "") + "] 不允许为空。";
         }
-        if(checkReg && !eval(checkReg).test(value)) {
+        if(checkReg && !(new RegExp(checkReg)).test(value)) {
             errorMsg = this.el.getAttribute("errorMsg");
             errorMsg = errorMsg || "[" + caption + "] 格式不正确，请更正.";
         }

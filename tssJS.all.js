@@ -1650,38 +1650,41 @@
             $.Cookie.del("token", "/");
             $.Cookie.del("token", "/" + FROMEWORK_CODE.toLowerCase());
             $.Cookie.del("token", "/" + CONTEXTPATH);
-            
-            popupMessage(info.msg);
-            relogin(request);
+
+            relogin(request, info.msg);
         }
 
-        function relogin(request) {
+        function relogin(request, msg) {
             var reloginBox = $("#relogin_box")[0];
             if(reloginBox == null) {
                 var boxHtml = [];
                 boxHtml[boxHtml.length] = "<h1>重新登录</h1>";
-                boxHtml[boxHtml.length] = "<span> 账&nbsp; 号：<input type='text' id='loginName' placeholder='请输入您的账号'/> </span>";
-                boxHtml[boxHtml.length] = "<span> 密&nbsp; 码：<input type='password' id='password' placeholder='请输入您的密码' /> </span>";
+                boxHtml[boxHtml.length] = "<span> <input type='text' id='loginName' placeholder='请输入您的账号'/> </span>";
+                boxHtml[boxHtml.length] = "<span> <input type='password' id='password' placeholder='请输入您的密码' /> </span>";
                 boxHtml[boxHtml.length] = "<span class='bottonBox'>";
-                boxHtml[boxHtml.length] = "  <input type='button' id='bt_login'  class='btStrong' value='确 定'/>&nbsp;&nbsp;";
-                boxHtml[boxHtml.length] = "  <input type='button' id='bt_cancel' class='btWeak' value='取 消'/>";
+                boxHtml[boxHtml.length] = "  <input type='button' id='bt_login'  value='确  定'/>&nbsp;&nbsp;";
+                boxHtml[boxHtml.length] = "  <input type='button' id='bt_cancel' value='取  消'/>";
                 boxHtml[boxHtml.length] = "</span>";
 
-                reloginBox = $.createElement("div", "popupBox");    
-                reloginBox.id = "relogin_box";    
-                reloginBox.innerHTML = boxHtml.join("");
-
+                reloginBox = $.createElement("div", "popupBox", "relogin_box");    
                 document.body.appendChild(reloginBox);
+                $(reloginBox).html(boxHtml.join(""));
 
                 $("#bt_cancel").click(function() {
-                    reloginBox.style.display = "none";
+                    $(reloginBox).hide();
                 });
 
                 var defaultUserName = $.Cookie.getValue("iUserName");
                 if( defaultUserName ) {
-                    $1("loginName").value = defaultUserName;
+                    $("#loginName").value(defaultUserName);
                 }
             }
+
+            var title = "重新登录";
+            if(msg) {
+                title += "，因" + msg.substring(0, 10) + (msg.length > 10 ? "..." : "");
+            }
+            $("h1", reloginBox).html(title);
 
             $(reloginBox).show(); // 显示登录框
 

@@ -38,7 +38,7 @@
 		this.mode = this.type.toLowerCase();
 		switch(this.mode) {
 			case "number":
-				this.checkReg = this.checkReg || "/^[0-9]*[1-9][0-9]*$/";
+				this.checkReg = this.checkReg || "/^(-?\d+)(\.\d+)?$/"; // 浮点数
 				break;
 			case "string":
 			case "hidden":

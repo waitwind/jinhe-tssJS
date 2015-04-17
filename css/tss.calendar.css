@@ -34,4 +34,4 @@
 .pika-button:hover { color:#fff; background:#ff8000; box-shadow:none; border-radius:3px;}
 .timeAera { font-size: 12px; font-weight: bold; margin: 10px 5px; line-height: 20px; vertical-align: top;}
 .timeAera input[type=range] { width: 120px;  margin-right: 5px; }
-.timeAera button { width: 50px; float:right; margin-right:70px; background-color:#FF9933; border:1px solid #dedede; letter-spacing:3px; }
+.timeAera button { width: 50px; float:right; margin-right:70px; background-color:lightgrey; border:1px solid #dedede; letter-spacing:3px; }

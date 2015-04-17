@@ -5,15 +5,16 @@
 	<title>Form test</title>
 
 	<link href="../css/tss.common.css" rel="stylesheet">
-	<link href="../css/tss.balloon.css" rel="stylesheet">
+	<link href="../css/tss.message.css" rel="stylesheet">
 	<link href="../css/tss.calendar.css" rel="stylesheet">
 	<link href="../css/tss.form.css" rel="stylesheet">
 
 	<script src="../src/tssJS.js"></script>
 	<script src="../src/tssJS.ajax.js"></script>
-	<script src="../src/tssJS.balloon.js"></script>
+	<script src="../src/tssJS.message.js"></script>
 	<script src="../src/tssJS.calendar.js"></script>
-	<script src="../src/tssJS.form.js"></script>
+	<script src="../src/tssJS.tool.js"></script>
+    <script src="../src/tssJS.form.js"></script>
 
 
 <SCRIPT LANGUAGE="JavaScript">
@@ -73,7 +74,7 @@
             	url: URL_SAVE_USER,
             	formNode: dataNode,
             	onsuccess: function() {
-					alert("成功提交" + $.XML.toXml(dataNode));
+					window.alert("成功提交" + $.XML.toXml(dataNode));
 	            }
             })
         }

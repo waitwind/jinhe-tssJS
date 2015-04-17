@@ -143,7 +143,7 @@ Tree * { padding:0px; margin:0px; font-size:14px; }
 Tree { height: 100%; display:block; padding:5px; color:#333; overflow-y: scroll; }
 Tree li { list-style:none; line-height:22px; text-align:left; white-space:nowrap; }
 Tree li ul { padding-left:18px; }
-Tree li a { padding:1px 3px 0px 0px;cursor:pointer;height:17px;color:#333;text-decoration:none;display:inline-block;}
+Tree li a { padding:0px 1px 3px 1px;cursor:pointer;height:17px;color:#333;text-decoration:none;display:inline-block;}
 Tree li>a:hover { text-decoration:underline; }
 Tree li>a.active { background-color: #FEF7A9; font-weight: bold; }
 Tree li>a.disable { color: grey; }

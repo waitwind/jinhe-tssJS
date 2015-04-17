@@ -93,6 +93,17 @@
         }, 10);
     },
 
+    value2List = function(value) {
+        var valueList = {};
+        if( !$.isNullOrEmpty(value) ) {
+            value.split(",").each(function(i, item){
+                valueList[item] = true;
+            })
+        }           
+
+        return valueList;
+    },
+
     fireOnChangeEvent = function(el, newValue) {
         var onchangeFunc = el.getAttribute("onchange");
         if(onchangeFunc) {
@@ -318,7 +329,6 @@
                         break;
                 }
 
-                fieldObj.saveAsDefaultValue();
                 this.fieldObjMap[fieldName] = fieldObj;
 
                 if(field.getAttribute('empty') == "false") {
@@ -504,11 +514,7 @@
                 this.el.disabled = disabled;        
             }
         },
-
-        saveAsDefaultValue : function() {
-            this.el.defaultValue = this.el.value;
-        },
-
+ 
         setFocus : setFocus
     };
 
@@ -571,11 +577,7 @@
             
             this.el.editable = status;
         },
-
-        saveAsDefaultValue : function() {
-            this.el.defaultValue = this.el.value;
-        },
-
+ 
         setFocus : setFocus
     };
 
@@ -587,9 +589,9 @@
         var valueNode = this.el.attributes["value"];
         this.el._value = valueNode ? valueNode.value : "";
 
-        var selectedValues = this.value2List(this.el._value);
-        var selectedIndex = [];
+        var selectedValues = value2List(this.el._value);
 
+        // TODO 加一个空白的选项
         var valueList = (this.el.getAttribute("editorvalue") || "").split('|');
         var textList  = (this.el.getAttribute("editortext")  || "").split('|');
         for(var i=0; i < valueList.length; i++) {
@@ -598,14 +600,7 @@
      
             if( selectedValues[value] ) {
                 this.el.options[i].selected = true;
-                selectedIndex[selectedIndex.length] = i;
             }
-        }
-        if( selectedIndex.length > 0 ){
-            this.el.defaultSelectedIndex = selectedIndex.join(",");
-        } 
-        else {
-            this.el.defaultSelectedIndex = this.el.selectedIndex = -1;
         }
 
         if(this.multiple && this.el.getAttribute("height") == null) {
@@ -613,7 +608,7 @@
         }   
 
         // 当empty = false(表示不允许为空)时，下拉列表的默认值自动取第一项值
-        if( this.el._value == "" &&  this.el.getAttribute('empty') == "false") {
+        if( !this.el._value && this.el.getAttribute('empty') == "false") {
             this.setValue(valueList[0]);
             form.setFieldValue(this.el.id, valueList[0]);
         }
@@ -634,31 +629,14 @@
     };
 
     ComboField.prototype = {
-        value2List: function(value) {
-            var valueList = {};
-            if( !$.isNullOrEmpty(value) ) {
-                value.split(",").each(function(i, item){
-                    valueList[item] = true;
-                })
-            }           
-
-            return valueList;
-        },
-
         setValue: function(value) {
-            var valueList = this.value2List(value);
+            var valueList = value2List(value);
 
-            var noSelected = true;
             $.each(this.el.options, function(i, option){
                 if(valueList[option.value]) {
                     option.selected = true;
-                    noSelected = false;
                 }
             });
- 
-            if(noSelected){
-                this.el.selectedIndex = -1; 
-            }
 
             this.el._value = value;
             fireOnChangeEvent(this.el, value);
@@ -672,17 +650,77 @@
 
         validate: validate,
 
-        saveAsDefaultValue: function() {
-            var selectedIndex = [];
-            for(var i=0; i < this.el.options.length; i++){
-                var opt = this.el.options[i];
-                if(opt.selected) {
-                    selectedIndex[selectedIndex.length] = i;
+        setFocus: setFocus
+    };
+
+    var ComboTreeField = function(fieldName, form) {
+        this.el = $1(fieldName);
+        this.multiple = this.el.getAttribute("multiple") == "multiple";
+
+        var valueList = (this.el.getAttribute("editorvalue") || "").split('|');
+        var textList  = (this.el.getAttribute("editortext")  || "").split('|');
+        this.nodesData = [];
+        for(var i=0; i < valueList.length; i++) {
+             nodesData.push( {"id": valueList[i], "name": textList[i], })
+        }
+        
+        var valueNode = this.el.attributes["value"];
+        this.el._value = valueNode ? valueNode.value : "";
+        if(this.el._value) {
+            if(this.multiple) {
+                this.tree.setCheckValues(this.el._value.split(','), true);
+            } else {
+                this.tree.setActiveTreeNode(this.el._value);
+            }
+        }
+
+        if(this.multiple) {
+            // 多选树
+        }   
+        
+        this.el.onchange = function() {
+            if(this.multiple) {
+                this._value = this.tree.getCheckedIds(false).join(",");
+            } else {
+                this._value = this.tree.getActiveTreeNode().id;
+            }
+            form.updateData(this);
+            fireOnChangeEvent(this, this._value);
+        };
+
+        this.el.onblur = function() {
+            form.updateData(this);
+        };
+
+        this.el.onpropertychange = function() {
+            if(window.event.propertyName == "value") {
+                 // 自动过滤树节点
+            }
+        };
+    };
+
+    ComboTreeField.prototype = {
+        setValue: function(value) {
+            if(value) {
+                if(this.multiple) {
+                    this.tree.setCheckValues(value.split(','), true);
+                } else {
+                    this.tree.setActiveTreeNode(value);
                 }
             }
-            this.el.defaultSelectedIndex = selectedIndex.join(",");
+
+            this.el._value = value;
+            fireOnChangeEvent(this.el, value);
         },
 
+        setEditable: function(status) {
+            this.el.editable  = status;
+            this.el.disabled  = (status == "true" ? false : true);
+            this.el.className = this.el.disabled ? "field_disabled" : "comboTree";
+        },
+
+        validate: validate,
+ 
         setFocus: setFocus
     };
  
@@ -695,7 +733,6 @@
         setValue: function(s) {},
         setEditable: function(s) {},
         validate: function() { return true; },
-        saveAsDefaultValue: function() {},
         setFocus: function() {}
     };
 

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>可编辑下拉框</title> 
+
+    <style type="text/css">
+        select, input {
+            padding: 0;
+            margin: 0;
+
+        }
+
+    </style>
+</head> 
+<body style="padding:100px;"> 
+
+        <select name="fason"> 
+            <option value="可编辑下拉框">可编辑下拉框</option> 
+            <option value="1作者1">1作者1</option> 
+            <option value="2作者2">2作者2</option> 
+            <option value="3作者3">3作者3</option> 
+            <option value="3作者4">3作者4</option> 
+        </select> 
+
+<script language="javascript"> 
+    function combox(obj,select){ 
+        this.obj=obj 
+        this.name=select; 
+        this.select=document.getElementsByName(select)[0]; 
+        /*要转换的下拉框*/ 
+    } 
+
+    /*初始化对象*/ 
+    combox.prototype.init=function(){ 
+        var inputbox="<input name='combox_"+this.name+"' onchange='"+this.obj+".find()' " 
+        inputbox+="style='position:absolute;width:"+(this.select.offsetWidth-16)+"px;height:"+this.select.offsetHeight+"px;left:"+getL(this.select)+"px;top:"+getT(this.select)+"px'>" 
+        document.write(inputbox) 
+        with(this.select.style){ 
+            left=getL(this.select) 
+            top=getT(this.select) 
+            position="absolute" 
+            clip="rect(0 "+(this.select.offsetWidth)+"px "+this.select.offsetHeight+"px "+(this.select.offsetWidth-18)+"px)" 
+            /*切割下拉框*/ 
+        } 
+        this.select.onchange=new Function(this.obj+".change()") 
+        this.change() 
+
+    } 
+    /*初始化结束*/ 
+
+    ////////对象事件定义/////// 
+    combox.prototype.find=function(){ 
+        /*当搜索到输入框的值时,下拉框自动定位*/ 
+        var inputbox=document.getElementsByName("combox_"+this.name)[0] 
+        with(this.select){ 
+        for(i=0;i<options.length;i++) 
+            if(options[i].text.indexOf(inputbox.value)==0){ 
+                selectedIndex=i 
+                this.change(); 
+                break; 
+            } 
+        } 
+    } 
+
+    combox.prototype.change=function(){ 
+        /*定义下拉框的onchange事件*/ 
+        var inputbox=document.getElementsByName("combox_"+this.name)[0] 
+        inputbox.value=this.select.options[this.select.selectedIndex].text; 
+        with(inputbox){select();focus()}; 
+    } 
+
+////////对象事件结束/////// 
+/*公用定位函数(获取控件绝对坐标)*/ 
+function getL(e){ 
+    var l=e.offsetLeft; 
+    while(e=e.offsetParent)l+=e.offsetLeft; 
+    return l 
+} 
+
+function getT(e){ 
+    var t=e.offsetTop; 
+    while(e=e.offsetParent)t+=e.offsetTop; 
+    return t 
+} 
+
+/*结束*/ 
+</script> 
+
+<script language="javascript"> 
+
+    var a=new combox("a","fason") 
+    a.init() 
+
+</script> 
+
+</body> 
+
+</html> 

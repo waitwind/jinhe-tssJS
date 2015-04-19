@@ -560,11 +560,11 @@
             this.el.scrollTop = treeNode.li.offsetTop - this.el.clientHeight / 2;
         },
 
-        getCheckedIds: function(includeHalfChecked) {
+        getCheckedIds: function(includeHalfChecked, idName) {
             var checkedNodes = this.getCheckedNodes(includeHalfChecked);
             var checkedNodeIds = [];
             checkedNodes.each(function(i, node){
-                checkedNodeIds.push(node.id);
+                checkedNodeIds.push(node[idName || "id"]);
             });
 
             return checkedNodeIds;

@@ -13,3 +13,6 @@
 .tssForm input.function { padding-right:18px; }
 .tssForm .functionBt { display:inline-block; width:20px; height:18px; position:relative; top:4px; left:-21px; background-image:url(../images/icon_function.gif); }
 .tssForm .required { color:red; margin-left:3px; margin-right:5px; }
+.tssForm .combo { }
+.comboTree { background-color: white; border:1px solid #ABAAAF; border-top:none; padding: 1px; }
+.comboTree .switch { width: 5px; }

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<HTML XMLNS:Tree>
+<head>
+	<meta charset="UTF-8"/>
+	<title>tssForm from json test</title>
+
+	<link href="../css/tss.common.css" rel="stylesheet">
+	<link href="../css/tss.button.css" rel="stylesheet">
+	<link href="../css/tss.message.css" rel="stylesheet">
+	<link href="../css/tss.calendar.css" rel="stylesheet">
+	<link href="../css/tss.form.css" rel="stylesheet">
+	<link href="../css/tss.tree.css" rel="stylesheet">
+
+	<script src="../src/tssJS.js"></script>
+	<script src="../src/tssJS.ajax.js"></script>
+	<script src="../src/tssJS.message.js"></script>
+	<script src="../src/tssJS.calendar.js"></script>
+	<script src="../src/tssJS.tool.js"></script>
+    <script src="../src/tssJS.form.js"></script>
+    <script src="../src/tssJS.json2Form.js"></script>
+    <script src="../src/tssJS.tree.js"></script>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+ 
+    function init() {
+		$("#btQuery").click(function() {
+			query();
+		});
+
+		$.ajax({ 
+			url: "data/form.json", 
+			method : "GET",
+			ondata: function() {
+				var queryForm = $.json2Form("queryForm", this.getResponseJSON());
+				$.cache.XmlDatas["queryFormXML"] = queryForm.template.sourceXML;
+			}
+		});
+    }
+
+	function f2(value) {
+		var tssForm = $.F("queryForm");
+		tssForm.updateDataExternal("param2", value);
+
+		$.getNextLevelOption(tssForm, "param1", value, "data/3.json", "param3")
+	}
+
+    function query() {
+        var queryForm = $.F("queryForm");
+        if(  !queryForm.checkForm() ) {
+            return;
+        }
+ 
+		var dataXML = $.cache.XmlDatas["queryFormXML"];
+		var dataNode = dataXML.querySelector("data");
+        if(dataNode) {
+            window.alert("成功提交" + $.XML.toXml(dataNode));
+        }
+    }
+
+    window.onload = init;
+
+//-->
+</SCRIPT>
+</head>
+
+<body>
+    
+	<div style="background-color:white; padding:10px; width:400px; margin:10px; border:1px solid #ABAAAF;">
+		<div id="queryForm" editable="true">
+			<div class="loading"></div>
+		</div>
+		<div style="padding:10px 20px 0 180px;">
+			<input id="btQuery" type="button" class="tssbutton orange small" value="查询"/>
+		</div>
+	</div>
+	 
+</body>
+</html>

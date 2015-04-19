@@ -19,13 +19,13 @@
 		      <column name="temp1"     caption="函数" mode="function" cmd="func1()" editable="true"  empty="false"/>
           <column name="temp2"     caption="日期" mode="datetime"  empty="false"/>
 
-          <column name="season2"    caption="季节2" mode="comboTree" values="0|1|2|3|4|5|6" texts="春天|夏天|秋天|寒冬腊月|阳春三月|清明时节|时维九月" onchange="f2"/> 
-          <column name="season3"    caption="季节3" mode="comboTree" values="0|1|2|3|4|5|6" texts="春天|夏天|秋天|寒冬腊月|阳春三月|清明时节|时维九月" multiple="true"/> 
+          <column name="season2"    caption="季节2" mode="combotree" values="0|1|2|3|4|5|6" texts="春天|夏天|秋天|寒冬腊月|阳春三月|清明时节|时维九月" onchange="f2"/> 
+          <column name="season3"    caption="季节3" mode="combotree" values="0|1|2|3|4|5|6" texts="春天|夏天|秋天|寒冬腊月|阳春三月|清明时节|时维九月" multiple="true"/> 
         </declare>
         <layout>
           <TR>
               <TD width="45"><label binding="loginName"/></TD>
-              <TD><input binding="loginName"/></TD>
+              <TD width="350"><input binding="loginName"/></TD>
               <TD><label binding="userName"/></TD>
               <TD><input binding="userName"/></TD>
           </TR>

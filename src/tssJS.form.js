@@ -86,6 +86,35 @@
         return valueList;
     },
 
+    createFieldObj = function(field, $el) {
+        var fieldObj;
+        var fieldType = field.getAttribute("mode");
+        switch(fieldType) {
+            case "number":
+                fieldObj = new StringField($el, this);
+                break;
+            case "date":
+            case "function":
+            case "datetime":
+                fieldObj = new FunctionField($el, this, fieldType === "datetime");
+                break;
+            case "hidden":
+                fieldObj = new HiddenFiled($el, this);
+                break;
+            case "combo":
+                fieldObj = new ComboField($el, this);
+                break;
+            case "combotree":
+                fieldObj = new ComboTreeField($el, this);
+                break;
+            case "string":
+            default:
+                fieldObj = new StringField($el, this);
+                break;
+        }
+        return fieldObj;
+    },
+
     fireOnChangeEvent = function(el, newValue) {
         var onchangeFunc = el.getAttribute("onchange");
         if(onchangeFunc) {
@@ -193,7 +222,7 @@
                         else if(mode == "string" && nodeName == 'textarea') {
                             htmls.push("<textarea " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + ">" + (value ? value : "") + "</textarea>");
                         }
-                        else if(mode == "string" || mode == "number" || mode == "function" || mode == "date" || mode == "datetime" || mode == "comboTree") {
+                        else if(mode == "string" || mode == "number" || mode == "function" || mode == "date" || mode == "datetime" || mode == "combotree") {
                             htmls.push("<input " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + _value + "></input>");
                         }
                     }
@@ -240,10 +269,10 @@
     };
  
     var Form = function(element) {
-        this.id   = element.id;
-        this.box  = element;
+        this.id  = element.id;
+        this.box = element;
 
-        this.editable  = element.getAttribute("editable") || "true";
+        this.editable = element.getAttribute("editable") || "true";
         this.fieldObjMap = {};
     };
 
@@ -280,35 +309,7 @@
                 var $el = $("#" + fieldName);
                 if( $el.length == 0 )  continue;
 
-                var fieldObj;
-                var fieldType = field.getAttribute("mode");
-                switch(fieldType) {
-                    case "number":
-                        fieldObj = new StringField($el, this);
-                        break;
-                    case "date":
-                    case "function":
-                        fieldObj = new FunctionField($el, this);
-                        break;
-                    case "datetime":
-                        fieldObj = new FunctionField($el, this, true);
-                        break;
-                    case "hidden":
-                        fieldObj = new HiddenFiled($el, this);
-                        break;
-                    case "combo":
-                        fieldObj = new ComboField($el, this);
-                        break;
-                    case "comboTree":
-                        fieldObj = new ComboTreeField($el, this);
-                        break;
-                    case "string":
-                    default:
-                        fieldObj = new StringField($el, this);
-                        break;
-                }
-
-                this.fieldObjMap[fieldName] = fieldObj;
+                this.fieldObjMap[fieldName] = createFieldObj.call(this, field, $el);
 
                 if(field.getAttribute('empty') == "false") {
                     var requiredTag = $.createElement("span", "required");
@@ -347,12 +348,11 @@
                 if ( editable == "false" ) {
                     _status = "false";
                 } 
-
-                if( !firstEditableField && _status == "true" && mode != "hidden") {
-                    firstEditableField = fieldObj;
-                }
-
                 fieldObj.setEditable(_status);
+
+                if( !firstEditableField && _status == "true" && mode == "string") {
+                    firstEditableField = fieldObj;
+                }               
             });
 
             if(firstEditableField) {
@@ -438,6 +438,22 @@
                 return $.alert("指定的字段[" + name + "]不存在");
             }
             return field.getAttribute(attrName);
+        },
+
+        updateField: function(name, attrs) {
+            var field = this.template.fieldsMap[name];
+            if( field ) {
+                var $el = $("#" + name);
+                $.each(attrs, function(i, attr) {
+                    $(field).attr(attr.name, attr.value);
+                    $el.attr(attr.name, attr.value);
+                });
+
+                var fieldObj = createFieldObj.call(this, field, $el);
+                this.fieldObjMap[name] = fieldObj;
+
+                fieldObj.refresh && fieldObj.refresh();
+            }
         },
 
         getXmlDocument: function() {
@@ -628,44 +644,48 @@
     var ComboTreeField = function($el, form) {
         this.el = $el[0];
         this.multiple = $el.attr("multiple") != null;
-
-        var valueList = ($el.attr("values") || "").split('|');
-        var textList  = ($el.attr("texts")  || "").split('|');
-        this.nodesData = [];
-        for(var i=0; i < valueList.length; i++) {
-            this.nodesData.push( {"id": valueList[i], "name": textList[i], })
-        }
-
-        var elPosition = $.absPosition(this.el);
+        
         var treeEl = $.createElement("Tree", "comboTree", $.getUniqueID("comboTree"));
-        $(treeEl).css("height", Math.min(valueList.length, 10) * 18 + "px");
-        $(treeEl).css("width", $.getStyle(this.el, "width"));
-        $(treeEl).position(elPosition.left, elPosition.top).hide();
+        document.body.appendChild(treeEl);
         if(this.multiple) {
             $(treeEl).attr("treeType", "multi");
-        }   
-        document.body.appendChild(treeEl);
-        this.tree = $(treeEl).tree(this.nodesData); 
+        } 
 
-        var valueNode = this.el.attributes["value"];
-        this.el._value = valueNode ? valueNode.value : "";
-        var names;
-        if(this.el._value) {
-            if(this.multiple) {
-                this.tree.setCheckValues(this.el._value, true);
-                names = this.tree.getCheckedIds(false, "name");
-            } else {
-                this.tree.setActiveTreeNode(this.el._value);
-                names = this.tree.getActiveTreeNode().name;
+        this.load = function() {
+            var valueList = ($el.attr("values") || "").split('|');
+            var textList  = ($el.attr("texts")  || "").split('|');
+            this.height = Math.min(valueList.length, 10) * 18 + "px";
+
+            this.nodesData = [];
+            for(var i=0; i < valueList.length; i++) {
+                this.nodesData.push( {"id": valueList[i], "name": textList[i], })
             }
-        }
-        this.el.value = names;
-        
-        var oThis = this;
-        this.el.onblur = function() {
-            form.updateData(this);
-        };
 
+            var elPosition = $.absPosition(this.el);
+            $(treeEl).position(elPosition.left, elPosition.top).hide();
+            $(treeEl).css("height", this.height).css("width", $.getStyle(this.el, "width"));
+
+            this.tree = $(treeEl).tree(this.nodesData); 
+            this.tree.onTreeNodeActived = onSelectNode;
+
+            var valueNode = this.el.attributes["value"];
+            this.el._value = valueNode ? valueNode.value : "";
+            var texts;
+            if(this.el._value) {
+                if(this.multiple) {
+                    this.tree.setCheckValues(this.el._value, true);
+                    texts = this.tree.getCheckedIds(false, "name");
+                } else {
+                    this.tree.setActiveTreeNode(this.el._value);
+                    var activeNode = this.tree.getActiveTreeNode();
+                    texts = activeNode ? activeNode.name : "";
+                }
+            }
+            this.el.value = texts || "";
+        }
+        this.load();
+
+        var oThis = this;
         this.el.onfocus = function() {
             $(oThis.tree.el).show(true);
         };
@@ -674,25 +694,31 @@
             // 自动过滤树节点
             var temp = [], inputVal = this.value;
             oThis.nodesData.each(function(i, nodeData){
-                if(nodeData.name.indexOf(inputVal) >=0) {
-                    temp.push(nodeData);
-                }
+                inputVal.split(",").each(function(i, item) {
+                    if(nodeData.name.indexOf(item) >=0) {
+                        temp.push(nodeData);
+                    }
+                });
             });
             oThis.tree = $(treeEl).tree(temp); 
-            oThis.tree.onTreeNodeActived = selectNode;
+            oThis.tree.onTreeNodeActived = onSelectNode;
+
+            // 如果删空了，则清除已经选中的值
+            if( $.isNullOrEmpty(inputVal) ) {
+                oThis.setValue(inputVal);
+                form.setFieldValue(oThis.el.id, inputVal);
+            }
         };
 
-        function selectNode(event) {
-            var selectedVal = event.node.id;
-            oThis.setValue(selectedVal);
-            form.setFieldValue(oThis.el.id, selectedVal);
-
-            fireOnChangeEvent(oThis.el, oThis._value);
-
+        function onSelectNode(event) {
             $(treeEl).hide();
+
+            var selectedNodeId = event.node.id;
+            oThis.setValue(selectedNodeId);
+            form.setFieldValue(oThis.el.id, selectedNodeId);
         }
 
-        this.tree.onTreeNodeActived = selectNode;
+        this.tree.onTreeNodeActived = onSelectNode;
     };
 
     ComboTreeField.prototype = {
@@ -708,7 +734,7 @@
                 }
             }
 
-            this.el.value = names;
+            this.el.value = names || "";
             this.el._value = value;
             fireOnChangeEvent(this.el, value);
         },
@@ -720,8 +746,11 @@
         },
 
         validate: validate,
- 
-        setFocus: setFocus
+        setFocus: setFocus,
+
+        refresh: function() {
+            this.load();
+        }
     };
  
     // 隐藏hidden字段

@@ -3,17 +3,7 @@
 /* 将json格式数据转换成Form组件 */
 ;(function($) {
 
-	var 
-
-		// item的类型允许为[id, code, name] or [pk, id, text]
-		createOption = function(item) {
-			var option = new Option();
-			option.value = item.id   || item.pk   || item[0] || '';
-			option.text  = item.name || item.text || item[2] || '';
-			return option;
-		},
-
-	Field = function(info) {
+var Field = function(info) {
 		this.name  = info.name;
 		this.label = info.label;
 		this.type  = info.type || "string";
@@ -36,12 +26,17 @@
 		}
 
 		this.mode = this.type.toLowerCase();
+		if(this.jsonUrl) {
+			this.mode = "combotree";
+		}
 		switch(this.mode) {
 			case "number":
 				this.checkReg = this.checkReg || "^(-?\\d+)(\\.\\d+)?$"; // 浮点数
 				this.errorMsg = this.errorMsg || "请输入数字";
 				break;
 			case "string":
+			case "combo":
+			case "combotree":
 			case "hidden":
 				break;
 			case "date":
@@ -90,33 +85,8 @@
 					this.options.codes = '1|2|3|4|5|6|7|8|9|10|11|12';
 					this.options.names = '一月|二月|三月|四月|五月|六月|七月|八月|九月|十月|十一月|十二月';
 				}
-				column += " editor='comboedit' editorvalue='" + this.options.codes + "' editortext='" + this.options.names + "'";
+				column += " values='" + this.options.codes + "' texts='" + this.options.names + "'";
 			}
-
-			if(this.jsonUrl) {
-				column += " editor='comboedit' editorvalue='' editortext=''"; // editorvalue='1|2|3' editortext='1|2|3'
-				var fThis = this;
-				$.ajax({
-					url : fThis.jsonUrl,
-					method: "GET",
-					type : "json",
-					ondata : function() { 
-						var result = this.getResponseJSON();
-						if( result ) {
-							var sEl = $1(fThis.name);
-							result.each(function(i, value){
-								sEl.options[sEl.options.length] = createOption(value);
-							});
-							
-							// 如果下拉列表要求非空，则默认选中最后一个选项
-							if( fThis.nullable == "false" && sEl.options.length > 0) {
-								sEl.options[sEl.options.length - 1].selected = true;
-								sEl.onchange();
-							}
-						}				
-					}
-				});
-			}	 
 
 			return column + "/>";
 		},
@@ -144,12 +114,16 @@
 	$.json2Form = function(formId, defines, buttonBox) {
 		var infos = defines ? (typeof(defines) === "string" ? $.parseJSON(defines) : defines) : [];
 
+		var fields = [];
 		var columns = [];
 		var layouts = [];
 		var datarow = [];
 		infos.each(function(i, info) {
 			info.name = info.name || info.code || "param" + (i+1);
+			
 			var item = new Field(info);
+			fields.push(item);
+
 			columns.push(item.createColumn());
 			if(item.mode !== "hidden") {
 				layouts.push(item.createLayout());
@@ -168,7 +142,31 @@
 		str[str.length] = "    <data><row>" + datarow.join("") + "</row></data>";
 		str[str.length] = "</xform>";
 		
-		return $.F(formId, $.XML.toNode(str.join("")));
+		var tssForm = $.F(formId, $.XML.toNode(str.join("")));
+		fields.each(function(i, field){
+			if( !field.jsonUrl ) return;
+			$.ajax({
+				url : field.jsonUrl,
+				method: "GET",
+				type : "json",
+				ondata : function() { 
+					var result = this.getResponseJSON();
+					if( result ) {
+						var values = [], texts = [];
+						result.each(function(i, item){
+							values.push( $.vt(item).value );
+							texts.push( $.vt(item).text );
+						});
+						tssForm.updateField(field.name, [
+							{"name": "texts", "value": texts.join('|')},
+						 	{"name": "values", "value": values.join('|')}
+						 ]);
+					}			
+				}
+			});
+		});
+
+		return tssForm;
 	};
 
 	// ---------------------------- 多级下拉选择联动 ------------------------------------------------
@@ -186,14 +184,17 @@
 			ondata : function() { 
 				var result = this.getResponseJSON();
 				if( result && result.length > 0) {
-					var sEl = $1(nextLevel);
-					sEl.options.length = 0; // 先清空
-					for(var i = 0; i < result.length; i++) {
-						sEl.options[i] = createOption(result[i]);
-					}
+					var values = [], texts = [];
+					result.each(function(i, item){
+						values.push( $.vt(item).value );
+						texts.push( $.vt(item).text );
+					});
 
-					// 设置为默认选中第一个
-					form.updateDataExternal(nextLevel, sEl.options[0].value);
+					form.updateField(nextLevel, [
+						{"name": "mode", "value": "combotree"},
+						{"name": "texts", "value": texts.join('|')},
+					 	{"name": "values", "value": values.join('|')}
+					 ]);
 				}				
 			}
 		});
@@ -215,6 +216,24 @@
 		return func1.toString().replace(fn,'$1') === func2.toString().replace(fn,'$1'); 
 	}
 
-	$.createOption = createOption;
+	// item的类型允许为[id, code, name] or [pk, id, text]
+	$.createOption = function(item) {
+		var option = new Option();
+		$.copy(option, $.vt(item));
+		return option;
+	};
+
+	$.vt = function(item) {
+		var result = {};
+		result.value = item.id   || item.pk   || item[0] || '';
+		result.text  = item.name || item.text || item[2] || '';
+		return result;
+	};
+
+	$.copy = function(to, from) {
+		$.each(from, function(name, value) {
+			to[name] = value;
+		});
+	}
 
 }) (tssJS);

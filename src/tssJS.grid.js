@@ -353,12 +353,11 @@
                     break;
                 case "string":
                 default:
-                    var editor = column.getAttribute("editor");
-                    var editortext = column.getAttribute("editortext");
-                    var editorvalue = column.getAttribute("editorvalue");
-                    if(editor == "comboedit" && editorvalue && editortext) {
-                        var listNames  = editortext.split("|");
-                        var listValues = editorvalue.split("|");
+                    var texts = column.getAttribute("texts");
+                    var values = column.getAttribute("values");
+                    if(values && texts) {
+                        var listNames  = texts.split("|");
+                        var listValues = values.split("|");
                         listValues.each(function(n, optionValue) {
                             if(value == optionValue) {
                                 value = listNames[n];

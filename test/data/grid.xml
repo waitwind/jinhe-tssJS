@@ -6,9 +6,9 @@
                 <column caption="头像" name="icon" mode="image" width="50px"/>
                 <column caption="用户ID" name="id" mode="string" display="none"/>
                 <column caption="用户名" name="loginName" mode="string" width="80px" sortable="true" highlight="true"/>
-                <column caption="用户状态" name="state" mode="string" editor="comboedit" editorvalue="0|1" editortext="停用|启用" width="60px"/>
+                <column caption="用户状态" name="state" mode="string" values="0|1" texts="停用|启用" width="60px"/>
                 <column caption="姓名" name="userName" mode="string" width="80px"/>
-                <column caption="性别" name="sex" mode="string" editor="comboedit" editorvalue="0|1" editortext="女|男"  width="50px"/>
+                <column caption="性别" name="sex" mode="string" values="0|1" texts="女|男"  width="50px"/>
                 <column caption="出生年月" name="birthday" mode="date" width="100px"/>
                 <column caption="电子邮件" name="mail" mode="string" width="120px"/>
                 <column caption="电话" name="telephone" mode="number" width="80px" sortable="true"/>

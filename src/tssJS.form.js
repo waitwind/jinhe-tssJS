@@ -306,7 +306,7 @@
                 var field = fieldsMap[fieldName];
 
                 // 取layout中绑定该field column的element，如无，则字段无需展示。
-                var $el = $("#" + fieldName);
+                var $el = $($1(fieldName));
                 if( $el.length == 0 )  continue;
 
                 this.fieldObjMap[fieldName] = createFieldObj.call(this, field, $el);
@@ -443,7 +443,7 @@
         updateField: function(name, attrs) {
             var field = this.template.fieldsMap[name];
             if( field ) {
-                var $el = $("#" + name);
+                var $el = $($1(name))
                 $.each(attrs, function(i, attr) {
                     $(field).attr(attr.name, attr.value);
                     $el.attr(attr.name, attr.value);
@@ -651,6 +651,7 @@
             $(treeEl).attr("treeType", "multi");
         } 
 
+        var oThis = this;
         this.load = function() {
             var valueList = ($el.attr("values") || "").split('|');
             var textList  = ($el.attr("texts")  || "").split('|');
@@ -667,6 +668,7 @@
 
             this.tree = $(treeEl).tree(this.nodesData); 
             this.tree.onTreeNodeActived = onSelectNode;
+            this.tree.onTreeNodeChecked = onSelectNode;
 
             var valueNode = this.el.attributes["value"];
             this.el._value = valueNode ? valueNode.value : "";
@@ -677,17 +679,28 @@
                     texts = this.tree.getCheckedIds(false, "name");
                 } else {
                     this.tree.setActiveTreeNode(this.el._value);
-                    var activeNode = this.tree.getActiveTreeNode();
-                    texts = activeNode ? activeNode.name : "";
+                    texts = this.tree.getActiveTreeNodeName();
                 }
             }
             this.el.value = texts || "";
         }
         this.load();
 
-        var oThis = this;
+        $.Event.addEvent(this.tree.el, 'mousedown', function(e) {
+            e = e || window.event;
+            $.Event.cancel(e);
+        }, true);
+
+        this.el.onblur = function() {
+            $(oThis.tree.el).hide();
+        };
+
         this.el.onfocus = function() {
-            $(oThis.tree.el).show(true);
+            $(oThis.tree.el).show();
+        };
+
+        this.el.onclick = function() {
+            $(oThis.tree.el).show();
         };
 
         this.el.oninput = function() {
@@ -695,13 +708,14 @@
             var temp = [], inputVal = this.value;
             oThis.nodesData.each(function(i, nodeData){
                 inputVal.split(",").each(function(i, item) {
-                    if(nodeData.name.indexOf(item) >=0) {
+                    if(nodeData.name.indexOf(item) >=0 && !temp.contains(nodeData)) {
                         temp.push(nodeData);
                     }
                 });
             });
             oThis.tree = $(treeEl).tree(temp); 
             oThis.tree.onTreeNodeActived = onSelectNode;
+            oThis.tree.onTreeNodeChecked = onSelectNode;
 
             // 如果删空了，则清除已经选中的值
             if( $.isNullOrEmpty(inputVal) ) {
@@ -711,32 +725,51 @@
         };
 
         function onSelectNode(event) {
-            $(treeEl).hide();
+            if(oThis.multiple) {
+                var value = oThis.setValue();
+                form.setFieldValue(oThis.el.id, value);
+            }
+            else {
+                $(treeEl).hide();
 
-            var selectedNodeId = event.node.id;
-            oThis.setValue(selectedNodeId);
-            form.setFieldValue(oThis.el.id, selectedNodeId);
+                var selectedNodeId = event.node.id;
+                oThis.setValue(selectedNodeId);
+                form.setFieldValue(oThis.el.id, selectedNodeId);
+            }
         }
 
         this.tree.onTreeNodeActived = onSelectNode;
+        this.tree.onTreeNodeChecked = onSelectNode;
     };
 
     ComboTreeField.prototype = {
         setValue: function(value) {
-            var names;
             if(value) {
                 if(this.multiple) {
                     this.tree.setCheckValues(value.split(','), true);
-                    names = this.tree.getCheckedIds(false, "name");
                 } else {
                     this.tree.setActiveTreeNode(value);
-                    names = this.tree.getActiveTreeNode().name;
+                }
+            } else {
+                if(this.multiple) {
+                    value = this.tree.getCheckedIds(false);
+                } else {
+                    value = this.tree.getActiveTreeNodeId();
                 }
             }
 
-            this.el.value = names || "";
-            this.el._value = value;
+            var text;
+            if(this.multiple) {
+                text = this.tree.getCheckedIds(false, "name");
+            } else {
+                text = this.tree.getActiveTreeNodeName();
+            }
+
+            this.el.value = text || "";
+            this.el._value = value || "";
             fireOnChangeEvent(this.el, value);
+
+            return value;
         },
 
         setEditable: function(status) {

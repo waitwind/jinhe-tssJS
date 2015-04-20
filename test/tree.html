@@ -82,6 +82,10 @@ function init() {
 
 				menu.show(event.clientX, event.clientY);
 			}
+
+            tree2.onTreeNodeChecked = function(ev) {
+                console.log(ev.checkState + "_" + ev.node.name);
+            }
 		},
 
 		onexception: function() {

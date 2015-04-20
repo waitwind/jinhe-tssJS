@@ -46,7 +46,8 @@
             eventNodeActived     = new $.EventFirer(this, "onTreeNodeActived"), 
             eventNodeDoubleClick = new $.EventFirer(this, "onTreeNodeDoubleClick"),
             eventNodeRightClick  = new $.EventFirer(this, "onTreeNodeRightClick"),
-            eventNodeMoved       = new $.EventFirer(this, "onTreeNodeMoved");
+            eventNodeMoved       = new $.EventFirer(this, "onTreeNodeMoved"),
+            eventNodeChecked     = new $.EventFirer(this, "onTreeNodeChecked");
 
         this.el = el;
         this.treeType  = el.getAttribute(_TREE_TYPE) || _TREE_TYPE_SINGLE;
@@ -420,6 +421,11 @@
                     .removeClass("checkstate_1_" + this.disabled)
                     .removeClass("checkstate_2_" + this.disabled)
                     .addClass("checkstate_" + this.checkState + "_" + this.disabled);
+
+                var ev = event || {};
+                ev.node = this;
+                ev.checkState = this.checkState;
+                eventNodeChecked.fire(ev);
             },
 
             getAttribute: function(name) {
@@ -463,8 +469,21 @@
             return activeNode
         },
 
+        getActiveTreeNodeId: function(key) {
+            var activeNode = this.getActiveTreeNode();
+             return activeNode ? activeNode.id : "";
+        }, 
+
+        getActiveTreeNodeName: function(key) {
+            var activeNode = this.getActiveTreeNode();
+            return activeNode ? activeNode.name : "";
+        }, 
+
         getActiveTreeNodeAttr: function(key) {
-            return this.getActiveTreeNode().attrs[key];
+            var activeNode = this.getActiveTreeNode();
+            if(activeNode) {
+                return activeNode.attrs[key];
+            }
         }, 
 
         setActiveTreeNode: function(id) {

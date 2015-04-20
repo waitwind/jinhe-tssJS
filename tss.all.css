@@ -98,7 +98,7 @@ input[type=text]:focus, textarea:focus {
 .pika-button:hover { color:#fff; background:#ff8000; box-shadow:none; border-radius:3px;}
 .timeAera { font-size: 12px; font-weight: bold; margin: 10px 5px; line-height: 20px; vertical-align: top;}
 .timeAera input[type=range] { width: 120px;  margin-right: 5px; }
-.timeAera button { width: 50px; float:right; margin-right:70px; background-color:#FF9933; border:1px solid #dedede; letter-spacing:3px; }
+.timeAera button { width: 50px; float:right; margin-right:70px; background-color:lightgrey; border:1px solid #dedede; letter-spacing:3px; }
 .tssForm { width:100%; display:block; font-size:12px; } 
 .tssForm table { width:100%; }
 .tssForm td { padding:3px 2px; border-width: 0; }
@@ -113,6 +113,9 @@ input[type=text]:focus, textarea:focus {
 .tssForm input.function { padding-right:18px; }
 .tssForm .functionBt { display:inline-block; width:20px; height:18px; position:relative; top:4px; left:-21px; background-image:url(../images/icon_function.gif); }
 .tssForm .required { color:red; margin-left:3px; margin-right:5px; }
+.tssForm .combo { }
+.comboTree { background-color: white; border:1px solid #ABAAAF; border-top:none; padding: 1px; }
+.comboTree .switch { width: 5px; }
 Grid { width:100%; height:100%; overflow:auto; position:relative; padding-top:0px; display:inline-block; }
 Grid div { position:relative; left:0px; top:0px; }
 Grid table { width:100%; height:auto; table-layout:fixed; border:0px; margin:0px; border-collapse:collapse; }
@@ -143,7 +146,7 @@ Tree * { padding:0px; margin:0px; font-size:14px; }
 Tree { height: 100%; display:block; padding:5px; color:#333; overflow-y: scroll; }
 Tree li { list-style:none; line-height:22px; text-align:left; white-space:nowrap; }
 Tree li ul { padding-left:18px; }
-Tree li a { padding:0px 1px 3px 1px;cursor:pointer;height:17px;color:#333;text-decoration:none;display:inline-block;}
+Tree li a { padding:0px 1px 3px 3px;cursor:pointer;height:17px;color:#333;text-decoration:none;display:inline-block;}
 Tree li>a:hover { text-decoration:underline; }
 Tree li>a.active { background-color: #FEF7A9; font-weight: bold; }
 Tree li>a.disable { color: grey; }

@@ -3673,7 +3673,7 @@
         updateField: function(name, attrs) {
             var field = this.template.fieldsMap[name];
             if( field ) {
-                var $el = $($1(name))
+                var $el = $($1(name));
                 $.each(attrs, function(i, attr) {
                     $(field).attr(attr.name, attr.value);
                     $el.attr(attr.name, attr.value);
@@ -3875,8 +3875,15 @@
         this.el = $el[0];
         this.multiple = $el.attr("multiple") != null;
         
-        var treeEl = $.createElement("Tree", "comboTree", $.getUniqueID("comboTree"));
-        document.body.appendChild(treeEl);
+        var treeEl;
+        if( !this.el.treeEl ) {
+            var treeEl = $.createElement("Tree", "comboTree", $.getUniqueID("comboTree"));
+            document.body.appendChild(treeEl);
+            this.el.treeEl = treeEl;
+        } else {
+            treeEl = this.el.treeEl;
+        }
+        
         if(this.multiple) {
             $(treeEl).attr("treeType", "multi");
         } 
@@ -3885,16 +3892,12 @@
         this.load = function() {
             var valueList = ($el.attr("values") || "").split('|');
             var textList  = ($el.attr("texts")  || "").split('|');
-            this.height = Math.min(valueList.length, 10) * 18 + "px";
+            this.height = Math.max(3, Math.min(valueList.length, 10)) * 18 + "px";
 
             this.nodesData = [];
             for(var i=0; i < valueList.length; i++) {
                 this.nodesData.push( {"id": valueList[i], "name": textList[i], })
             }
-
-            var elPosition = $.absPosition(this.el);
-            $(treeEl).position(elPosition.left, elPosition.top).hide();
-            $(treeEl).css("height", this.height).css("width", $.getStyle(this.el, "width"));
 
             this.tree = $(treeEl).tree(this.nodesData); 
             this.tree.onTreeNodeActived = onSelectNode;
@@ -3916,6 +3919,13 @@
         }
         this.load();
 
+        this.position = function() {
+            var elPosition = $.absPosition(this.el);
+            $(treeEl).position(elPosition.left, elPosition.top).hide();
+            $(treeEl).css("height", this.height).css("width", $.getStyle(this.el, "width"));
+        }
+        this.position();
+
         $.Event.addEvent(this.tree.el, 'mousedown', function(e) {
             e = e || window.event;
             $.Event.cancel(e);
@@ -3926,10 +3936,12 @@
         };
 
         this.el.onfocus = function() {
+            oThis.position();
             $(oThis.tree.el).show();
         };
 
         this.el.onclick = function() {
+            oThis.position();
             $(oThis.tree.el).show();
         };
 

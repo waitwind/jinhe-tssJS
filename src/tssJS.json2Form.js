@@ -14,14 +14,17 @@ var Field = function(info) {
 		this.jsonUrl = info.jsonUrl;
 		this.multiple = (info.multiple == "true") || false;
 		this.onchange = info.onchange;
-		this.width  = (info.width || "250px").trim();
-		this.height = info.height;	
 		this.defaultValue = info.defaultValue;
+
+		this.width  = (info.width || "250px").trim();
+		if( !this.jsonUrl ) {
+			this.height = info.height;	
+		}
 
 		if( /^\d*$/.test(this.width) ) {
 			this.width += "px";
 		}
-		if( info.height && /^\d*$/.test(this.height.trim()) ) {
+		if( this.height && /^\d*$/.test(this.height.trim()) ) {
 			this.height = this.height.trim() + "px";
 		}
 
@@ -189,7 +192,8 @@ var Field = function(info) {
 						values.push( $.vt(item).value );
 						texts.push( $.vt(item).text );
 					});
-
+					
+					$("#" + nextLevel).css("height", "18px");
 					form.updateField(nextLevel, [
 						{"name": "mode", "value": "combotree"},
 						{"name": "texts", "value": texts.join('|')},

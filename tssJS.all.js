@@ -3287,7 +3287,7 @@
         if(value == "" && empty == "false") {
             errorMsg = "[" + caption.replace(/\s/g, "") + "] 不允许为空。";
         }
-        if(checkReg && !(new RegExp(checkReg)).test(value)) {
+        else if(checkReg && value && !(new RegExp(checkReg)).test(value)) {
             errorMsg = this.el.getAttribute("errorMsg");
             errorMsg = errorMsg || "[" + caption + "] 格式不正确，请更正.";
         }
@@ -3536,15 +3536,15 @@
                 var field = fieldsMap[fieldName];
 
                 // 取layout中绑定该field column的element，如无，则字段无需展示。
-                var $el = $($1(fieldName));
-                if( $el.length == 0 )  continue;
+                var el = $1(fieldName);
+                if( !el )  continue;
 
-                this.fieldObjMap[fieldName] = createFieldObj.call(this, field, $el);
+                this.fieldObjMap[fieldName] = createFieldObj.call(this, field, $(el));
 
                 if(field.getAttribute('empty') == "false") {
                     var requiredTag = $.createElement("span", "required");
                     $(requiredTag).html("*");
-                    $el[0].parentNode.appendChild(requiredTag);
+                    el.parentNode.appendChild(requiredTag);
                 }
             }
 
@@ -6035,7 +6035,7 @@
                 i = parseInt(100 / parseInt(document.body.clientWidth / _x, 10), 10), 
                 s = !1;
 
-            if (Math.abs(i - f) < 5)
+            if (Math.abs(i - f) < 10)
                 return;
 
             $(".leftbar").hasClass("leftbar-open") && _x > barWidth && closeLeftbar();

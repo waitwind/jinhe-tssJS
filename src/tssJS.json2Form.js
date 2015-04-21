@@ -31,6 +31,8 @@ var Field = function(info) {
 		this.mode = this.type.toLowerCase();
 		if(this.jsonUrl) {
 			this.mode = "combotree";
+		} else if(this.options && this.options.codes && this.options.codes.length) {
+			this.mode = "combo";
 		}
 		switch(this.mode) {
 			case "number":
@@ -154,7 +156,7 @@ var Field = function(info) {
 				type : "json",
 				ondata : function() { 
 					var result = this.getResponseJSON();
-					if( result ) {
+					if( result && result.length ) {
 						var values = [], texts = [];
 						result.each(function(i, item){
 							values.push( $.vt(item).value );
@@ -186,7 +188,7 @@ var Field = function(info) {
 			type : "json",
 			ondata : function() { 
 				var result = this.getResponseJSON();
-				if( result && result.length > 0) {
+				if( result && result.length ) {
 					var values = [], texts = [];
 					result.each(function(i, item){
 						values.push( $.vt(item).value );

@@ -38,7 +38,7 @@
                 i = parseInt(100 / parseInt(document.body.clientWidth / _x, 10), 10), 
                 s = !1;
 
-            if (Math.abs(i - f) < 5)
+            if (Math.abs(i - f) < 10)
                 return;
 
             $(".leftbar").hasClass("leftbar-open") && _x > barWidth && closeLeftbar();

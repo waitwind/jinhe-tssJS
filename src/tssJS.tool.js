@@ -1,5 +1,93 @@
 
 
+/* 
+ * panel 
+ */
+;(function($){
+
+    $.fn.extend({
+        panel: function(title, contentHtml) {
+            if(this.length > 0) {
+                return new Panel(this[0], title, contentHtml);
+            }
+        }
+    });
+
+    var Panel = function(el, title, contentHtml) {
+        this.el = el;
+        this.$el = $(el);
+        this.width  = el.clientWidth;
+        this.height = el.clientHeight;
+
+        this.$el.addClass("tss-panel").drag().resize().resize("col").resize("row");
+        this.$el.html(
+            '<div class="title">' + 
+                '<h2>' +title+ '</h2>' + 
+                '<div>' + 
+                    '<span class="min" title="最小化"></span>' + 
+                    '<span class="max" title="最大化"></span>' + 
+                    '<span class="revert" title="还原"></span>' + 
+                    '<span class="close" title="关闭"></span>' + 
+                '</div>' + 
+            '</div>' + 
+            '<div class="content">' + contentHtml + '</div>'
+        );
+
+        var $title = $(".title", el);
+        var $content = $(".content", el);
+
+        var $min = $(".min", el);
+        var $max = $(".max", el);
+        var $revert = $(".revert", el);
+        var $close = $(".close", el);
+
+        var oThis = this;
+        $max.click(function(){
+            var inner = $.getInner();
+            oThis.$el.addClass('tss-panel-max')
+                .css('width', (inner.width- 2) + "px")
+                .css('height', (inner.height- 2) + "px");
+            $max.hide();
+            $revert.show(true);
+        });
+
+        $revert.click(function(){
+            var inner = $.getInner();
+            oThis.$el.removeClass('tss-panel-max')
+                .css('width', this.width + "px")
+                .css('height', this.height + "px");
+            $max.show(true);
+            $revert.hide();
+        });
+
+        $min.click(function(){
+            if($content.hasClass("tss-panel-min")) {
+                $content.removeClass("tss-panel-min");
+                $min.hide();
+                $revert.show(true);
+            } else {
+                $content.addClass("tss-panel-min");
+                $min.show(true);
+                $revert.hide();
+            }
+        });
+
+        $close.click(function(){
+            oThis.$el.hide();
+        });
+
+        function cancelBubble(event) {
+            this.onfocus = function () {this.blur()};
+            $.Event.cancel(event)
+        }
+        $min.addEvent("mousedown", cancelBubble);
+        $max.addEvent("mousedown", cancelBubble);
+        $revert.addEvent("mousedown", cancelBubble);
+        $close.addEvent("mousedown", cancelBubble);
+    }
+
+})(tssJS);
+
 /*
  *  左栏
  */

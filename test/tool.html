@@ -12,11 +12,13 @@
     <script type="text/javascript" src="../src/tssJS.tool.js"></script>
 
     <style type="text/css">
-        body {
-            background-color: grey;
-        }
- 
-        .demo{width:760px; margin:20px auto 0 auto; height:70px;}
+        body { background-color: grey; }
+        body, div, h2 {  margin:0;  padding:0; }
+        
+        #div2 { width:200px; height:120px; position:absolute; overflow:hidden; background:#EEEEEE; border:1px solid #f00; }
+        #div2 h2 { width:100%; height:25px; margin:0;font-size:14px; background:#CC9900; color:#fff; text-indent:15px; cursor:move; }
+        #div2 p { padding:10px; line-height:24px; font-size:13px; text-indent:24px; color:#996600; }
+        .demo{ width:760px; margin:3px auto 0 auto; height:50px;}
 
     </style>
 
@@ -24,11 +26,9 @@
 </head>
 <body>
 
-    <div id="div2" style="width:200px; height:200px; position:relative; overflow:hidden;  background:#EEEEEE; border:1px solid #f00; " class="moveable resizable">
-        <h2 style="width:100%; height:25px; margin:0;font-size:14px; background:#CC9900; color:#fff; text-indent:15px; cursor:move; ">
-            完美的拖拽
-        </h2>
-        <p style="padding:10px; line-height:24px; font-size:13px; text-indent:24px; color:#996600;">
+    <div id="div2" class="moveable resizable">
+        <h2> 完美的拖拽 </h2>
+        <p>
             体验不错的JavaScript网页拖动，除了拖动，还可拖动放大，像Windows窗口一样被放大或缩小，只要按住层的右下角，就可以收放自如的放大或缩小。想使用的朋友，可将代码里的Js封装成类，从外部引入想必更合理些.
         </p>
     </div>
@@ -69,10 +69,22 @@
         <button class="tssbutton orange">Button Tag</button>
     </div>
 
+    <div class="demo">
+        <a href="#" class="tssbutton black">橘红</a> 
+        <a href="#" class="tssbutton black bigrounded">Rounded</a> 
+        <a href="#" class="tssbutton black medium">Medium</a> 
+        <a href="#" class="tssbutton black small">Small</a> 
+        <input class="tssbutton black" type="button" value="Input Element" /> 
+        <button class="tssbutton black">Button Tag</button>
+    </div>
+
+    <div id="panel1" style="width:600px;margin:auto;"></div>
  
     <script type="text/javascript">
     
-        $.leftbar( function() {  } );
+        $.leftbar( function() { alert("点击成功") } );
+
+        $("#panel1").panel("哈哈大笑", "1111111222222<br/><br/><br/><br/><br/>");
 
     </script>  
 </body>

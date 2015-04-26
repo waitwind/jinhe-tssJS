@@ -2005,6 +2005,13 @@
         closeBox = function() {
             $("#alert_box").hide().remove();
             $.hideWaitingLayer();
+        },
+
+        // 检查是否在texteara外按了enter键
+        checkEnterPress = function(ev){
+            var srcElement = $.Event.getSrcElement(ev);
+            var tagName = srcElement.tagName.toLowerCase();
+            return 13 == ev.keyCode && "textarea" != tagName;
         };
 
 
@@ -2020,7 +2027,7 @@
         }
         $(".btbox .ok", boxEl).click(ok);
         $.Event.addEvent(document, "keydown", function(ev) {
-            if(13 == ev.keyCode) { // Enter
+            if( checkEnterPress(ev) ) { 
                setTimeout(ok, 10);
             }
         });
@@ -2044,7 +2051,7 @@
         $(".btbox .ok", boxEl).click(function() { ok(true); });
         $(".btbox .cancel", boxEl).click(function() { ok(false); });
         $.Event.addEvent(document, "keydown", function(ev) {
-            if(13 == ev.keyCode) { // Enter
+            if( checkEnterPress(ev) ) { 
                setTimeout( function() { ok(true); }, 10);
             }
         });
@@ -2068,7 +2075,7 @@
         $(".btbox .cancel", boxEl).click(closeBox);
 
         $.Event.addEvent(document, "keydown", function(ev) {
-            if(13 == ev.keyCode) { // Enter
+            if( checkEnterPress(ev) ) { 
                setTimeout(ok, 10);
             }
         });
@@ -5996,6 +6003,103 @@
 
     return WorkSpace;
 }); 
+
+/* 
+ * panel 
+ */
+;(function($){
+
+    $.fn.extend({
+        panel: function(title, contentHtml) {
+            if(this.length > 0) {
+                return new Panel(this[0], title, contentHtml);
+            }
+        }
+    });
+
+    var Panel = function(el, title, contentHtml) {
+        this.el = el;
+        this.$el = $(el);
+        this.$el.html(
+            '<div class="title">' + 
+                '<h2>' +title+ '</h2>' + 
+                '<div>' + 
+                    '<span class="min" title="最小化"></span>' + 
+                    '<span class="max" title="最大化"></span>' + 
+                    '<span class="revert" title="还原"></span>' + 
+                    '<span class="close" title="关闭"></span>' + 
+                '</div>' + 
+            '</div>' + 
+            '<div class="content">' + contentHtml + '</div>'
+        );
+        this.$el.addClass("tss-panel").resize().resize("col").resize("row").drag();
+
+        this.width  = el.clientWidth;
+        this.height = el.clientHeight;
+        this.location = $.absPosition(el);
+
+        var $title = $(".title", el);
+        var $content = $(".content", el);
+
+        var $min = $(".min", el);
+        var $max = $(".max", el);
+        var $revert = $(".revert", el);
+        var $close = $(".close", el);
+
+        var oThis = this;
+        $max.click(function(){
+            var inner = $.getInner();
+            oThis.$el.css('width',  "100%")
+                .css('height', "100%")
+                .css('top', '0px').css('left', '0px');
+            oThis.$el.addClass('tss-panel-max').removeClass("tss-panel-min");
+
+            $max.hide();
+            $min.hide();
+            $revert.show(true);
+            $content.show();
+        });
+
+        $revert.click(function(){
+            var inner = $.getInner();
+            oThis.$el.removeClass('tss-panel-max')
+                .css('width', oThis.width + "px")
+                .css('height', "")
+                .css('left', oThis.location.left + 'px').css('top', oThis.location.top + 'px');
+            $max.show(true);
+            $min.show(true);
+            $revert.hide();
+        });
+
+        $min.click(function(){
+            if(oThis.$el.hasClass("tss-panel-min")) {
+                oThis.$el.removeClass("tss-panel-min");
+                $content.show();
+            } else {
+                oThis.$el.addClass("tss-panel-min").removeClass('tss-panel-max')
+                    .css('width', oThis.width + "px")
+                    .css('height', "");
+                $max.show(true);
+                $revert.hide();
+                $content.hide();
+            }
+        });
+
+        $close.click(function(){
+            oThis.$el.hide();
+        });
+
+        function cancelBubble(event) {
+            this.onfocus = function () {this.blur()};
+            $.Event.cancel(event)
+        }
+        $min.addEvent("mousedown", cancelBubble);
+        $max.addEvent("mousedown", cancelBubble);
+        $revert.addEvent("mousedown", cancelBubble);
+        $close.addEvent("mousedown", cancelBubble);
+    }
+
+})(tssJS);
 
 /*
  *  左栏

@@ -16,10 +16,6 @@
     var Panel = function(el, title, contentHtml) {
         this.el = el;
         this.$el = $(el);
-        this.width  = el.clientWidth;
-        this.height = el.clientHeight;
-
-        this.$el.addClass("tss-panel").drag().resize().resize("col").resize("row");
         this.$el.html(
             '<div class="title">' + 
                 '<h2>' +title+ '</h2>' + 
@@ -32,6 +28,11 @@
             '</div>' + 
             '<div class="content">' + contentHtml + '</div>'
         );
+        this.$el.addClass("tss-panel").resize().resize("col").resize("row").drag();
+
+        this.width  = el.clientWidth;
+        this.height = el.clientHeight;
+        this.location = $.absPosition(el);
 
         var $title = $(".title", el);
         var $content = $(".content", el);
@@ -44,31 +45,39 @@
         var oThis = this;
         $max.click(function(){
             var inner = $.getInner();
-            oThis.$el.addClass('tss-panel-max')
-                .css('width', (inner.width- 2) + "px")
-                .css('height', (inner.height- 2) + "px");
+            oThis.$el.css('width',  "100%")
+                .css('height', "100%")
+                .css('top', '0px').css('left', '0px');
+            oThis.$el.addClass('tss-panel-max').removeClass("tss-panel-min");
+
             $max.hide();
+            $min.hide();
             $revert.show(true);
+            $content.show();
         });
 
         $revert.click(function(){
             var inner = $.getInner();
             oThis.$el.removeClass('tss-panel-max')
-                .css('width', this.width + "px")
-                .css('height', this.height + "px");
+                .css('width', oThis.width + "px")
+                .css('height', "")
+                .css('left', oThis.location.left + 'px').css('top', oThis.location.top + 'px');
             $max.show(true);
+            $min.show(true);
             $revert.hide();
         });
 
         $min.click(function(){
-            if($content.hasClass("tss-panel-min")) {
-                $content.removeClass("tss-panel-min");
-                $min.hide();
-                $revert.show(true);
+            if(oThis.$el.hasClass("tss-panel-min")) {
+                oThis.$el.removeClass("tss-panel-min");
+                $content.show();
             } else {
-                $content.addClass("tss-panel-min");
-                $min.show(true);
+                oThis.$el.addClass("tss-panel-min").removeClass('tss-panel-max')
+                    .css('width', oThis.width + "px")
+                    .css('height', "");
+                $max.show(true);
                 $revert.hide();
+                $content.hide();
             }
         });
 

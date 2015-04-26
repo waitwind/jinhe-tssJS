@@ -186,6 +186,29 @@ WorkSpace\:PhaseBox td { vertical-align:top; }
 WorkSpace\:Page { height:100%; padding:20px; margin-right:0px; overflow:hidden; background-color:#F7F8FD; border:1px solid #98989C; border-top:0px;}
 WorkSpace\:Page.tight { padding:0px; }
 WorkSpace\:PageStep { text-align:center; padding:0; width:100%; display:block;}
+.tss-panel { position:absolute; vertical-align: top; background-color: #fff; 
+  box-sizing:border-box;
+  -moz-box-sizing:border-box; 
+  -webkit-box-sizing:border-box; 
+  border: 1px solid #99b1c4; 
+}
+.tss-panel .title { position:relative; background:url(../images/alert/title.gif) repeat-x 0px -2px; }
+.tss-panel .title h2 {  margin:0;  padding:0; text-indent: 12px; font-size: 1em; height: 21px; cursor:move; }
+.tss-panel .title div { position:absolute; height:19px; top:1px; right:1px; }
+.tss-panel .title span { display: inline-block; float:left; width:21px; height:19px; margin-left:5px; cursor: pointer;
+  background:url(../images/panel.png) no-repeat;}
+.tss-panel .title .min { background-position:-29px 0; }
+.tss-panel .title .min:hover { background-position:-29px -29px; }
+.tss-panel .title .max { background-position:-60px 0; }
+.tss-panel .title .max:hover { background-position:-60px  -29px; }
+.tss-panel .title .revert { background-position:-149px 0; display:none; }
+.tss-panel .title .revert:hover { background-position:-149px -29px; }
+.tss-panel .title .close { background-position:-89px 0; }
+.tss-panel .title .close:hover { background-position:-89px -29px; }
+
+.tss-panel-max { top: 0px; left: 0px; }
+.tss-panel-min { height: 20px; overflow: hidden; }
+
 .leftbar {
     position:fixed; bottom:20%; 
     z-index:100;

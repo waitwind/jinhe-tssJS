@@ -110,6 +110,13 @@
         closeBox = function() {
             $("#alert_box").hide().remove();
             $.hideWaitingLayer();
+        },
+
+        // 检查是否在texteara外按了enter键
+        checkEnterPress = function(ev){
+            var srcElement = $.Event.getSrcElement(ev);
+            var tagName = srcElement.tagName.toLowerCase();
+            return 13 == ev.keyCode && "textarea" != tagName;
         };
 
 
@@ -125,7 +132,7 @@
         }
         $(".btbox .ok", boxEl).click(ok);
         $.Event.addEvent(document, "keydown", function(ev) {
-            if(13 == ev.keyCode) { // Enter
+            if( checkEnterPress(ev) ) { 
                setTimeout(ok, 10);
             }
         });
@@ -149,7 +156,7 @@
         $(".btbox .ok", boxEl).click(function() { ok(true); });
         $(".btbox .cancel", boxEl).click(function() { ok(false); });
         $.Event.addEvent(document, "keydown", function(ev) {
-            if(13 == ev.keyCode) { // Enter
+            if( checkEnterPress(ev) ) { 
                setTimeout( function() { ok(true); }, 10);
             }
         });
@@ -173,7 +180,7 @@
         $(".btbox .cancel", boxEl).click(closeBox);
 
         $.Event.addEvent(document, "keydown", function(ev) {
-            if(13 == ev.keyCode) { // Enter
+            if( checkEnterPress(ev) ) { 
                setTimeout(ok, 10);
             }
         });

@@ -311,9 +311,7 @@
         showSubMenu: function() {
             if( this.submenu ) {
                 var position = $.absPosition(this.el);
-                var x = position.left + this.el.offsetWidth;
-                var y = position.top;
-                this.submenu.show(x, y);
+                this.submenu.show(position.right, position.bottom);
             }
         },
 

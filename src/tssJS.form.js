@@ -691,7 +691,7 @@
 
         this.position = function() {
             var elPosition = $.absPosition(this.el);
-            $(treeEl).position(elPosition.left, elPosition.top).hide();
+            $(treeEl).position(elPosition.left, elPosition.bottom).hide();
             $(treeEl).css("height", this.height).css("width", $.getStyle(this.el, "width"));
         }
         this.position();

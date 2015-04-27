@@ -74,7 +74,6 @@
         ($.alert || alert)(msg);
     },
 
- 
     /*
      *  XMLHTTP请求对象，负责发起XMLHTTP请求并接收响应数据。例:
             var request = new HttpRequest();
@@ -495,111 +494,18 @@
             $.Cookie.del("token", "/" + FROMEWORK_CODE.toLowerCase());
             $.Cookie.del("token", "/" + CONTEXTPATH);
 
-            relogin(request, info.msg);
-        }
-
-        function relogin(request, msg) {
-            var reloginBox = $("#relogin_box")[0];
-            if(reloginBox == null) {
-                var boxHtml = [];
-                boxHtml[boxHtml.length] = "<h1>重新登录</h1>";
-                boxHtml[boxHtml.length] = "<span> <input type='text' id='loginName' placeholder='请输入您的账号'/> </span>";
-                boxHtml[boxHtml.length] = "<span> <input type='password' id='password' placeholder='请输入您的密码' /> </span>";
-                boxHtml[boxHtml.length] = "<span class='bottonBox'>";
-                boxHtml[boxHtml.length] = "  <input type='button' id='bt_login'  value='确  定'/>&nbsp;&nbsp;";
-                boxHtml[boxHtml.length] = "  <input type='button' id='bt_cancel' value='取  消'/>";
-                boxHtml[boxHtml.length] = "</span>";
-
-                reloginBox = $.createElement("div", "popupBox", "relogin_box");    
-                document.body.appendChild(reloginBox);
-                $(reloginBox).html(boxHtml.join(""));
-
-                $("#bt_cancel").click(function() {
-                    $(reloginBox).hide();
-                });
-
-                var defaultUserName = $.Cookie.getValue("iUserName");
-                if( defaultUserName ) {
-                    $("#loginName").value(defaultUserName);
-                }
-            }
-
-            var title = "重新登录";
-            if(msg) {
-                title += "，因" + msg.substring(0, 10) + (msg.length > 10 ? "..." : "");
-            }
-            $("h1", reloginBox).html(title);
-
-            $(reloginBox).show(); // 显示登录框
-
-            var loginNameObj = $("#loginName")[0];
-            var passwordObj  = $("#password")[0];
-
-            loginNameObj.focus();
-            passwordObj.value = ""; // 清空上次输入的密码，以防泄密
-            
-            loginNameObj.onblur = function() { 
-                var value = this.value;
-                if(value == null || value == "") return;
-                
-                if(loginNameObj.identifier) {
-                    delete loginNameObj.identifier;
-                }
-                
-                $.ajax({
-                    url: "/" + CONTEXTPATH + "getLoginInfo.in",
-                    params: {"loginName": value},
-                    onexcption: function() {
-                        loginNameObj.focus();
-                    },
-                    onresult: function(){
-                        loginNameObj.identifier = this.getNodeValue("identifier");
-                        loginNameObj.randomKey  = this.getNodeValue("randomKey");
-                        
-                        passwordObj.focus();
-                    }
-                });
-            }
-
-            $.Event.addEvent(document, "keydown", function(ev) {
-                if(13 == ev.keyCode) { // enter
-                    $.Event.cancel(event);
-                    $("#bt_login").focus();
-
-                    setTimeout(doLogin, 10);
-                }
-            });
-
-            $("#bt_login").click( function() { doLogin(); } );
-            
-            var doLogin = function() {
-                var identifier = loginNameObj.identifier;
-                var randomKey  = loginNameObj.randomKey;
-
-                var loginName  = loginNameObj.value;
-                var password   = passwordObj.value;
-                
-                if( "" == loginName ) {
-                    popupMessage("请输入账号");
-                    loginNameObj.focus();
-                    return;
-                } 
-                else if( "" == password ) {
-                    popupMessage("请输入密码");
-                    passwordObj.focus();
-                    return;
-                } 
-                else if( identifier == null ) {
-                    popupMessage("无法登录，用户配置可能有误，请联系管理员。");
-                    return;
-                } 
-
-                request.setHeader("loginName", $.encode(loginName, randomKey));
-                request.setHeader("password",  $.encode(password, randomKey));
-                request.setHeader("identifier", identifier);
-                request.setHeader("randomKey", randomKey);
-                request.send();
-                $(reloginBox).hide();
+            if($.relogin) {
+                $.relogin( 
+                    function(loginName, password, identifier, randomKey) { 
+                        request.setHeader("loginName", $.encode(loginName, randomKey));
+                        request.setHeader("password",  $.encode(password, randomKey));
+                        request.setHeader("identifier", identifier);
+                        request.setHeader("randomKey", randomKey);
+                        request.send();
+                    }, info.msg );
+            } else {
+                alert(info.msg);
+                location.href = "/" + CONTEXTPATH + "/login.html";
             }
         }
     }   

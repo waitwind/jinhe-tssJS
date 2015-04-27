@@ -52,6 +52,20 @@ input[type=text]:focus, textarea:focus {
 #alert_box .content { padding: 20px 12px 10px 12px; }
 #alert_box .message { max-height:150px; padding-left: 50px; padding-bottom: 10px; font-size:13px; }
 #alert_box .message  input { margin: .5em 0em; height: 20px; width: 250px; line-height: 20px; }
+
+/* message相关 */
+.popupBox { background-color: white; border:1px solid #98989C; margin-left: auto; margin-right: auto; position: absolute; top:1px; left: -100px; right: -100px; z-Index: 10001;}
+
+/* relogin相关 */
+#relogin_box { width:300px; border: solid 1px #99b1c4; border-radius:5px; background-color:#EEEEEE; font-size: 15px; }
+#relogin_box h1 { line-height:40px; padding:0px 10px; background-color:#003399; color:#fff; }
+#relogin_box span { display:block; height: 30px; margin:15px 0px; padding:0px 10px; } 
+#relogin_box span input { margin-left: 10px; }
+#relogin_box #loginName, 
+#relogin_box #password { width:250px; height: 22px; font-size: 13px; border-radius:3px; border:1px solid #0C6F73; padding-left: 5px; }
+#relogin_box .bottonBox input { background-color: #999999; color: #FFFFFF; cursor: pointer;
+         border-radius: 3px; border: 1px solid #88D0E7; width: 117px; height: 25px; font-size: 14px;  }
+#relogin_box .bottonBox input:hover { font-weight: bold; background-color: #003399; }
 .menu { position:absolute; width:135px; padding:1px; border:1px solid #666666; background: #F9F8F7 url(../images/menu_bg.gif) repeat-y;}
 .menu div { padding:5px 0px 0px 30px; font-size:12px; line-height:12px; width:104px; height:22px; overflow:hidden; position:relative; }
 .menu div.separator { padding:0px; width:103px; height:1px; overflow:hidden; background-color:#A6A6A6; margin:1px 0px 1px 30px; }
@@ -193,7 +207,7 @@ WorkSpace\:PageStep { text-align:center; padding:0; width:100%; display:block;}
   border: 1px solid #99b1c4; 
 }
 .tss-panel .title { position:relative; background:url(../images/alert/title.gif) repeat-x 0px -2px; }
-.tss-panel .title h2 {  margin:0;  padding:0; text-indent: 12px; font-size: 1em; height: 21px; cursor:move; }
+.tss-panel .title h2 {  margin:0; padding:0; text-indent: 3px; font-size: 1.1em; height: 21px; cursor:move; color: #fff; }
 .tss-panel .title div { position:absolute; height:19px; top:1px; right:1px; }
 .tss-panel .title span { display: inline-block; float:left; width:21px; height:19px; margin-left:5px; cursor: pointer;
   background:url(../images/panel.png) no-repeat;}
@@ -205,7 +219,7 @@ WorkSpace\:PageStep { text-align:center; padding:0; width:100%; display:block;}
 .tss-panel .title .revert:hover { background-position:-149px -29px; }
 .tss-panel .title .close { background-position:-89px 0; }
 .tss-panel .title .close:hover { background-position:-89px -29px; }
-
+.tss-panel .content { height: 96%; }
 .tss-panel-max { top: 0px; left: 0px; }
 .tss-panel-min { height: 20px; overflow: hidden; }
 

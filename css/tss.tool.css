@@ -6,7 +6,7 @@
   border: 1px solid #99b1c4; 
 }
 .tss-panel .title { position:relative; background:url(../images/alert/title.gif) repeat-x 0px -2px; }
-.tss-panel .title h2 {  margin:0;  padding:0; text-indent: 12px; font-size: 1em; height: 21px; cursor:move; }
+.tss-panel .title h2 {  margin:0; padding:0; text-indent: 3px; font-size: 1.1em; height: 21px; cursor:move; color: #fff; }
 .tss-panel .title div { position:absolute; height:19px; top:1px; right:1px; }
 .tss-panel .title span { display: inline-block; float:left; width:21px; height:19px; margin-left:5px; cursor: pointer;
   background:url(../images/panel.png) no-repeat;}
@@ -18,7 +18,7 @@
 .tss-panel .title .revert:hover { background-position:-149px -29px; }
 .tss-panel .title .close { background-position:-89px 0; }
 .tss-panel .title .close:hover { background-position:-89px -29px; }
-
+.tss-panel .content { height: 96%; }
 .tss-panel-max { top: 0px; left: 0px; }
 .tss-panel-min { height: 20px; overflow: hidden; }
 

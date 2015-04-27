@@ -60,7 +60,7 @@
             var inner = $.getInner();
             oThis.$el.removeClass('tss-panel-max')
                 .css('width', oThis.width + "px")
-                .css('height', "")
+                .css('height', oThis.height + "px")
                 .css('left', oThis.location.left + 'px').css('top', oThis.location.top + 'px');
             $max.show(true);
             $min.show(true);
@@ -69,9 +69,10 @@
 
         $min.click(function(){
             if(oThis.$el.hasClass("tss-panel-min")) {
-                oThis.$el.removeClass("tss-panel-min");
+                oThis.$el.removeClass("tss-panel-min").css('height', oThis.height + "px");
                 $content.show();
-            } else {
+            } 
+            else {
                 oThis.$el.addClass("tss-panel-min").removeClass('tss-panel-max')
                     .css('width', oThis.width + "px")
                     .css('height', "");

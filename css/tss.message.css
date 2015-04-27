@@ -23,3 +23,17 @@
 #alert_box .content { padding: 20px 12px 10px 12px; }
 #alert_box .message { max-height:150px; padding-left: 50px; padding-bottom: 10px; font-size:13px; }
 #alert_box .message  input { margin: .5em 0em; height: 20px; width: 250px; line-height: 20px; }
+
+/* message相关 */
+.popupBox { background-color: white; border:1px solid #98989C; margin-left: auto; margin-right: auto; position: absolute; top:1px; left: -100px; right: -100px; z-Index: 10001;}
+
+/* relogin相关 */
+#relogin_box { width:300px; border: solid 1px #99b1c4; border-radius:5px; background-color:#EEEEEE; font-size: 15px; }
+#relogin_box h1 { line-height:40px; padding:0px 10px; background-color:#003399; color:#fff; }
+#relogin_box span { display:block; height: 30px; margin:15px 0px; padding:0px 10px; } 
+#relogin_box span input { margin-left: 10px; }
+#relogin_box #loginName, 
+#relogin_box #password { width:250px; height: 22px; font-size: 13px; border-radius:3px; border:1px solid #0C6F73; padding-left: 5px; }
+#relogin_box .bottonBox input { background-color: #999999; color: #FFFFFF; cursor: pointer;
+         border-radius: 3px; border: 1px solid #88D0E7; width: 117px; height: 25px; font-size: 14px;  }
+#relogin_box .bottonBox input:hover { font-weight: bold; background-color: #003399; }

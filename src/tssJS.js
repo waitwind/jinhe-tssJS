@@ -717,23 +717,30 @@
 
         //  获取绝对位置
         absPosition: function(node) {
-            var left, top, pEl = node;
+            var left, right, top, bottom, pEl = node;
 
             if (typeof node.getBoundingClientRect === 'function') {
                 var clientRect = node.getBoundingClientRect();
                 left = clientRect.left + window.pageXOffset;
-                top = clientRect.bottom + window.pageYOffset;
+                right = clientRect.right + window.pageXOffset;
+                top = clientRect.top + window.pageYOffset;
+                bottom = clientRect.bottom + window.pageYOffset;
             } else {
                 left = pEl.offsetLeft;
-                top = pEl.offsetTop + pEl.offsetHeight;
+                top = pEl.offsetTop;
                 while ((pEl = pEl.offsetParent)) {
                     left += pEl.offsetLeft;
                     top += pEl.offsetTop;
                 }
+
+                right = left + node.offsetWidth;
+                bottom = top + node.offsetHeight
             }
             return {
                 "left": left,
-                "top": top
+                "top": top,
+                "right": right,
+                "bottom": bottom
             };
         },
 

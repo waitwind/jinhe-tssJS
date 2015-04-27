@@ -69,7 +69,7 @@
     </div>
 
     <div class="demo">
-        <a href="#" class="tssbutton black">橘红</a> 
+        <a href="#" class="tssbutton black">黑色</a> 
         <a href="#" class="tssbutton black bigrounded">Rounded</a> 
         <a href="#" class="tssbutton black medium">Medium</a> 
         <a href="#" class="tssbutton black small">Small</a> 
@@ -77,13 +77,16 @@
         <button class="tssbutton black">Button Tag</button>
     </div>
 
-    <div id="panel1" style="width:600px;margin:auto;"></div>
+    <div id="panel1" style="width:600px;position:absolute;top:200px;left:500px;"></div>
+    <div id="panel2" style="width:50%;position:absolute;top:400px;left:40%;"></div>
  
     <script type="text/javascript">
     
         $.leftbar( function() { alert("点击成功") } );
 
-        $("#panel1").panel("哈哈大笑", "1111111222222<br/><br/><br/><br/><br/>");
+        $("#panel1").css("height", "400px").panel('报表一【<a href="#" onclick="getQueryForm(497)">设置条件</a>】', '<div id="d1" style="width:100%;height:100%;" >1111111111</div>');
+
+        $("#panel2").css("height", "400px").panel('报表二【<a href="#" onclick="getQueryForm(500)">设置条件</a>】', '<div id="d2" style="width:100%;height:100%;" >2222222222</div>');
 
     </script>  
 </body>

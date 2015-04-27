@@ -13,6 +13,8 @@
         }
     });
 
+    var panelIndex = 1;
+
     var Panel = function(el, title, contentHtml) {
         this.el = el;
         this.$el = $(el);
@@ -29,6 +31,7 @@
             '<div class="content">' + contentHtml + '</div>'
         );
         this.$el.addClass("tss-panel").resize().resize("col").resize("row").drag();
+        this.$el.css("zIndex", panelIndex++);
 
         this.width  = el.clientWidth;
         this.height = el.clientHeight;
@@ -43,6 +46,11 @@
         var $close = $(".close", el);
 
         var oThis = this;
+
+        this.$el.click(function() {
+            oThis.$el.css("zIndex", panelIndex++);
+        });
+
         $max.click(function(){
             var inner = $.getInner();
             oThis.$el.css('width',  "100%")
@@ -201,6 +209,8 @@ tssJS.fn.extend({
                 document.addEventListener("mousemove", doDrag, true);
                 document.addEventListener("mouseup", stopDrag, true);
             }
+
+            return false;
         };
 
         function doDrag(ev) {
@@ -215,7 +225,8 @@ tssJS.fn.extend({
 
         function stopDrag() {
             if (handle.releaseCapture) {
-                handle.onmousemove = handle.onmouseup = null;
+                handle.onmousemove = null;
+                handle.onmouseup = null;
                 handle.releaseCapture();
             } else {
                 document.removeEventListener("mousemove", doDrag, true);
@@ -253,6 +264,10 @@ tssJS.fn.extend({
 
             document.addEventListener("mousemove", doDrag, true);
             document.addEventListener("mouseup", stopDrag, true);
+
+            $.showWaitingLayer(); // 创建一个遮罩层，防止存在iframe时捕捉不到mousemove事件
+
+            return false;
         };
 
         function doDrag(ev) {
@@ -286,6 +301,7 @@ tssJS.fn.extend({
         function stopDrag() {
             document.removeEventListener("mousemove", doDrag, true);
             document.removeEventListener("mouseup", stopDrag, true);
+            $.hideWaitingLayer();
         };
 
         return this;

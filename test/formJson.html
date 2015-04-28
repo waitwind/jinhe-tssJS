@@ -23,6 +23,13 @@
 
 <SCRIPT LANGUAGE="JavaScript">
 <!--
+
+    var customizeJS = 
+    'function f1() { ' + 
+    '   $.alert("我是自定义脚本，tssForm已成功加载。" + $("#param4").value()); ' + 
+    '   $("#param7").click(function(){ this.value = "鸡蛋要不要" });' +
+    '} ' + 
+    'f1();';
  
     function init() {
 		$("#btQuery").click(function() {
@@ -33,7 +40,7 @@
 			url: "data/form.json", 
 			method : "GET",
 			ondata: function() {
-				var queryForm = $.json2Form("queryForm", this.getResponseJSON());
+				var queryForm = $.json2Form("queryForm", this.getResponseJSON(), null, customizeJS);
 				$.cache.XmlDatas["queryFormXML"] = queryForm.template.sourceXML;
 			}
 		});

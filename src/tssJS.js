@@ -466,6 +466,10 @@
     $.fn.extend({
 
         find: function(selector, parent) {
+            if(this[0]) {
+                return $(selector, this[0]);
+            }
+
             parent = parent || document;
             var elements = parent.querySelectorAll(selector);
 

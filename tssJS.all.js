@@ -466,6 +466,10 @@
     $.fn.extend({
 
         find: function(selector, parent) {
+            if(this[0]) {
+                return $(selector, this[0]);
+            }
+
             parent = parent || document;
             var elements = parent.querySelectorAll(selector);
 
@@ -3545,6 +3549,11 @@
 
             // 绑定各个字段输入框对应的编辑方式
             this.attachEditor();
+
+            // 添加tssForm定制的script
+            if(this.template.script) {
+                $.createScript($.XML.getText(this.template.script));
+            }
         
             // 绑定事件
             this.box.onselectstart = function() {
@@ -5428,7 +5437,9 @@
                 node.refreshCheckState(0);
             });
 
-            checkedIds = (checkedIds || "").split(',');
+            if( !checkedIds ) return;
+
+            checkedIds = checkedIds.length ? checkedIds : checkedIds.split(',');
             for(var i = 0; i < checkedIds.length; i++) {
                 var li = this.el.querySelector("li[nodeId='" + checkedIds[i] + "']");
                 if(li) {

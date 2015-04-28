@@ -116,7 +116,7 @@ var Field = function(info) {
 		}
 	}
 
-	$.json2Form = function(formId, defines, buttonBox) {
+	$.json2Form = function(formId, defines, buttonBox, customizeJS) {
 		var infos = defines ? (typeof(defines) === "string" ? $.parseJSON(defines) : defines) : [];
 
 		var fields = [];
@@ -145,6 +145,9 @@ var Field = function(info) {
 		str[str.length] = layouts.join("") + (buttonBox || "");
 		str[str.length] = "    </layout>";
 		str[str.length] = "    <data><row>" + datarow.join("") + "</row></data>";
+		if(customizeJS) {
+			str[str.length] = "<script> <![CDATA[" + customizeJS + "]]> </script>";
+		}
 		str[str.length] = "</xform>";
 		
 		var tssForm = $.F(formId, $.XML.toNode(str.join("")));

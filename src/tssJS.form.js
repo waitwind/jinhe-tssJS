@@ -288,6 +288,11 @@
 
             // 绑定各个字段输入框对应的编辑方式
             this.attachEditor();
+
+            // 添加tssForm定制的script
+            if(this.template.script) {
+                $.createScript($.XML.getText(this.template.script));
+            }
         
             // 绑定事件
             this.box.onselectstart = function() {

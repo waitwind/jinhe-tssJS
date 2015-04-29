@@ -3395,11 +3395,11 @@
     XMLTemplate = function(dataXML) {
         this.sourceXML = dataXML;
              
-        this.declare = $("declare", dataXML)[0];
-        this.layout  = $("layout", dataXML)[0]; 
-        this.script  = $("script", dataXML)[0];
+        this.declare = $("xform>declare", dataXML)[0];
+        this.layout  = $("xform>layout", dataXML)[0]; 
+        this.script  = $("xform>script", dataXML)[0];
     
-        this.dataNode =  $("data", dataXML)[0];
+        this.dataNode =  $("xform>data", dataXML)[0];
         if(this.dataNode == null) {             
             this.dataNode = $.XML.createNode("data");
             this.sourceXML.appendChild(this.dataNode);

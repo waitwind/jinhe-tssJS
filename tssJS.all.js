@@ -2120,7 +2120,7 @@
 
     var
     /* 样式名称 */
-    CSS_CLASS_MENU = "menu",
+    CSS_CLASS_MENU = "rmenu",
     CSS_CLASS_MENU_ITEM_ACITVE = "active",
     CSS_CLASS_MENU_SEPARATOR = "separator",
 
@@ -2303,9 +2303,7 @@
 
         /* 添加分隔线 */
         addSeparator: function() {
-            var separator = document.createElement("div");
-            separator.className = CSS_CLASS_MENU_SEPARATOR;
-
+            var separator = $.createElement("div", CSS_CLASS_MENU_SEPARATOR);
             this.el.appendChild(separator);
         },
 
@@ -2367,7 +2365,7 @@
         /* 高亮菜单项 */
         active: function() {
             if( !!this.isEnable ) {
-                this.el.className = CSS_CLASS_MENU_ITEM_ACITVE;
+                $(this.el).addClass(CSS_CLASS_MENU_ITEM_ACITVE);
             }
         },
 

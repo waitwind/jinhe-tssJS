@@ -6039,16 +6039,16 @@
 ;(function($){
 
     $.fn.extend({
-        panel: function(title, contentHtml) {
+        panel: function(title, contentHtml, resizable, moveable) {
             if(this.length > 0) {
-                return new Panel(this[0], title, contentHtml);
+                return new Panel(this[0], title, contentHtml, resizable, moveable);
             }
         }
     });
 
     var panelIndex = 1;
 
-    var Panel = function(el, title, contentHtml) {
+    var Panel = function(el, title, contentHtml, resizable, moveable) {
         this.el = el;
         this.$el = $(el);
         this.$el.html(
@@ -6063,8 +6063,14 @@
             '</div>' + 
             '<div class="content">' + contentHtml + '</div>'
         );
-        this.$el.addClass("tss-panel").resize().resize("col").resize("row").drag();
-        this.$el.css("zIndex", panelIndex++);
+        this.$el.addClass("tss-panel").css("zIndex", panelIndex++);
+
+        if(moveable == null || moveable) {
+            this.$el.drag();
+        }
+        if(resizable) {
+            this.$el.resize().resize("col").resize("row");
+        }
 
         this.width  = el.clientWidth;
         this.height = el.clientHeight;

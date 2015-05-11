@@ -1911,27 +1911,13 @@
         $(boxEl).center(360, 300);   
         callback && $.showWaitingLayer();
 
-        $.Event.addEvent(document, "keydown", function(ev) {
-            if(27 == ev.keyCode) { // ESC 退出
-               closeBox();
-            }
-        });
-
         return $box[0];
     },
 
     closeBox = function() {
         $("#alert_box").hide().remove();
         $.hideWaitingLayer();
-    },
-
-    // 检查是否在texteara外按了enter键
-    checkEnterPress = function(ev){
-        var srcElement = $.Event.getSrcElement(ev);
-        var tagName = srcElement.tagName.toLowerCase();
-        return 13 == ev.keyCode && "textarea" != tagName;
     };
-
 
     // content：内容，title：对话框标题，callback：回调函数    
     $.alert = function(content, title, callback) {
@@ -1944,11 +1930,6 @@
             callback && callback();
         }
         $(".btbox .ok", boxEl).click(ok);
-        $.Event.addEvent(document, "keydown", function(ev) {
-            if( checkEnterPress(ev) ) { 
-               setTimeout(ok, 10);
-            }
-        });
     };
 
     // content：内容，title：对话框标题，callback：回调函数
@@ -1968,11 +1949,6 @@
         }
         $(".btbox .ok", boxEl).click(function() { ok(true); });
         $(".btbox .cancel", boxEl).click(function() { ok(false); });
-        $.Event.addEvent(document, "keydown", function(ev) {
-            if( checkEnterPress(ev) ) { 
-               setTimeout( function() { ok(true); }, 10);
-            }
-        });
     };
 
     // content：内容，deinput：输入框的默认值，title：对话框标题，callback：回调函数
@@ -1991,12 +1967,6 @@
         }
         $(".btbox .ok", boxEl).click(ok);
         $(".btbox .cancel", boxEl).click(closeBox);
-
-        $.Event.addEvent(document, "keydown", function(ev) {
-            if( checkEnterPress(ev) ) { 
-               setTimeout(ok, 10);
-            }
-        });
     };
 
 })(tssJS);
@@ -2067,15 +2037,6 @@
                 }
             });
         }
-
-        $.Event.addEvent(document, "keydown", function(ev) {
-            if(13 == ev.keyCode) { // enter
-                $.Event.cancel(event);
-                $("#bt_login").focus();
-
-                setTimeout(doLogin, 10);
-            }
-        });
 
         $("#bt_login").click( function() { doLogin(); } );
         

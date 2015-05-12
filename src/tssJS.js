@@ -972,6 +972,8 @@
             /* 取消事件 */
             cancel: function(ev) { 
                 ev = ev || window.event;
+                if(!ev) return;
+
                 if (ev.preventDefault) {
                     ev.preventDefault();
                 } else {
@@ -1006,6 +1008,8 @@
 
             /* 阻止事件向上冒泡 */
             cancelBubble: function(ev) {
+                if(!ev) return;
+                
                 if( ev.stopPropagation ) {
                     ev.stopPropagation();
                 }

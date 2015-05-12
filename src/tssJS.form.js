@@ -68,9 +68,8 @@
             if( !!this.isInstance ) {
                 this.setFocus();
             }
-            if( event ) {
-                $.Event.cancel(event);
-            }
+
+            $.Event.cancel();
             return false;
         }
         return true;
@@ -295,8 +294,8 @@
             }
         
             // 绑定事件
-            this.box.onselectstart = function() {
-                event.cancelBubble = true; // 拖动选择事件取消冒泡
+            this.box.onselectstart = function(ev) {
+                $.Event.cancelBubble(ev); // 拖动选择事件取消冒泡
             }
 
             var form = this.box.querySelector("form");
@@ -396,7 +395,8 @@
         // 将界面数据更新到Form模板的data/row/里
         updateData: function(el) {
             var newValue;
-            if(event && event.propertyName == "checked") {
+            var ev = window.event;
+            if(ev && ev.propertyName == "checked") {
                 newValue = el.checked == true ? 1 : 0;
             }
             else if(el.tagName.toLowerCase() == "select") {

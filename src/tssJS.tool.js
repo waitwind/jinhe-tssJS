@@ -100,9 +100,9 @@
             oThis.$el.hide();
         });
 
-        function cancelBubble(event) {
+        function cancelBubble(ev) {
             this.onfocus = function () {this.blur()};
-            $.Event.cancel(event)
+            $.Event.cancel(ev)
         }
         $min.addEvent("mousedown", cancelBubble);
         $max.addEvent("mousedown", cancelBubble);
@@ -201,7 +201,7 @@ tssJS.fn.extend({
         var elementStart = {x:0, y:0};  // 拖动条起始位置
 
         handle.onmousedown = function(ev) {
-            var oEvent = ev || event;
+            var oEvent = ev || window.event;
             mouseStart.x  = oEvent.clientX;
             mouseStart.y  = oEvent.clientY;
             elementStart.x = element.offsetLeft;
@@ -220,7 +220,7 @@ tssJS.fn.extend({
         };
 
         function doDrag(ev) {
-            ev = ev || event;
+            ev = ev || window.event;
 
             var x = ev.clientX - mouseStart.x + elementStart.x;
             var y = ev.clientY - mouseStart.y + elementStart.y;
@@ -262,7 +262,7 @@ tssJS.fn.extend({
         var handleStart = {x:0, y:0};  // 拖动条起始位置
 
         handle.onmousedown = function(ev) {
-            var oEvent = ev || event;
+            var oEvent = ev || window.event;
             mouseStart.x  = oEvent.clientX;
             mouseStart.y  = oEvent.clientY;
             handleStart.x = handle.offsetLeft;
@@ -277,7 +277,7 @@ tssJS.fn.extend({
         };
 
         function doDrag(ev) {
-            var oEvent = ev || event;
+            var oEvent = ev || window.event;
 
             // 水平移动距离
             if (type == "col" || type == null) {

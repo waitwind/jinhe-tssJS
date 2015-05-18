@@ -356,19 +356,19 @@
                 $(li.checkbox).click( function() { checkNode(nThis); } );
 
                 // 添加拖到事件处理
-                $.Event.addEvent(li, "dragstart", function(ev){
+                $(li).addEvent("dragstart", function(ev){
                     var dt = ev.dataTransfer;
                     dt.effectAllowed = 'move';
                     dt.setData("text", li.node.id);
                 }, true);        
 
-                $.Event.addEvent(li, "dragend", function(ev) {
+                $(li).addEvent("dragend", function(ev) {
                     ev.dataTransfer.clearData("text");
-                    ev.preventDefault(); // 不执行默认处理，拒绝被拖放
+                    $.Event.cancel(ev); // 不执行默认处理，拒绝被拖放
                 }, true);
 
 
-                $.Event.addEvent(li, "drop", function(ev){
+                $(li).addEvent("drop", function(ev){
                     var dt = ev.dataTransfer;
                     var nodeId = dt.getData("text");
                     var dragEL = $("li[nodeId='" + nodeId + "']")[0];
@@ -383,11 +383,11 @@
                         eventNodeMoved.fire(eObj); 
                     }                   
 
-                    ev.preventDefault();
+                    $.Event.cancel(ev);
                 }, true);
 
-                $.Event.addEvent(li, "dragover", function(ev) {
-                    ev.preventDefault();
+                $(li).addEvent("dragover", function(ev) {
+                    $.Event.cancel(ev);
                 }, true);
 
                 return li;

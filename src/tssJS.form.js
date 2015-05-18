@@ -219,10 +219,10 @@
                             htmls.push("<select " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + _value + "></select>");
                         }
                         else if(mode == "string" && nodeName == 'textarea') {
-                            htmls.push("<textarea " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + ">" + (value ? value : "") + "</textarea>");
+                            htmls.push("<textarea " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + " spellcheck='false'>" + (value ? value : "") + "</textarea>");
                         }
                         else if(mode == "string" || mode == "number" || mode == "function" || mode == "date" || mode == "datetime" || mode == "combotree") {
-                            htmls.push("<input " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + _value + "></input>");
+                            htmls.push("<input " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + _value + " spellcheck='false'></input>");
                         }
                     }
                     htmls.push("</td>");

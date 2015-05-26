@@ -701,6 +701,7 @@
         }
         this.position();
 
+        // 控制mousedown事件，使的在树节点上点击时，下拉框不会消失（不加的话一点击this.el的obblur会被触发）
         $.Event.addEvent(this.tree.el, 'mousedown', function(e) {
             e = e || window.event;
             $.Event.cancel(e);

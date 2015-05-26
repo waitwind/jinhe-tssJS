@@ -3925,6 +3925,7 @@
         }
         this.position();
 
+        // 控制mousedown事件，使的在树节点上点击时，下拉框不会消失（不加的话一点击this.el的obblur会被触发）
         $.Event.addEvent(this.tree.el, 'mousedown', function(e) {
             e = e || window.event;
             $.Event.cancel(e);
@@ -5580,10 +5581,10 @@
             this.phasesParams = null;
 
             // 执行Tab页上定义的回调方法
-            this.execCallBack("onTabClose");
+            this.execCallBack("onTabClose", this.SID);
 
             if( this.ws.noTabOpend() ) {
-                this.ws.element.style.display = "none";
+                $(this.ws.element).hide();
             } 
             else if( isCloseActiveTab ) {
                 this.ws.switchToTab(this.ws.getFirstTab());
@@ -5946,6 +5947,22 @@
                 if( tab.isActive ) {
                     return tab;
                 }
+            }
+        },
+
+        getTab: function(sid) {
+            for(var item in this.tabs) {
+                var tab = this.tabs[item];
+                if( tab.SID === sid ) {
+                    return tab;
+                }
+            }
+        },
+
+        closeTab: function(sid) {
+            var tab = this.getTab(sid);
+            if(tab) {
+                tab.close();
             }
         },
 

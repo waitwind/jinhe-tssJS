@@ -414,9 +414,10 @@
         insertRow: function(map) {
             var trList = this.gridBox.querySelectorAll("table tbody tr");
             var lastRow = trList[trList.length - 1];
+            var lastRowIndex = lastRow ? parseInt(lastRow.getAttribute("_index")) : 0; 
 
             var newRow = this.tbody.insertRow(this.totalRowsNum ++);
-            newRow.setAttribute("_index", parseInt(lastRow.getAttribute("_index")) + 1);
+            newRow.setAttribute("_index", lastRowIndex + 1);
 
             var thList = $("table thead td", this.gridBox);
             thList.each( function(i, th) {

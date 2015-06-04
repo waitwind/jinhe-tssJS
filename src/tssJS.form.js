@@ -447,6 +447,9 @@
 
         updateField: function(name, attrs) {
             var field = this.template.fieldsMap[name];
+            if(!field) {
+                field = this.template.fieldsMap[name.replace('p_', '')]; // recorder.html的查询form在字段前加了p_
+            }
             if( field ) {
                 var $el = $($1(name));
                 $.each(attrs, function(i, attr) {

@@ -882,7 +882,10 @@
                 var params = queryString.split("&");
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i].split("=");
-                    items[param[0]] = param[1];
+                    if(param.length == 2) {
+                        var key = param[0].replace(/%20/g, "");
+                        items[key] = param[1].replace(/%20/g, "");
+                    }
                 }
             }
         }

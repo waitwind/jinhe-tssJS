@@ -590,6 +590,7 @@
         }
         valueList = valueList.split('|');
         textList  = textList.split('|');
+        this.el.options.length = 0; // 先清空
         for(var i=0; i < valueList.length; i++) {
             var value = valueList[i];
             this.el.options[i] = new Option(textList[i], value);

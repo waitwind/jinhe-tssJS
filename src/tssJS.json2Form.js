@@ -235,7 +235,7 @@ var Field = function(info) {
 	$.vt = function(item) {
 		var result = {};
 		result.value = item.id   || item.pk   || item[0] || '';
-		result.text  = item.name || item.text || item[2] || '';
+		result.text  = item.name || item.text || item[2] || item[1] || item[0] || '';
 		return result;
 	};
 

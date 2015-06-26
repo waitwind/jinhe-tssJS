@@ -59,12 +59,19 @@
 
     bindAdjustTHHandler = function(table) { 
 
+        $(".checkAll", table).click(function(){
+            var allCheck = this.checked;
+            $("input[name='grid_cb']", table).each(function(){
+                this.checked = allCheck;
+            });
+        });
+
         $("thead tr td", table).each(function(i, th) {
             // 双击隐藏列
             th.ondblclick = function() {
-                $(th).css("display", "none");
+                $(th).hide();
                 $("tbody tr", table).each( function(j, row) {
-                    $(row.cells[i]).css("display", "none");
+                    $(row.cells[i]).hide();
                 });
             };
 
@@ -179,7 +186,7 @@
 
             thead.push('<thead><tr>');
             if(this.hasHeader) {
-                thead.push('<td name="cellheader" style="width:30px"><input type="checkbox" id="checkAll"/></td>');
+                thead.push('<td name="cellheader" style="width:30px"><input type="checkbox" class="checkAll"/></td>');
             }
             if(this.needSequence) {
                 thead.push('<td name="sequence" style="width:30px">序号</td>');
@@ -483,6 +490,19 @@
         getHighlightRow: function() {
             return $(".rolloverRow", this.tbody)[0];
         },
+
+        getCheckedRows: function() {
+            var ids = [];
+            $("input[name='grid_cb']", this.tbody).each(function(){
+                if(this.checked){
+                    var tr = this.parentNode.parentNode;
+                    var id = $("td[name='id']", tr).attr("value");
+                    ids.push(id);
+                }
+            });
+            return ids.join(",");
+        },
+
 
         // 添加Grid事件处理
         addGridEvent: function() {          

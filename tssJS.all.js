@@ -4542,17 +4542,20 @@
         },
 
         getCheckedRows: function() {
-            var ids = [];
+            return this.getCheckedRowsValue("id").join(",");
+        },
+
+        getCheckedRowsValue: function(field) {
+            var result = [];
             $("input[name='grid_cb']", this.tbody).each(function(){
                 if(this.checked){
                     var tr = this.parentNode.parentNode;
-                    var id = $("td[name='id']", tr).attr("value");
-                    ids.push(id);
+                    var fValue = $("td[name='" + field + "']", tr).attr("value");
+                    result.push(fValue);
                 }
             });
-            return ids.join(",");
+            return result;
         },
-
 
         // 添加Grid事件处理
         addGridEvent: function() {          

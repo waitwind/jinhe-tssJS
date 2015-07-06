@@ -1890,7 +1890,54 @@
 });
 
 
-/* Alert/Confirm/Prompt */
+;(function($) {
+
+    var setHeight = function(tipEL, direction) {
+        var popH = parseInt(tipEL.style.height);
+        if (direction == "up") {
+            if (popH <= 100) {
+                $(tipEL).css("height", (popH + 4) + "px");
+            } else {
+                clearInterval(show);
+            }
+        }
+        if (direction == "down") {
+            if (popH >= 4) {
+                $(tipEL).css("height", (popH - 4) + "px");
+            } else {
+                clearInterval(hide);
+                $(tipEL).hide();
+            }
+        }
+    }
+
+    $.tssTip = function(content, title) {
+        var $tipEL = $("#tssTip");
+        if(!$tipEL.length) {
+            var el = $.createElement("div", null, "tssTip");
+            var html = [];
+            html.push('<div class="title">' + (title || '消息提醒') + '<span class="close" onclick="$.tssTip()">×</span></div>');
+            html.push('<div class="content">' + content + '</div>');
+            $tipEL = $(el);
+            $tipEL.html(html.join("\n"));
+            $tipEL.css("height", '0');
+
+            $(document.body).appendChild(el);
+        }
+
+        var popH = parseInt($tipEL[0].style.height);
+        if (popH == 0) {
+            $tipEL.show(true);
+            show = setInterval( function() { setHeight($tipEL[0], 'up'); }, 20);
+        } else {
+            hide = setInterval( function() { setHeight($tipEL[0], 'down'); }, 20);
+        }
+    }
+
+})(tssJS);
+
+
+/* Tip/Alert/Confirm/Prompt */
 (function($) {
 
     var popupBox = function(title, callback) {
@@ -1924,6 +1971,15 @@
     closeBox = function() {
         $("#alert_box").hide().remove();
         $.hideWaitingLayer();
+    };
+
+    // content：内容，title：对话框标题  
+    $.tip = function(content, title, callback) {
+        var boxEl = popupBox(title || '消息提醒');
+        $(".content", boxEl).addClass("tip");
+        $(".btbox", boxEl).hide();
+        $(".content .message", boxEl).html(content);
+        $(boxEl).css("width", "250px").css("position", "fixed").css("right", "1px").css("bottom", "1px").css("top", "").css("left", "");
     };
 
     // content：内容，title：对话框标题，callback：回调函数    

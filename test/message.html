@@ -30,43 +30,18 @@
             $targetEl.css("left", x + "px").css("top", y + "px").css("width", w + "px");
             $targetEl.notice(info);
         }
+
+ 
+window.onload = function() { //加载
+    $.tssTip("您有新的消息没有查收,没有什么能够阻挡，你对自由的向往。");
+
+    $.tip("您有新的消息没有查收");
+}
+
     </script>
 
 </head>
 <body>
-<!--
-<div id="alert_box" class="moveable" style="position: fixed; z-index: 99999; top: 116px; left: 580px; width:300px;">
-    <h1 class="title">提示</h1>
-    <span class="close"></span>
-    <div class="content alert">
-        <div class="message">欢迎来到helloweba.com</div>
-        <div class="btbox"><input type="button" value="确 定" class="ok"></div>
-    </div>
-
-
-    <h1 class="title">输入框</h1>
-    <span class="close"></span>
-    <div class="content prompt">
-        <div class="message">请填写:<br><input type="text"></div>
-        <div class="btbox">
-            <input type="button" value="确 定" class="ok"> &nbsp;
-            <input type="button" value="取 消" class="cancel">
-        </div>
-    </div>
-
-
-    <h1 class="title">确认框</h1>
-    <span class="close"></span>
-    <div class="content confirm">
-        <div class="message">你确认此操作吗?</div>
-        <div class="btbox">
-            <input type="button" value="确 定" class="ok"> &nbsp;
-            <input type="button" value="取 消" class="cancel">
-        </div>
-    </div>
-
-</div>
--->
 
     <div id="xxx" style="position:absolute; border:1px solid red;">没有什么能够阻挡，你对自由的向往。天马行空的生涯，你的心了无牵挂。穿过幽暗的岁月，也曾感到仿徨。当你低头的瞬间，才发觉脚下的路。心中那自由的世界，如此的清澈高远，盛开着永不凋零，蓝莲花。</div>
 
@@ -103,5 +78,40 @@
         });
  
     </script>  
+
+<!--
+<div id="alert_box" class="moveable" style="position: fixed; z-index: 99999; top: 116px; left: 580px; width:300px;">
+    <h1 class="title">提示</h1>
+    <span class="close"></span>
+    <div class="content alert">
+        <div class="message">欢迎来到helloweba.com</div>
+        <div class="btbox"><input type="button" value="确 定" class="ok"></div>
+    </div>
+
+
+    <h1 class="title">输入框</h1>
+    <span class="close"></span>
+    <div class="content prompt">
+        <div class="message">请填写:<br><input type="text"></div>
+        <div class="btbox">
+            <input type="button" value="确 定" class="ok"> &nbsp;
+            <input type="button" value="取 消" class="cancel">
+        </div>
+    </div>
+
+
+    <h1 class="title">确认框</h1>
+    <span class="close"></span>
+    <div class="content confirm">
+        <div class="message">你确认此操作吗?</div>
+        <div class="btbox">
+            <input type="button" value="确 定" class="ok"> &nbsp;
+            <input type="button" value="取 消" class="cancel">
+        </div>
+    </div>
+
+</div>
+-->
+
 </body>
 </html>

@@ -34,6 +34,9 @@
 
 	$.assertEquals(true,  $.isNullOrEmpty( " " ) );
 
+	console.log($.now());
+	console.log($.now(true));
+
 	var json = '{"x":"1", "y":"2"}';
 	var data = $.parseJSON(json);
 	$.assertEquals("12", data["x"] + data["y"], "$.parseJSON(json) error.");

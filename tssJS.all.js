@@ -342,7 +342,10 @@
             },
 
             // 获取当前时间的便捷函数
-            now: function() {
+            now: function(format) {
+                if(format) {
+                    return new Date().format('yyyy-MM-dd hh:mm:ss');
+                }
                 return (new Date()).getTime();
             },
 

@@ -691,6 +691,16 @@
 ; (function($) {
     $.extend({
 
+        radioValue: function(name) {
+            var value;
+            $("input[name='" + name + "'").each(function(i, item) {
+                if(item.checked) {
+                    value = item.value;
+                }
+            });
+            return value;
+        },
+
         hasClass: function(el, cn) {
             var reg = new RegExp('(\\s|^)' + cn + '(\\s|$)');
             return (' ' + el.className + ' ').match(reg);
@@ -823,7 +833,7 @@
                 $.setOpacity(waitingDiv, 33);
             }
             else {
-                waitingObj.css("display", "block");
+                waitingObj.show(true);
             }
 
             $.waitingLayerCount ++;
@@ -834,7 +844,7 @@
 
             var waitingObj = $("#_waiting");
             if( waitingObj.length > 0 && $.waitingLayerCount <= 0 ) {
-                waitingObj.css("display", "none");
+                waitingObj.hide();
             }
         }
 
@@ -1365,9 +1375,7 @@
             var oThis = this;
 
             try {
-                if(this.waiting) {
-                    $.showWaitingLayer();
-                }
+                this.waiting && $.showWaitingLayer();
 
                 this.xmlhttp.onreadystatechange = function() {
                     if(oThis.xmlhttp.readyState == 4) {
@@ -1380,13 +1388,13 @@
                         response.statusText   = oThis.xmlhttp.statusText;
 
                         if(oThis.isAbort) {
-                            $.hideWaitingLayer();
+                            if(oThis.waiting) $.hideWaitingLayer();
                         }
                         else {
                             setTimeout( function() {
                                 oThis.abort();
 
-                                $.hideWaitingLayer();
+                                if(oThis.waiting) $.hideWaitingLayer();
                                 oThis.onload(response);
 
                             }, 100);
@@ -1403,7 +1411,7 @@
                 this.xmlhttp.send(this.requestBody);
             } 
             catch (e) {
-                $.hideWaitingLayer();
+                if(oThis.waiting) $.hideWaitingLayer();
 
                 var result = {
                     dataType: _HTTP_RESPONSE_DATA_TYPE_EXCEPTION,
@@ -4118,7 +4126,7 @@
 
     $.G = function(id, data) {
         var grid = GridCache[id];
-        if( grid == null || data ) {
+        if( data ) {
             grid = new $.Grid($1(id), data);
             GridCache[grid.id] = grid;  
         }
@@ -4372,7 +4380,7 @@
     Grid.prototype = {
         load: function(data, append) {
             if("object" != typeof(data) || data.nodeType != $.XML._NODE_TYPE_ELEMENT) {
-                $.alert("传入的Grid数据有问题。")  
+                return $.alert("传入的Grid数据有问题。")  
             } 
 
             // 初始化变量

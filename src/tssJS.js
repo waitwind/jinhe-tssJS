@@ -691,6 +691,16 @@
 ; (function($) {
     $.extend({
 
+        radioValue: function(name) {
+            var value;
+            $("input[name='" + name + "'").each(function(i, item) {
+                if(item.checked) {
+                    value = item.value;
+                }
+            });
+            return value;
+        },
+
         hasClass: function(el, cn) {
             var reg = new RegExp('(\\s|^)' + cn + '(\\s|$)');
             return (' ' + el.className + ' ').match(reg);
@@ -823,7 +833,7 @@
                 $.setOpacity(waitingDiv, 33);
             }
             else {
-                waitingObj.css("display", "block");
+                waitingObj.show(true);
             }
 
             $.waitingLayerCount ++;
@@ -834,7 +844,7 @@
 
             var waitingObj = $("#_waiting");
             if( waitingObj.length > 0 && $.waitingLayerCount <= 0 ) {
-                waitingObj.css("display", "none");
+                waitingObj.hide();
             }
         }
 

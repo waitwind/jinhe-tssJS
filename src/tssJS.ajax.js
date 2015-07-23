@@ -188,9 +188,7 @@
             var oThis = this;
 
             try {
-                if(this.waiting) {
-                    $.showWaitingLayer();
-                }
+                this.waiting && $.showWaitingLayer();
 
                 this.xmlhttp.onreadystatechange = function() {
                     if(oThis.xmlhttp.readyState == 4) {
@@ -203,13 +201,13 @@
                         response.statusText   = oThis.xmlhttp.statusText;
 
                         if(oThis.isAbort) {
-                            $.hideWaitingLayer();
+                            if(oThis.waiting) $.hideWaitingLayer();
                         }
                         else {
                             setTimeout( function() {
                                 oThis.abort();
 
-                                $.hideWaitingLayer();
+                                if(oThis.waiting) $.hideWaitingLayer();
                                 oThis.onload(response);
 
                             }, 100);
@@ -226,7 +224,7 @@
                 this.xmlhttp.send(this.requestBody);
             } 
             catch (e) {
-                $.hideWaitingLayer();
+                if(oThis.waiting) $.hideWaitingLayer();
 
                 var result = {
                     dataType: _HTTP_RESPONSE_DATA_TYPE_EXCEPTION,

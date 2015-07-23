@@ -9,7 +9,7 @@
 
     $.G = function(id, data) {
         var grid = GridCache[id];
-        if( grid == null || data ) {
+        if( data ) {
             grid = new $.Grid($1(id), data);
             GridCache[grid.id] = grid;  
         }
@@ -263,7 +263,7 @@
     Grid.prototype = {
         load: function(data, append) {
             if("object" != typeof(data) || data.nodeType != $.XML._NODE_TYPE_ELEMENT) {
-                $.alert("传入的Grid数据有问题。")  
+                return $.alert("传入的Grid数据有问题。")  
             } 
 
             // 初始化变量

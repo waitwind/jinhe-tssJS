@@ -162,6 +162,8 @@
 		$.assertEquals("L1", $1("layout.id").value);
 		$.assertEquals("L1", $$("layout.id").value);
 
+		$.assertEquals("2", $.radioValue("fileType"));
+
 	 }, "tssJS");
 
  	// test Cookie、Query等
@@ -271,6 +273,11 @@
 	</div>
 
 	<input id="layout.id" value="L1"/>
+
+	<div>测试单选按钮：
+		<label><input name="fileType" type="radio" value="1"/> 图片 </label> 
+        <label><input name="fileType" type="radio" value="2" checked="checked"/> 文档 </label> 
+	</div>
 
 </body>
 </html>

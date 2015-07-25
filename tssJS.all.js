@@ -4903,7 +4903,7 @@
 
             _default = $.Query.get("_default") || _default;
             if(_default) {
-                tree.searchNode(_default);
+                tree.searchNode( decodeURI(_default) );
                 if(tree.getActiveTreeNode()) {
                     setTimeout(function() {
                         var callback = tree.onTreeNodeDoubleClick || tree.onTreeNodeActived;

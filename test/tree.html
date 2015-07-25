@@ -49,7 +49,11 @@ function init() {
 		ondata: function() {
 			treeData = this.getResponseJSON();
 			console.log(treeData);
-			var tree3 = $("#tree3").tree(treeData);	
+			var tree3 = $("#tree3").tree(treeData, "node3");	
+
+			tree3.onTreeNodeDoubleClick = function(event) {
+				alert("默认打开树节点：" + tree3.getActiveTreeNode().name);
+			}
 		}
 	});
  
@@ -69,7 +73,7 @@ function init() {
 				console.log(event.node.id);
 			}
 			tree1.onTreeNodeDoubleClick = function(event) {
-				alert("双击树节点：" + event.node.name);
+				alert("双击树节点：" + tree1.getActiveTreeNode().name);
 			}
 			tree1.onTreeNodeMoved = function(event) {
 				console.log(event.dragNode.name);

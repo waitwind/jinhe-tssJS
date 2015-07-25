@@ -4893,22 +4893,33 @@
 
     var TreeCache = {};
 
-    $.T = function(id, data) {
+    $.T = function(id, data, _default) {
         var tree = TreeCache[id];
         if( tree == null && data == null ) return tree;
 
         if( tree == null || data ) {
             tree = new $.Tree($1(id), data);
             TreeCache[id] = tree;   
-        }
+
+            _default = $.Query.get("_default") || _default;
+            if(_default) {
+                tree.searchNode(_default);
+                if(tree.getActiveTreeNode()) {
+                    setTimeout(function() {
+                        var callback = tree.onTreeNodeDoubleClick || tree.onTreeNodeActived;
+                        callback && callback();
+                    }, 100); 
+                }
+            }
+        }   
         
         return tree;
     };
 
     $.fn.extend({
-        tree: function(data) {
+        tree: function(data, _default) {
             if(this.length > 0) {
-               return $.T(this[0].id, data);
+               return $.T(this[0].id, data, _default);
             }
         }
     });

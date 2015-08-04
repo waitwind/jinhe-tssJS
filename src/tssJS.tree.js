@@ -433,7 +433,7 @@
                     .removeClass("checkstate_2_" + this.disabled)
                     .addClass("checkstate_" + this.checkState + "_" + this.disabled);
 
-                var ev = event || {};
+                var ev = window.event || {};
                 ev.node = this;
                 ev.checkState = this.checkState;
                 eventNodeChecked.fire(ev);

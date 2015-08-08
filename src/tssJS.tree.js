@@ -422,6 +422,10 @@
                 $(this.li.a).addClass("active");
             },
 
+            inactive: function() {
+                $(this.li.a).removeClass("active");
+            },
+
             openNode: function() {
                 clickSwich(this);
             },
@@ -497,8 +501,15 @@
             }
         }, 
 
-        setActiveTreeNode: function(id) {
-            var treeNode = this.getTreeNodeById(id);
+        // 如果找不到指定的treeNode，或id为空，则清空原active节点
+        setActiveTreeNode: function(idOrnode) {
+            var activeNode = this.getActiveTreeNode();
+            if(activeNode) {
+                activeNode.inactive();
+            }
+            if(!idOrnode) return;
+
+            var treeNode = idOrnode.active ? idOrnode : this.getTreeNodeById(idOrnode);
             if(treeNode) {
                 treeNode.active();
                 this.scrollTo(treeNode);
@@ -683,14 +694,14 @@
         }
 
         this.next = function() {
-            if(findedNodes.length == 0) {
-                return;
+            var node;
+            if(findedNodes.length) {
+                node = findedNodes[++ currentIndex % findedNodes.length];
             }
-
-            var node = findedNodes[++ currentIndex % findedNodes.length];
-            
-            node.active();
-            tree.scrollTo(node);
+            else {
+                $(tree.el).notice("没有找到名称含有【" + lastSearchStr + "】的树节点。");
+            }
+            tree.setActiveTreeNode(node);
         }
     }
 

@@ -56,11 +56,17 @@
     }
 
 	function func1() {
-		$.F("userForm").updateDataExternal("temp1", "12345678");
+		updateField("temp1", "12345678");
 	}
 
 	function f2(value) {
-		$.F("userForm").updateDataExternal("sex2", value);
+	    updateField("sex2", value);    
+	}
+
+	function updateField(code, value) {
+	    var xform = $.F("userForm");
+	    xform.updateDataExternal(code, value);    
+	    xform.updateData( $1(code) );
 	}
 
     function saveUser(cacheID) {

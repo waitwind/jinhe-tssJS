@@ -605,9 +605,14 @@
         }   
 
         // 当empty = false(表示不允许为空)时，下拉列表的默认值自动取第一项值
-        if( !this.el._value && this.required) {
-            this.setValue(valueList[0]);
-            form.setFieldValue(this.el.id, valueList[0]);
+        if( this.required ) {
+            var oldVal = this.el._value; 
+
+            // 原值为空，或当前的下拉列表已经不包含原值，则重新设值
+            if( !oldVal || !valueList.contains(oldVal) ) {
+                this.setValue(valueList[0]);
+                form.setFieldValue(this.el.id, valueList[0]);
+            }            
         }
         
         this.el.onchange = function() {
@@ -765,25 +770,20 @@
     };
 
     ComboTreeField.prototype = {
+        // 下拉多选树是勾选，不会传入value值，需要直接去取已经选中的树节点
         setValue: function(value) {
-            if(value) {
-                if(this.multiple) {
-                    this.tree.setCheckValues(value.split(','), true);
-                } else {
-                    this.tree.setActiveTreeNode(value);
-                }
-            } else {
-                if(this.multiple) {
-                    value = this.tree.getCheckedIds(false);
-                } else {
-                    value = this.tree.getActiveTreeNodeId();
-                }
-            }
-
             var text;
             if(this.multiple) {
+                if(value) {                   
+                    this.tree.setCheckValues(value.split(','), true);
+                }
+                else {
+                    value = this.tree.getCheckedIds(false);
+                }
                 text = this.tree.getCheckedIds(false, "name");
-            } else {
+            } 
+            else {
+                this.tree.setActiveTreeNode(value);
                 text = this.tree.getActiveTreeNodeName();
             }
 

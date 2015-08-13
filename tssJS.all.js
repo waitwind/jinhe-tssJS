@@ -4059,25 +4059,20 @@
     };
 
     ComboTreeField.prototype = {
+        // 下拉多选树是勾选，不会传入value值，需要直接去取已经选中的树节点
         setValue: function(value) {
-            if(value) {
-                if(this.multiple) {
-                    this.tree.setCheckValues(value.split(','), true);
-                } else {
-                    this.tree.setActiveTreeNode(value);
-                }
-            } else {
-                if(this.multiple) {
-                    value = this.tree.getCheckedIds(false);
-                } else {
-                    value = this.tree.getActiveTreeNodeId();
-                }
-            }
-
             var text;
             if(this.multiple) {
+                if(value) {                   
+                    this.tree.setCheckValues(value.split(','), true);
+                }
+                else {
+                    value = this.tree.getCheckedIds(false);
+                }
                 text = this.tree.getCheckedIds(false, "name");
-            } else {
+            } 
+            else {
+                this.tree.setActiveTreeNode(value);
                 text = this.tree.getActiveTreeNodeName();
             }
 

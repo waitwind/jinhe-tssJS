@@ -171,7 +171,7 @@ var Field = function(info) {
 						 ]);
 
 						// 列表数据加载后刷新下显示值（form生成时，因列表数据还没取到，没法显示下拉控件的值）
-						tssForm.updateDataExternal(field.name, field.defaultValue); 
+						field.defaultValue && tssForm.updateDataExternal(field.name, field.defaultValue); 
 					}			
 				}
 			});

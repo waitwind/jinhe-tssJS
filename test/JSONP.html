@@ -1,13 +1,16 @@
 <html>
 <head>
 
-<script src="tools/tssJS/tssJS.all.js"></script>
-<script src="tools/tssJS/tssJS.jsonp.js"></script>
+<script src="../tssJS.all.js"></script>
+<script src="../src/tssJS.jsonp.js"></script>
 
  <SCRIPT LANGUAGE="JavaScript">
  <!--
 	
-	$.JSONP.getJSON("http://bl00618-l:8088/dms/display/json/GetAllVisitors", {'param1': 'hello jsonp!'}, function(result) { console.log(result.length); });
+	$.JSONP.getJSON("http://localhost:8088/tss/data/jsonp/GetAllVisitors", {'param1': 'hello jsonp!'}, 
+		function(result) { 
+			console.log(result[0]); 
+		});
 
 	/*
 	$.ajax({

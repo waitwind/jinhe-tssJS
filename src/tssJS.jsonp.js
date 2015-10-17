@@ -3,7 +3,7 @@
 /* 
  * 跨域调用支持 
  * $.JSONP.getJSON(
-        "http://bl00618-l:8088/dms/display/json/GetAllVisitors", 
+        "http://www.boubei.com/tss/data/jsonp/GetAllVisitors", 
         {'param1': 'hello jsonp!'}, 
         function(result) { console.log(result.length); }
    );
